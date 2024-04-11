@@ -1,0 +1,61 @@
+package org.thingsboard.domain.tenant.service.impl;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.thingsboard.common.event.DeleteEntityEvent;
+import org.thingsboard.common.event.SaveEntityEvent;
+import org.thingsboard.domain.tenant.model.Merchant;
+import org.thingsboard.domain.tenant.persistence.MerchantDao;
+import org.thingsboard.domain.tenant.service.MerchantService;
+import org.thingsboard.domain.tenant.service.MerchantValidator;
+
+/**
+ * TODO Comment
+ *
+ * @author <a href="mailto:ichensoul@gmail.com">chensoul</a>
+ * @since TODO
+ */
+@RequiredArgsConstructor
+@Service
+public class MerchantServiceImpl implements MerchantService {
+	private final ApplicationEventPublisher eventPublisher;
+	private final MerchantDao merchantDao;
+	private final MerchantValidator merchantValidator;
+
+	@Override
+	public Merchant findMerchantById(Long merchantId) {
+		return merchantDao.findById(merchantId);
+	}
+
+	@Override
+	public Merchant saveMerchant(Merchant merchant) {
+		merchantValidator.validate(merchant);
+		Merchant save = merchantDao.save(merchant);
+
+		eventPublisher.publishEvent(SaveEntityEvent.builder()
+			.entityId(save.getId()).entity(save).created(true).build());
+		return save;
+	}
+
+	@Override
+	public void deleteMerchant(Merchant merchant) {
+		if (merchant != null) {
+			merchantDao.removeById(merchant);
+			eventPublisher.publishEvent(DeleteEntityEvent.builder().tenantId(merchant.getTenantId())
+				.entity(merchant).entityId(merchant.getId()).build());
+		}
+	}
+
+	@Override
+	public void deleteMerchantsByTenantId(String tenantId) {
+		merchantDao.removeByTenantId(tenantId);
+	}
+
+	@Override
+	public Page<Merchant> findTenants(Pageable pageable, String tenantId, String search) {
+		return merchantDao.findTenants(pageable, tenantId, search);
+	}
+}

@@ -1,0 +1,108 @@
+server:
+  port: 8090
+
+spring.main.allow-circular-references: "true"
+spring.mvc.async.request-timeout: "${SPRING_MVC_ASYNC_REQUEST_TIMEOUT:30000}" # The default timeout for asynchronous requests in milliseconds
+spring.mvc.pathmatch.matching-strategy: "ANT_PATH_MATCHER" # For endpoints matching in Swagger
+
+#Spring doc common parameters
+springdoc:
+  # If false swagger API docs will be unavailable
+  api-docs.enabled: "${SWAGGER_ENABLED:true}"
+  # Swagger default produces media-type
+  default-produces-media-type: "${SWAGGER_DEFAULT_PRODUCES_MEDIA_TYPE:application/json}"
+
+# Swagger common parameters
+swagger:
+  # General swagger match pattern of swagger UI links
+  api_path: "${SWAGGER_API_PATH:/api/**}"
+  # General swagger match pattern path of swagger UI links
+  security_path_regex: "${SWAGGER_SECURITY_PATH_REGEX:/api/.*}"
+  # Nonsecurity API path match pattern of swagger UI links
+  non_security_path_regex: "${SWAGGER_NON_SECURITY_PATH_REGEX:/api/(?:noauth|v1)/.*}"
+  # The title on the API doc UI page
+  title: "${SWAGGER_TITLE:ThingsBoard REST API}"
+  # The description on the API doc UI page
+  description: "${SWAGGER_DESCRIPTION: ThingsBoard open-source IoT platform REST API documentation.}"
+  contact:
+    # The contact name on the API doc UI page
+    name: "${SWAGGER_CONTACT_NAME:ThingsBoard team}"
+    # The contact URL on the API doc UI page
+    url: "${SWAGGER_CONTACT_URL:https://thingsboard.io}"
+    # The contact email on the API doc UI page
+    email: "${SWAGGER_CONTACT_EMAIL:info@thingsboard.io}"
+  license:
+    # The license title on the API doc UI page
+    title: "${SWAGGER_LICENSE_TITLE:Apache License Version 2.0}"
+    # Link to the license body on the API doc UI page
+    url: "${SWAGGER_LICENSE_URL:https://github.com/thingsboard/thingsboard/blob/master/LICENSE}"
+  # The version of the API doc to display. Default to the package version.
+  version: "${SWAGGER_VERSION:}"
+
+
+# SQL DAO Configuration parameters
+spring:
+  datasource:
+    # Database driver for Spring JPA - org.postgresql.Driver
+    driverClassName: "${SPRING_DRIVER_CLASS_NAME:com.mysql.cj.jdbc.Driver}"
+    # Database connection URL
+    url: "${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/sample}"
+    # Database user name
+    username: "${SPRING_DATASOURCE_USERNAME:root}"
+    # Database user password
+    password: "${SPRING_DATASOURCE_PASSWORD:rootpwd}"
+    hikari:
+      # This property controls the amount of time that a connection can be out of the pool before a message is logged indicating a possible connection leak. A value of 0 means leak detection is disabled
+      leakDetectionThreshold: "${SPRING_DATASOURCE_HIKARI_LEAK_DETECTION_THRESHOLD:0}"
+      # This property increases the number of connections in the pool as demand increases. At the same time, the property ensures that the pool doesn't grow to the point of exhausting a system's resources, which ultimately affects an application's performance and availability
+      maximumPoolSize: "${SPRING_DATASOURCE_MAXIMUM_POOL_SIZE:16}"
+      registerMbeans: "${SPRING_DATASOURCE_HIKARI_REGISTER_MBEANS:false}" # true - enable MBean to diagnose pools state via JMX
+
+spring.data.redis:
+  host: localhost
+  password: dev-pwd
+
+mybatis-plus:
+  global-config:
+    db-config:
+      id-type: AUTO
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# Security parameters
+security:
+  # Enable/disable access to Tenant Administrators JWT token by System Administrator or Customer Users JWT token by Tenant Administrator
+  user_token_access_enabled: "${SECURITY_USER_TOKEN_ACCESS_ENABLED:true}"
+  # Enable/disable case-sensitive username login
+  user_login_case_sensitive: "${SECURITY_USER_LOGIN_CASE_SENSITIVE:true}"
+  claim:
+    # Enable/disable claiming devices; if false -> the device's [claimingAllowed] SERVER_SCOPE attribute must be set to [true] to allow claiming the specific device
+    allowClaimingByDefault: "${SECURITY_CLAIM_ALLOW_CLAIMING_BY_DEFAULT:true}"
+    # Time allowed to claim the device in milliseconds
+    duration: "${SECURITY_CLAIM_DURATION:86400000}" # 1 minute, note this value must equal claimDevices.timeToLiveInMinutes value
+  basic:
+    # Enable/Disable basic security options
+    enabled: "${SECURITY_BASIC_ENABLED:false}"
+  oauth2:
+    # Redirect URL where access code from external user management system will be processed
+    loginProcessingUrl: "${SECURITY_OAUTH2_LOGIN_PROCESSING_URL:/login/oauth2/code/}"
+    githubMapper:
+      # The email addresses that will be mapped from the URL
+      emailUrl: "${SECURITY_OAUTH2_GITHUB_MAPPER_EMAIL_URL_KEY:https://api.github.com/user/emails}"
+  java_cacerts:
+    # CA certificates keystore default path. Typically this keystore is at JAVA_HOME/lib/security/cacerts
+    path: "${SECURITY_JAVA_CACERTS_PATH:${java.home}/lib/security/cacerts}"
+    # The password of the cacerts keystore file
+    password: "${SECURITY_JAVA_CACERTS_PASSWORD:changeit}"
+
+# Mail settings parameters
+mail:
+  oauth2:
+    # Interval for checking refresh token expiration in seconds(by default, 1 day).
+    refreshTokenCheckingInterval: "${REFRESH_TOKEN_EXPIRATION_CHECKING_INTERVAL:86400}"
+
+logging:
+  level:
+#    org.springframework.security: trace
+    org.thingsboard: trace
+
