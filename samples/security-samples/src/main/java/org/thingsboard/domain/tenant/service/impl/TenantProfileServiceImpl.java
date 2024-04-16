@@ -30,7 +30,7 @@ public class TenantProfileServiceImpl implements TenantProfileService {
 
 	@Override
 	public TenantProfile findOrCreateDefaultTenantProfile(String tenantId) {
-		TenantProfile defaultTenantProfile = findDefaultTenantProfile(tenantId);
+		TenantProfile defaultTenantProfile = findDefaultTenantProfile();
 		if (defaultTenantProfile == null) {
 			defaultTenantProfile = new TenantProfile();
 			defaultTenantProfile.setIsDefault(true);
@@ -72,8 +72,8 @@ public class TenantProfileServiceImpl implements TenantProfileService {
 	}
 
 	@Override
-	public TenantProfile findDefaultTenantProfile(String tenantId) {
-		return tenantProfileDao.findDefaultTenantProfile(tenantId);
+	public TenantProfile findDefaultTenantProfile() {
+		return tenantProfileDao.findDefaultTenantProfile();
 	}
 
 	@Override
@@ -82,7 +82,7 @@ public class TenantProfileServiceImpl implements TenantProfileService {
 
 		if (tenantProfile != null && !tenantProfile.getIsDefault()) {
 			tenantProfile.setIsDefault(true);
-			TenantProfile previousDefaultTenantProfile = findDefaultTenantProfile(tenantId);
+			TenantProfile previousDefaultTenantProfile = findDefaultTenantProfile();
 			if (previousDefaultTenantProfile == null) {
 				saveTenantProfile(tenantId, tenantProfile);
 			} else if (!previousDefaultTenantProfile.getId().equals(tenantProfile.getId())) {

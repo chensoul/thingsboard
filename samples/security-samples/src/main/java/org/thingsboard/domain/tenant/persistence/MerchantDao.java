@@ -25,7 +25,7 @@ import org.thingsboard.domain.tenant.model.Merchant;
  * The Interface CustomerDao.
  */
 public interface MerchantDao extends Dao<Merchant> {
-	Optional<Merchant> findMerchantsByTenantIdAndName(String tenantId, String name);
+	Optional<Merchant> findMerchantByTenantIdAndName(String tenantId, String name);
 
 	void removeByTenantId(String tenantId);
 

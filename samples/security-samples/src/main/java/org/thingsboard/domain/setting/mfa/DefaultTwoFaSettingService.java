@@ -38,9 +38,9 @@ import org.thingsboard.domain.setting.mfa.provider.TwoFaProvider;
 import org.thingsboard.domain.setting.mfa.provider.TwoFaProviderConfig;
 import org.thingsboard.domain.setting.mfa.provider.TwoFaProviderType;
 import org.thingsboard.domain.setting.security.SecuritySettingService;
-import org.thingsboard.domain.setting.system.model.SystemSetting;
-import static org.thingsboard.domain.setting.system.model.SystemSettingType.MFA;
-import org.thingsboard.domain.setting.system.service.SystemSettingService;
+import org.thingsboard.domain.setting.system.SystemSetting;
+import org.thingsboard.domain.setting.system.SystemSettingService;
+import static org.thingsboard.domain.setting.system.SystemSettingType.MFA;
 import org.thingsboard.domain.user.model.User;
 import org.thingsboard.domain.user.model.UserSetting;
 import org.thingsboard.domain.user.model.UserSettingType;
@@ -206,7 +206,7 @@ public class DefaultTwoFaSettingService implements TwoFaSettingService {
 
 	@Override
 	public boolean checkVerificationCode(SecurityUser user, String verificationCode, TwoFaConfig accountConfig, boolean checkLimits) {
-		if (!userService.findUserCredentialsByUserId(user.getId()).isEnabled()) {
+		if (!userService.findUserCredentialByUserId(user.getId()).isEnabled()) {
 			throw new ThingsboardException("User is disabled", ThingsboardErrorCode.AUTHENTICATION);
 		}
 

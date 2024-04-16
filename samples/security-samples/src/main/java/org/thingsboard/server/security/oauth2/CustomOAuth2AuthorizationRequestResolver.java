@@ -43,7 +43,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.thingsboard.common.util.MiscUtils;
-import org.thingsboard.domain.oauth2.OAuth2Service;
+import org.thingsboard.domain.oauth2.service.OAuth2Service;
 
 @Service
 @Slf4j
@@ -120,11 +120,11 @@ public class CustomOAuth2AuthorizationRequestResolver implements OAuth2Authoriza
 		attributes.put(org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.REGISTRATION_ID, clientRegistration.getRegistrationId());
 		if (!StringUtils.isEmpty(appPackage)) {
 			if (StringUtils.isEmpty(appToken)) {
-				throw new IllegalArgumentException("Invalid application token.");
+				throw new IllegalArgumentException("Invalid application token");
 			} else {
 				String appSecret = this.oAuth2Service.findAppSecret(registrationId, appPackage);
 				if (StringUtils.isEmpty(appSecret)) {
-					throw new IllegalArgumentException("Invalid package: " + appPackage + ". No application secret found for Client Registration with given application package.");
+					throw new IllegalArgumentException("Invalid package: " + appPackage + ". No application secret found for Client Registration with given application package");
 				}
 				String callbackUrlScheme = this.oAuth2AppTokenFactory.validateTokenAndGetCallbackUrlScheme(appPackage, appToken, appSecret);
 				attributes.put(OAuth2ParameterNames.CALLBACK_URL_SCHEME, callbackUrlScheme);

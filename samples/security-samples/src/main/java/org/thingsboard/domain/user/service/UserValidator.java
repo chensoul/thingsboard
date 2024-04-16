@@ -1,9 +1,11 @@
 package org.thingsboard.domain.user.service;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.thingsboard.common.exception.DataValidationException;
+import org.thingsboard.common.exception.ThingsboardErrorCode;
+import org.thingsboard.common.exception.ThingsboardException;
 import org.thingsboard.common.model.EntityType;
 import org.thingsboard.common.service.DataValidator;
 import org.thingsboard.domain.tenant.model.Merchant;
@@ -13,6 +15,7 @@ import org.thingsboard.domain.user.model.Authority;
 import org.thingsboard.domain.user.model.User;
 import org.thingsboard.domain.user.persistence.MybatisUserDao;
 import static org.thingsboard.server.security.SecurityUser.SYS_TENANT_ID;
+import static org.thingsboard.server.security.SecurityUtils.getCurrentUser;
 
 /**
  * TODO Comment
@@ -20,12 +23,12 @@ import static org.thingsboard.server.security.SecurityUser.SYS_TENANT_ID;
  * @author <a href="mailto:ichensoul@gmail.com">chensoul</a>
  * @since TODO
  */
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Component
 public class UserValidator extends DataValidator<User> {
-	private MybatisUserDao userDao;
-	private MerchantDao merchantDao;
-	private TenantDao tenantDao;
+	private final MybatisUserDao userDao;
+	private final MerchantDao merchantDao;
+	private final TenantDao tenantDao;
 
 	protected void validateCreate(User user) {
 		if (!user.getTenantId().equals(SYS_TENANT_ID)) {
@@ -111,6 +114,15 @@ public class UserValidator extends DataValidator<User> {
 			} else if (!merchant.getTenantId().equals(tenantId)) {
 				throw new DataValidationException("User can't be assigned to customer from different tenant!");
 			}
+		}
+	}
+
+	@Override
+	public void validateDelete(User user) {
+		super.validateDelete(user);
+
+		if (user.getAuthority() == Authority.SYS_ADMIN && getCurrentUser().getId().equals(user.getId())) {
+			throw new ThingsboardException("Sysadmin is not allowed to delete himself", ThingsboardErrorCode.PERMISSION_DENIED);
 		}
 	}
 }

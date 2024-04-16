@@ -17,7 +17,6 @@ package org.thingsboard.domain.setting.jwt;
 
 public interface JwtSettingService {
 
-	String TOKEN_SIGNING_KEY_DEFAULT = "defaultSigningKey";
 
 	JwtSetting getJwtSetting();
 

@@ -2,10 +2,11 @@ package org.thingsboard.domain.notification.persistence;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+import org.thingsboard.common.dao.aspect.SqlDao;
 import org.thingsboard.common.dao.DaoUtil;
 import org.thingsboard.common.dao.MybatisAbstractDao;
 import org.thingsboard.domain.notification.Notification;
@@ -17,10 +18,11 @@ import org.thingsboard.domain.notification.NotificationStatus;
  * @author <a href="mailto:ichensoul@gmail.com">chensoul</a>
  * @since TODO
  */
-@AllArgsConstructor
+@SqlDao
+@RequiredArgsConstructor
 @Component
 public class MybatisNotificationDao extends MybatisAbstractDao<NotificationEntity, Notification> implements NotificationDao {
-	private NotificationMapper mapper;
+	private final NotificationMapper mapper;
 
 	@Override
 	protected Class<NotificationEntity> getEntityClass() {

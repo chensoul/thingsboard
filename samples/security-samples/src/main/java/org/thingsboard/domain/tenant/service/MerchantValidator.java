@@ -38,7 +38,7 @@ public class MerchantValidator extends DataValidator<Merchant> {
 	protected void validateCreate(Merchant merchant) {
 		validateEntityCountPerTenant(merchant.getTenantId(), EntityType.MERCHANT);
 
-		merchantDao.findMerchantsByTenantIdAndName(merchant.getTenantId(), merchant.getName()).ifPresent(
+		merchantDao.findMerchantByTenantIdAndName(merchant.getTenantId(), merchant.getName()).ifPresent(
 			c -> {
 				throw new DataValidationException("Customer with such title already exists!");
 			}
@@ -47,7 +47,7 @@ public class MerchantValidator extends DataValidator<Merchant> {
 
 	@Override
 	protected Merchant validateUpdate(Merchant merchant) {
-		Optional<Merchant> customerOpt = merchantDao.findMerchantsByTenantIdAndName(merchant.getTenantId(), merchant.getName());
+		Optional<Merchant> customerOpt = merchantDao.findMerchantByTenantIdAndName(merchant.getTenantId(), merchant.getName());
 		customerOpt.ifPresent(
 			c -> {
 				if (!c.getId().equals(merchant.getId())) {

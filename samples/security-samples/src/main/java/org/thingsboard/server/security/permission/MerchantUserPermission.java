@@ -32,7 +32,7 @@ public class MerchantUserPermission extends AbstractPermission {
 	}
 
 	private static final PermissionChecker customerPermissionChecker =
-		new PermissionChecker.GenericPermissionChecker(Operation.GET) {
+		new PermissionChecker.GenericPermissionChecker(Operation.READ) {
 
 			@Override
 			@SuppressWarnings("unchecked")
@@ -57,7 +57,7 @@ public class MerchantUserPermission extends AbstractPermission {
 				return false;
 			}
 
-			if (Operation.GET.equals(operation)) {
+			if (Operation.READ.equals(operation)) {
 				return true;
 			}
 

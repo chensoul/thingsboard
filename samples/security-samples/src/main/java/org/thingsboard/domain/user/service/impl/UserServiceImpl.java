@@ -10,7 +10,6 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -34,20 +33,21 @@ import org.thingsboard.common.model.HasId;
 import org.thingsboard.common.util.JacksonUtil;
 import static org.thingsboard.common.validation.Validator.validateString;
 import org.thingsboard.domain.audit.ActionType;
-import static org.thingsboard.domain.user.contoller.UserController.ACTIVATE_URL_PATTERN;
+import org.thingsboard.domain.notification.channel.mail.MailService;
+import org.thingsboard.domain.setting.security.SecuritySettingService;
+import static org.thingsboard.domain.user.UserController.ACTIVATE_URL_PATTERN;
+import org.thingsboard.domain.user.event.UserCredentialInvalidationEvent;
 import org.thingsboard.domain.user.model.Authority;
 import org.thingsboard.domain.user.model.User;
 import org.thingsboard.domain.user.model.UserCredential;
 import org.thingsboard.domain.user.persistence.UserCredentialDao;
 import org.thingsboard.domain.user.persistence.UserDao;
+import org.thingsboard.domain.user.persistence.UserSettingDao;
 import org.thingsboard.domain.user.service.UserCredentialValidator;
 import org.thingsboard.domain.user.service.UserService;
 import org.thingsboard.domain.user.service.UserValidator;
-import org.thingsboard.server.mail.MailService;
-import static org.thingsboard.server.security.SecurityUtils.getCurrentUser;
-import org.thingsboard.domain.user.event.UserCredentialInvalidationEvent;
 import org.thingsboard.server.security.SecurityUser;
-import org.thingsboard.domain.setting.security.SecuritySettingService;
+import static org.thingsboard.server.security.SecurityUtils.getCurrentUser;
 
 /**
  * TODO Comment
@@ -76,6 +76,7 @@ public class UserServiceImpl implements UserService {
 	private final UserCredentialValidator userCredentialValidator;
 	private final UserCredentialDao userCredentialDao;
 	private final UserDao userDao;
+	private final UserSettingDao userSettingDao;
 
 	@Override
 	public User findUserById(Serializable id) {
@@ -99,7 +100,7 @@ public class UserServiceImpl implements UserService {
 
 		boolean sendEmail = user.getId() == null && sendActivationMail;
 		if (sendEmail) {
-			UserCredential userCredential = findUserCredentialsByUserId(savedUser.getId());
+			UserCredential userCredential = findUserCredentialByUserId(savedUser.getId());
 			String baseUrl = securitySettingService.getBaseUrl(request);
 			String activateUrl = String.format(ACTIVATE_URL_PATTERN, baseUrl,
 				userCredential.getActivateToken());
@@ -126,8 +127,6 @@ public class UserServiceImpl implements UserService {
 		User savedUser = userDao.save(user);
 
 		if (user.getId() == null) {
-//			countService.publishCountEntityEvictEvent(savedUser.getTenantId(), EntityType.USER);
-
 			UserCredential userCredential = new UserCredential();
 			userCredential.setEnabled(false);
 			userCredential.setActivateToken(generateSafeToken(DEFAULT_TOKEN_LENGTH));
@@ -144,35 +143,28 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public void deleteUser(User user) {
-		if (user.getAuthority() == Authority.SYS_ADMIN && getCurrentUser().getId().equals(user.getId())) {
-			throw new ThingsboardException("Sysadmin is not allowed to delete himself", ThingsboardErrorCode.PERMISSION_DENIED);
-		}
+		userValidator.validateDelete(user);
 
-		Objects.requireNonNull(user, "User is null");
 		userCredentialDao.removeByUserId(user.getId());
-//		userAuthSettingsDao.removeByUserId(userId);
-
+		userSettingDao.removeByUserId(user.getId());
 		userDao.removeById(user.getId());
 
 		eventPublisher.publishEvent(new UserCredentialInvalidationEvent(user.getId()));
-//		countService.publishCountEntityEvictEvent(tenantId, EntityType.USER);
-		eventPublisher.publishEvent(DeleteEntityEvent.builder()
-			.tenantId(user.getTenantId())
-			.entity(user).build());
+		eventPublisher.publishEvent(DeleteEntityEvent.builder().tenantId(user.getTenantId()).entity(user).build());
 	}
 
 	@Override
-	public UserCredential findUserCredentialsByUserId(Serializable userId) {
+	public UserCredential findUserCredentialByUserId(Serializable userId) {
 		return userCredentialDao.findByUserId((Long) userId);
 	}
 
 	@Override
-	public UserCredential findUserCredentialsByActivateToken(String activateToken) {
+	public UserCredential findUserCredentialByActivateToken(String activateToken) {
 		return userCredentialDao.findByActivateToken(activateToken);
 	}
 
 	@Override
-	public UserCredential findUserCredentialsByResetToken(String resetToken) {
+	public UserCredential findUserCredentialByResetToken(String resetToken) {
 		return userCredentialDao.findByResetToken(resetToken);
 	}
 
@@ -182,17 +174,17 @@ public class UserServiceImpl implements UserService {
 		if (user == null) {
 			throw new UsernameNotFoundException(String.format("Unable to find user by email [%s]", email));
 		}
-		UserCredential userCredential = findUserCredentialsByUserId(user.getId());
+		UserCredential userCredential = findUserCredentialByUserId(user.getId());
 		if (!userCredential.isEnabled()) {
 			throw new DisabledException(String.format("User credentials not enabled [%s]", email));
 		}
 		userCredential.setResetToken(generateSafeToken(DEFAULT_TOKEN_LENGTH));
-		return saveUserCredentials(userCredential);
+		return saveUserCredential(userCredential);
 	}
 
 	@Override
-	public UserCredential activateUserCredentials(String activateToken, String encodedPassword) {
-		UserCredential userCredential = findUserCredentialsByActivateToken(activateToken);
+	public UserCredential activateUserCredential(String activateToken, String encodedPassword) {
+		UserCredential userCredential = findUserCredentialByActivateToken(activateToken);
 		if (userCredential == null) {
 			throw new DataValidationException(String.format("Unable to find user credentials by activateToken [%s]", activateToken));
 		}
@@ -205,11 +197,11 @@ public class UserServiceImpl implements UserService {
 		if (userCredential.getPassword() != null) {
 			updatePasswordHistory(userCredential);
 		}
-		return saveUserCredentials(userCredential);
+		return saveUserCredential(userCredential);
 	}
 
 	@Override
-	public UserCredential saveUserCredentials(UserCredential userCredential) {
+	public UserCredential saveUserCredential(UserCredential userCredential) {
 		userCredentialValidator.validate(userCredential);
 
 		UserCredential result = userCredentialDao.save(userCredential);
@@ -223,9 +215,9 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public void setUserCredentialsEnabled(Serializable userId, boolean userCredentialsEnabled) {
-		UserCredential userCredential = findUserCredentialsByUserId(userId);
+		UserCredential userCredential = findUserCredentialByUserId(userId);
 		userCredential.setEnabled(userCredentialsEnabled);
-		saveUserCredentials(userCredential);
+		saveUserCredential(userCredential);
 
 		User user = findUserById(userId);
 		JsonNode extra = user.getExtra();
@@ -238,7 +230,7 @@ public class UserServiceImpl implements UserService {
 		if (userCredentialsEnabled) {
 			resetFailedLoginAttempts(user);
 		} else {
-			eventPublisher.publishEvent(new UserCredentialInvalidationEvent(userId));
+			eventPublisher.publishEvent(new UserCredentialInvalidationEvent((Long) userId));
 		}
 		saveUser(user);
 	}
@@ -273,14 +265,14 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void resetFailedLoginAttempts(Serializable userId) {
+	public void resetFailedLoginAttempt(Serializable userId) {
 		User user = findUserById(userId);
 		resetFailedLoginAttempts(user);
 		saveUser(user);
 	}
 
 	@Override
-	public int increaseFailedLoginAttempts(Serializable userId) {
+	public int increaseFailedLoginAttempt(Serializable userId) {
 		User user = findUserById(userId);
 		int failedLoginAttempts = increaseFailedLoginAttempts(user);
 		saveUser(user);
@@ -304,23 +296,23 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserCredential requestExpiredPasswordReset(Serializable id) {
-		UserCredential userCredential = findUserCredentialsByUserId(id);
+		UserCredential userCredential = findUserCredentialByUserId(id);
 		if (!userCredential.isEnabled()) {
 			throw new DataValidationException("Unable to reset password for inactive user");
 		}
 		userCredential.setResetToken(generateSafeToken(DEFAULT_TOKEN_LENGTH));
-		return saveUserCredentials(userCredential);
+		return saveUserCredential(userCredential);
 	}
 
 	@Override
-	public UserCredential replaceUserCredentials(UserCredential userCredential) {
+	public UserCredential replaceUserCredential(UserCredential userCredential) {
 		userCredentialValidator.validate(userCredential);
 		userCredentialDao.removeById(userCredential.getId());
 		userCredential.setId(null);
 		if (userCredential.getPassword() != null) {
 			updatePasswordHistory(userCredential);
 		}
-		UserCredential result = saveUserCredentials(userCredential);
+		UserCredential result = saveUserCredential(userCredential);
 		eventPublisher.publishEvent(ActionEntityEvent.builder()
 			.entityId(userCredential.getUserId())
 			.actionType(ActionType.CREDENTIALS_UPDATE).build());
@@ -375,7 +367,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public SecurityUser changePassword(String currentPassword, String newPassword) {
 		SecurityUser securityUser = getCurrentUser();
-		UserCredential userCredential = findUserCredentialsByUserId(securityUser.getId());
+		UserCredential userCredential = findUserCredentialByUserId(securityUser.getId());
 		if (!passwordEncoder.matches(currentPassword, userCredential.getPassword())) {
 			throw new ThingsboardException("Current password doesn't match!", ThingsboardErrorCode.BAD_REQUEST_PARAMS);
 		}
@@ -384,7 +376,7 @@ public class UserServiceImpl implements UserService {
 			throw new ThingsboardException("New password should be different from existing!", ThingsboardErrorCode.BAD_REQUEST_PARAMS);
 		}
 		userCredential.setPassword(passwordEncoder.encode(newPassword));
-		replaceUserCredentials(userCredential);
+		replaceUserCredential(userCredential);
 
 		eventPublisher.publishEvent(new UserCredentialInvalidationEvent(securityUser.getId()));
 		return securityUser;

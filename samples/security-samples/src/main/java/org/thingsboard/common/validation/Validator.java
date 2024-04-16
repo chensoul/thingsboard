@@ -99,10 +99,11 @@ public class Validator {
 		}
 	}
 
-	public static void checkNotNull(Object reference, String errorMessage) {
+	public static Object checkNotNull(Object reference, String errorMessage) {
 		if (reference == null) {
 			throw new DataValidationException(errorMessage);
 		}
+		return reference;
 	}
 
 	public static void checkParameter(String name, String param) {

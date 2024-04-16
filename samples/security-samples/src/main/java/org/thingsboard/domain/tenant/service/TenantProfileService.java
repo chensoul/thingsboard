@@ -26,7 +26,7 @@ public interface TenantProfileService {
 
 	TenantProfile saveTenantProfile(String tenantId, TenantProfile tenantProfile);
 
-	TenantProfile findDefaultTenantProfile(String tenantId);
+	TenantProfile findDefaultTenantProfile();
 
 	void deleteTenantProfile(TenantProfile tenantProfileId);
 

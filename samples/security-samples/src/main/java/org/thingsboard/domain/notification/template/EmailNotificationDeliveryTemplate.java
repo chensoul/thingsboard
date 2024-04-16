@@ -46,8 +46,8 @@ public class EmailNotificationDeliveryTemplate extends NotificationDeliveryTempl
 	}
 
 	@Override
-	public NotificationDeliveryType getDeliveryType() {
-		return NotificationDeliveryType.EMAIL;
+	public NotificationDeliveryMethod getDeliveryMethod() {
+		return NotificationDeliveryMethod.EMAIL;
 	}
 
 	@Override

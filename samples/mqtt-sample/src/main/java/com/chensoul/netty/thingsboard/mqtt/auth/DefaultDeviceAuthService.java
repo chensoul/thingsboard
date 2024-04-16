@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.thingsboard.domain.iot.device.Device;
 import org.thingsboard.domain.iot.device.DeviceCredential;
-import org.thingsboard.domain.iot.device.DeviceCredentialFilter;
+import org.thingsboard.domain.iot.device.credential.DeviceCredentialFilter;
 
 @Service
 @Slf4j

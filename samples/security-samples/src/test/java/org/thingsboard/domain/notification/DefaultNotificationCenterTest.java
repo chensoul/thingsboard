@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.thingsboard.common.util.JacksonUtil;
 import org.thingsboard.domain.notification.info.AlarmNotificationInfo;
 import org.thingsboard.domain.notification.info.NotificationInfo;
-import org.thingsboard.domain.notification.settings.NotificationSettings;
+import org.thingsboard.domain.setting.notification.NotificationSetting;
 import org.thingsboard.domain.notification.targets.NotificationTarget;
 import org.thingsboard.domain.notification.targets.PlatformUserNotificationTargetConfig;
 import org.thingsboard.domain.notification.template.NotificationTemplate;
@@ -50,7 +50,7 @@ class DefaultNotificationCenterTest {
 			.config(new NotificationRequestConfig())
 			.build();
 
-		NotificationSettings settings = new NotificationSettings();
+		NotificationSetting settings = new NotificationSetting();
 
 		defaultNotificationCenter.processNotificationRequest(request, settings, null);
 	}

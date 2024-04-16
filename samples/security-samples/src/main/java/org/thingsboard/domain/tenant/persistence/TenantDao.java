@@ -22,4 +22,6 @@ import org.thingsboard.domain.tenant.model.Tenant;
 
 public interface TenantDao extends Dao<Tenant> {
 	Page<Tenant> findTenants(Pageable pageable, String textSearch);
+
+	Tenant findByName(String name);
 }

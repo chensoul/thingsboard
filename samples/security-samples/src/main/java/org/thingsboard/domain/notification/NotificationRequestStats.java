@@ -24,20 +24,20 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.Data;
-import org.thingsboard.domain.notification.template.NotificationDeliveryType;
+import org.thingsboard.domain.notification.template.NotificationDeliveryMethod;
 
 @Data
 public class NotificationRequestStats {
 
-	private final Map<NotificationDeliveryType, AtomicInteger> sent;
+	private final Map<NotificationDeliveryMethod, AtomicInteger> sent;
 	@JsonIgnore
 	private final AtomicInteger totalSent;
-	private final Map<NotificationDeliveryType, Map<String, String>> errors;
+	private final Map<NotificationDeliveryMethod, Map<String, String>> errors;
 	@JsonIgnore
 	private final AtomicInteger totalErrors;
 	private String error;
 	@JsonIgnore
-	private final Map<NotificationDeliveryType, Set<Object>> processedRecipients;
+	private final Map<NotificationDeliveryMethod, Set<Object>> processedRecipients;
 
 	public NotificationRequestStats() {
 		this.sent = new ConcurrentHashMap<>();
@@ -48,8 +48,8 @@ public class NotificationRequestStats {
 	}
 
 	@JsonCreator
-	public NotificationRequestStats(@JsonProperty("sent") Map<NotificationDeliveryType, AtomicInteger> sent,
-									@JsonProperty("errors") Map<NotificationDeliveryType, Map<String, String>> errors,
+	public NotificationRequestStats(@JsonProperty("sent") Map<NotificationDeliveryMethod, AtomicInteger> sent,
+									@JsonProperty("errors") Map<NotificationDeliveryMethod, Map<String, String>> errors,
 									@JsonProperty("error") String error) {
 		this.sent = sent;
 		this.totalSent = null;
@@ -59,12 +59,12 @@ public class NotificationRequestStats {
 		this.processedRecipients = Collections.emptyMap();
 	}
 
-	public void reportSent(NotificationDeliveryType deliveryMethod, NotificationRecipient recipient) {
+	public void reportSent(NotificationDeliveryMethod deliveryMethod, NotificationRecipient recipient) {
 		sent.computeIfAbsent(deliveryMethod, k -> new AtomicInteger()).incrementAndGet();
 		totalSent.incrementAndGet();
 	}
 
-	public void reportError(NotificationDeliveryType deliveryMethod, Throwable error, NotificationRecipient recipient) {
+	public void reportError(NotificationDeliveryMethod deliveryMethod, Throwable error, NotificationRecipient recipient) {
 		if (error instanceof AlreadySentException) {
 			return;
 		}
@@ -76,11 +76,11 @@ public class NotificationRequestStats {
 		totalErrors.incrementAndGet();
 	}
 
-	public void reportProcessed(NotificationDeliveryType deliveryMethod, Object recipientId) {
+	public void reportProcessed(NotificationDeliveryMethod deliveryMethod, Object recipientId) {
 		processedRecipients.computeIfAbsent(deliveryMethod, k -> ConcurrentHashMap.newKeySet()).add(recipientId);
 	}
 
-	public boolean contains(NotificationDeliveryType deliveryMethod, Object recipientId) {
+	public boolean contains(NotificationDeliveryMethod deliveryMethod, Object recipientId) {
 		Set<Object> processedRecipients = this.processedRecipients.get(deliveryMethod);
 		return processedRecipients != null && processedRecipients.contains(recipientId);
 	}

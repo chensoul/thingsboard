@@ -15,8 +15,7 @@
  */
 package org.thingsboard.domain.iot.device.credential;
 
-import org.thingsboard.domain.iot.device.DeviceCredentialFilter;
-import org.thingsboard.domain.iot.device.DeviceCredentialType;
+import org.thingsboard.domain.iot.device.model.DeviceCredentialType;
 
 public class DeviceTokenCredential implements DeviceCredentialFilter {
 

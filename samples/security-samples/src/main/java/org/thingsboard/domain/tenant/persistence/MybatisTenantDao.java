@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.thingsboard.common.dao.DaoUtil;
 import org.thingsboard.common.dao.MybatisAbstractDao;
+import org.thingsboard.common.dao.aspect.SqlDao;
 import org.thingsboard.domain.tenant.model.Tenant;
 
 /**
@@ -17,6 +18,7 @@ import org.thingsboard.domain.tenant.model.Tenant;
  * @author <a href="mailto:ichensoul@gmail.com">chensoul</a>
  * @since TODO
  */
+@SqlDao
 @RequiredArgsConstructor
 @Component
 public class MybatisTenantDao extends MybatisAbstractDao<TenantEntity, Tenant> implements TenantDao {
@@ -39,5 +41,10 @@ public class MybatisTenantDao extends MybatisAbstractDao<TenantEntity, Tenant> i
 				.or().like(TenantEntity::getEmail, textSearch)));
 
 		return DaoUtil.toPageData(pageResult);
+	}
+
+	@Override
+	public Tenant findByName(String name) {
+		return DaoUtil.getData(mapper.selectOne(Wrappers.<TenantEntity>lambdaQuery().eq(TenantEntity::getName, name)));
 	}
 }

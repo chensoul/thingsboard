@@ -22,7 +22,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import static org.thingsboard.common.util.JacksonUtil.newObjectNode;
-import org.thingsboard.domain.notification.template.NotificationDeliveryType;
+import org.thingsboard.domain.notification.template.NotificationDeliveryMethod;
 import org.thingsboard.domain.notification.template.NotificationTemplate;
 import org.thingsboard.domain.notification.template.NotificationTemplateConfig;
 import org.thingsboard.domain.notification.template.NotificationType;
@@ -392,7 +392,7 @@ public class DefaultNotifications {
 			webTemplate.setConfig(additionalConfig);
 			webTemplate.setEnabled(true);
 			templateConfig.setDeliveryTemplates(Map.of(
-				NotificationDeliveryType.WEB, webTemplate
+				NotificationDeliveryMethod.WEB, webTemplate
 			));
 			template.setConfig(templateConfig);
 			return template;

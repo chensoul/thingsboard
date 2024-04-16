@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+import org.thingsboard.common.dao.aspect.SqlDao;
 import org.thingsboard.common.dao.MybatisAbstractDao;
 
 /**
@@ -14,6 +15,7 @@ import org.thingsboard.common.dao.MybatisAbstractDao;
  * @author <a href="mailto:ichensoul@gmail.com">chensoul</a>
  * @since TODO
  */
+@SqlDao
 @RequiredArgsConstructor
 @Component
 public class MybatisAuditLogDao extends MybatisAbstractDao<AuditLogEntity, AuditLog> implements AuditLogDao {

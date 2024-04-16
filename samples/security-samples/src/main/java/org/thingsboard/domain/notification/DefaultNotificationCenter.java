@@ -12,13 +12,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.thingsboard.domain.notification.channels.NotificationChannel;
+import org.thingsboard.domain.notification.channel.NotificationChannel;
 import org.thingsboard.domain.notification.persistence.NotificationTargetService;
-import org.thingsboard.domain.notification.settings.NotificationSettings;
+import org.thingsboard.domain.setting.notification.NotificationSetting;
 import org.thingsboard.domain.notification.targets.NotificationTarget;
 import org.thingsboard.domain.notification.targets.PlatformUserNotificationTargetConfig;
 import org.thingsboard.domain.notification.template.NotificationDeliveryTemplate;
-import org.thingsboard.domain.notification.template.NotificationDeliveryType;
+import org.thingsboard.domain.notification.template.NotificationDeliveryMethod;
 import org.thingsboard.domain.notification.template.NotificationTemplate;
 import org.thingsboard.domain.notification.template.WebNotificationDeliveryTemplate;
 import org.thingsboard.domain.user.model.User;
@@ -33,7 +33,7 @@ import org.thingsboard.domain.user.model.User;
 @Service
 @RequiredArgsConstructor
 public class DefaultNotificationCenter implements NotificationChannel<User, WebNotificationDeliveryTemplate>, NotificationCenter {
-	private Map<NotificationDeliveryType, NotificationChannel> channels;
+	private Map<NotificationDeliveryMethod, NotificationChannel> channels;
 
 	private final NotificationExecutorService notificationExecutor;
 	private final NotificationTargetService notificationTargetService;
@@ -41,12 +41,12 @@ public class DefaultNotificationCenter implements NotificationChannel<User, WebN
 	@Autowired
 	public void setChannels(List<NotificationChannel> channels, DefaultNotificationCenter webNotificationChannel) {
 		this.channels = channels.stream().collect(Collectors.toMap(NotificationChannel::getDeliveryMethod, c -> c));
-		this.channels.put(NotificationDeliveryType.WEB, (NotificationChannel) webNotificationChannel);
+		this.channels.put(NotificationDeliveryMethod.WEB, (NotificationChannel) webNotificationChannel);
 	}
 
-	public NotificationRequest processNotificationRequest(NotificationRequest request, NotificationSettings settings, FutureCallback<NotificationRequestStats> callback) {
+	public NotificationRequest processNotificationRequest(NotificationRequest request, NotificationSetting settings, FutureCallback<NotificationRequestStats> callback) {
 		NotificationTemplate notificationTemplate = request.getTemplate();
-		Set<NotificationDeliveryType> deliveryTypes = new HashSet<>();
+		Set<NotificationDeliveryMethod> deliveryTypes = new HashSet<>();
 		List<NotificationTarget> targets = request.getTargets().stream()
 			.map(id -> notificationTargetService.findNotificationTargetById(id))
 			.collect(Collectors.toList());
@@ -54,14 +54,14 @@ public class DefaultNotificationCenter implements NotificationChannel<User, WebN
 		notificationTemplate.getConfig().getDeliveryTemplates().forEach((type, deliveryTemplate) -> {
 			if (!deliveryTemplate.isEnabled()) return;
 			try {
-				channels.get(deliveryTemplate.getDeliveryType()).check(request.getTenantId());
+				channels.get(deliveryTemplate.getDeliveryMethod()).check(request.getTenantId());
 			} catch (Exception e) {
 				throw new IllegalArgumentException(e.getMessage());
 			}
-			if (targets.stream().noneMatch(target -> target.getConfig().getType().getSupportedDeliveryTypes().contains(deliveryTemplate.getDeliveryType()))) {
-				throw new IllegalArgumentException("Recipients for " + deliveryTemplate.getDeliveryType().getName() + " delivery method not chosen");
+			if (targets.stream().noneMatch(target -> target.getConfig().getType().getSupportedDeliveryTypes().contains(deliveryTemplate.getDeliveryMethod()))) {
+				throw new IllegalArgumentException("Recipients for " + deliveryTemplate.getDeliveryMethod().getName() + " delivery method not chosen");
 			}
-			deliveryTypes.add(deliveryTemplate.getDeliveryType());
+			deliveryTypes.add(deliveryTemplate.getDeliveryMethod());
 		});
 		if (deliveryTypes.isEmpty()) {
 			throw new IllegalArgumentException("No delivery methods to send notification with");
@@ -145,7 +145,7 @@ public class DefaultNotificationCenter implements NotificationChannel<User, WebN
 			}
 		}
 
-		Set<NotificationDeliveryType> deliveryTypes = new HashSet<>(ctx.getDeliveryTypes());
+		Set<NotificationDeliveryMethod> deliveryTypes = new HashSet<>(ctx.getDeliveryTypes());
 		deliveryTypes.removeIf(deliveryType -> !target.getConfig().getType().getSupportedDeliveryTypes().contains(deliveryType));
 		log.debug("[{}] Processing notification request for {} target ({}) for delivery methods {}", ctx.getRequest().getId(), target.getConfig().getType(), target.getId(), deliveryTypes);
 		if (deliveryTypes.isEmpty()) {
@@ -153,7 +153,7 @@ public class DefaultNotificationCenter implements NotificationChannel<User, WebN
 		}
 
 		for (NotificationRecipient recipient : recipients) {
-			for (NotificationDeliveryType deliveryType : deliveryTypes) {
+			for (NotificationDeliveryMethod deliveryType : deliveryTypes) {
 				try {
 					processForRecipient(deliveryType, recipient, ctx);
 					ctx.getStats().reportSent(deliveryType, recipient);
@@ -164,7 +164,7 @@ public class DefaultNotificationCenter implements NotificationChannel<User, WebN
 		}
 	}
 
-	private void processForRecipient(NotificationDeliveryType deliveryType, NotificationRecipient recipient, NotificationContext ctx) throws Exception {
+	private void processForRecipient(NotificationDeliveryMethod deliveryType, NotificationRecipient recipient, NotificationContext ctx) throws Exception {
 		if (ctx.getStats().contains(deliveryType, recipient.getId())) {
 			throw new AlreadySentException();
 		} else {
@@ -201,6 +201,7 @@ public class DefaultNotificationCenter implements NotificationChannel<User, WebN
 			.requestId(request.getId())
 			.recipientId(recipient.getId())
 			.type(ctx.getNotificationType())
+			.deliveryMethod(NotificationDeliveryMethod.WEB)
 			.subject(processedTemplate.getSubject())
 			.text(processedTemplate.getBody())
 			.config(processedTemplate.getConfig())
@@ -224,7 +225,7 @@ public class DefaultNotificationCenter implements NotificationChannel<User, WebN
 	}
 
 	@Override
-	public Set<NotificationDeliveryType> getAvailableDeliveryTypes(String tenantId) {
+	public Set<NotificationDeliveryMethod> getAvailableDeliveryTypes(String tenantId) {
 		return channels.values().stream()
 			.filter(channel -> {
 				try {
@@ -245,7 +246,7 @@ public class DefaultNotificationCenter implements NotificationChannel<User, WebN
 
 
 	@Override
-	public NotificationDeliveryType getDeliveryMethod() {
-		return NotificationDeliveryType.WEB;
+	public NotificationDeliveryMethod getDeliveryMethod() {
+		return NotificationDeliveryMethod.WEB;
 	}
 }

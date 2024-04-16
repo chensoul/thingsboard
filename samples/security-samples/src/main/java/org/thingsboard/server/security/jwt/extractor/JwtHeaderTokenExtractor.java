@@ -23,18 +23,23 @@ import org.springframework.stereotype.Component;
 @Component(value = "jwtHeaderTokenExtractor")
 public class JwtHeaderTokenExtractor implements TokenExtractor {
 	public static final String HEADER_PREFIX = "Bearer ";
+	public static final String REQUEST_PREFIX = "accessToken";
 
 	@Override
 	public String extract(HttpServletRequest request) {
 		String header = request.getHeader(JWT_TOKEN_HEADER_PARAM);
+		if (StringUtils.isNotBlank(header)) {
+			if (header.length() < HEADER_PREFIX.length()) {
+				throw new AuthenticationServiceException("Invalid authorization header size.");
+			}
+			header = header.substring(HEADER_PREFIX.length(), header.length());
+		} else {
+			header = request.getParameter(REQUEST_PREFIX);
+		}
+
 		if (StringUtils.isBlank(header)) {
 			throw new AuthenticationServiceException("Authorization header cannot be blank!");
 		}
-
-		if (header.length() < HEADER_PREFIX.length()) {
-			throw new AuthenticationServiceException("Invalid authorization header size.");
-		}
-
-		return header.substring(HEADER_PREFIX.length(), header.length());
+		return header;
 	}
 }

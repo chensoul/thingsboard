@@ -46,7 +46,7 @@ public class TenantAdminPermission extends AbstractPermission {
 	};
 
 	private static final PermissionChecker tenantPermissionChecker =
-		new PermissionChecker.GenericPermissionChecker(Operation.GET) {
+		new PermissionChecker.GenericPermissionChecker(Operation.READ) {
 			@Override
 			@SuppressWarnings("unchecked")
 			public boolean hasPermission(SecurityUser user, Operation operation, Serializable entityId, HasTenantId entity) {

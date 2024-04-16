@@ -18,10 +18,9 @@ package org.thingsboard.domain.usage;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.thingsboard.common.dao.entity.EntityServiceRegistry;
 import org.thingsboard.common.model.EntityType;
-import org.thingsboard.common.service.EntityServiceRegistry;
 import org.thingsboard.domain.tenant.model.DefaultTenantProfileConfiguration;
-import org.thingsboard.domain.tenant.model.Tenant;
 import org.thingsboard.domain.tenant.model.TenantProfile;
 import org.thingsboard.domain.tenant.service.TenantProfileService;
 import org.thingsboard.server.security.SecurityUtils;
@@ -49,9 +48,9 @@ public class DefaultApiLimitService implements ApiLimitService {
 		if (SecurityUtils.isSysTenantId(tenantId)) {
 			return 0L;
 		}
-		TenantProfile tenantProfile = tenantProfileService.findDefaultTenantProfile(tenantId);
+		TenantProfile tenantProfile = tenantProfileService.findDefaultTenantProfile();
 		if (tenantProfile == null) {
-			throw new IllegalArgumentException("Tenant profile not found for tenant " + tenantId);
+			return 0L;
 		}
 		Number value = extractor.apply(tenantProfile.getDefaultProfileConfiguration());
 		if (value == null) {

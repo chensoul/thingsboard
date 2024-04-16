@@ -23,6 +23,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.thingsboard.common.model.BaseData;
 import org.thingsboard.domain.notification.info.NotificationInfo;
+import org.thingsboard.domain.notification.template.NotificationDeliveryMethod;
 import org.thingsboard.domain.notification.template.NotificationType;
 
 @Data
@@ -35,6 +36,7 @@ public class Notification extends BaseData<Long> {
 	private Long requestId;
 	private Long recipientId;
 	private NotificationType type;
+	private NotificationDeliveryMethod deliveryMethod;
 	private String subject;
 	private String text;
 	private JsonNode config;

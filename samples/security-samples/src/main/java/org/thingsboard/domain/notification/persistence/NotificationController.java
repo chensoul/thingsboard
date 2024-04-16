@@ -41,21 +41,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.thingsboard.common.model.EntityType;
 import org.thingsboard.domain.notification.Notification;
-import org.thingsboard.domain.notification.NotificationCenter;
 import org.thingsboard.domain.notification.NotificationContext;
 import org.thingsboard.domain.notification.NotificationRecipient;
 import org.thingsboard.domain.notification.NotificationRequest;
 import org.thingsboard.domain.notification.NotificationStatus;
-import org.thingsboard.domain.notification.settings.NotificationSettings;
-import org.thingsboard.domain.notification.settings.UserNotificationSettings;
 import org.thingsboard.domain.notification.targets.NotificationTarget;
 import org.thingsboard.domain.notification.targets.NotificationTargetType;
 import org.thingsboard.domain.notification.template.NotificationDeliveryTemplate;
-import org.thingsboard.domain.notification.template.NotificationDeliveryType;
+import org.thingsboard.domain.notification.template.NotificationDeliveryMethod;
 import org.thingsboard.domain.notification.template.NotificationTemplate;
 import org.thingsboard.domain.user.model.User;
 import org.thingsboard.server.security.SecurityUser;
-import static org.thingsboard.server.security.SecurityUser.SYS_TENANT_ID;
 
 @RestController
 @RequestMapping("/api")
@@ -67,8 +63,7 @@ public class NotificationController {
 	private final NotificationRequestService notificationRequestService;
 	private final NotificationTemplateService notificationTemplateService;
 	private final NotificationTargetService notificationTargetService;
-	private final NotificationSettingsService notificationSettingsService;
-	private final NotificationCenter notificationCenter;
+
 
 	@GetMapping("/notifications")
 	@PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'MERCHANT_USER')")
@@ -153,11 +148,6 @@ public class NotificationController {
 					recipientsPart = recipients.getContent().stream().map(r -> (NotificationRecipient) r).collect(Collectors.toList());
 					break;
 				}
-				case SLACK: {
-					recipientsCount = 1;
-//					recipientsPart = List.of(((SlackNotificationTargetConfig) target.getConfig()).getConversation());
-					break;
-				}
 				case MICROSOFT_TEAM: {
 					recipientsCount = 1;
 //					recipientsPart = List.of(((MicrosoftTeamsNotificationTargetConfig) target.getConfig()));
@@ -189,7 +179,7 @@ public class NotificationController {
 		preview.setRecipientsCountByTarget(recipientsCountByTarget);
 		preview.setTotalRecipientsCount(recipientsCountByTarget.values().stream().mapToInt(Integer::intValue).sum());
 
-		Set<NotificationDeliveryType> deliveryTypes = template.getConfig().getDeliveryTemplates().entrySet()
+		Set<NotificationDeliveryMethod> deliveryTypes = template.getConfig().getDeliveryTemplates().entrySet()
 			.stream().filter(entry -> entry.getValue().isEnabled()).map(Map.Entry::getKey).collect(Collectors.toSet());
 		NotificationContext ctx = NotificationContext.builder()
 			.tenantId(user.getTenantId())
@@ -198,7 +188,7 @@ public class NotificationController {
 			.template(template)
 			.settings(null)
 			.build();
-		Map<NotificationDeliveryType, NotificationDeliveryTemplate> processedTemplates = ctx.getDeliveryTypes().stream()
+		Map<NotificationDeliveryMethod, NotificationDeliveryTemplate> processedTemplates = ctx.getDeliveryTypes().stream()
 			.collect(Collectors.toMap(m -> m, deliveryMethod -> {
 				NotificationTargetType targetType = NotificationTargetType.forDeliveryMethod(deliveryMethod);
 				return ctx.getProcessedTemplate(deliveryMethod, firstRecipient.get(targetType));
@@ -227,42 +217,5 @@ public class NotificationController {
 		notificationRequestService.deleteNotificationRequest(id);
 	}
 
-
-	@PostMapping("/notification/settings")
-	@PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-	public NotificationSettings saveNotificationSettings(@RequestBody @Valid NotificationSettings notificationSettings,
-														 @AuthenticationPrincipal SecurityUser user) {
-		String tenantId = user.isSystemAdmin() ? SYS_TENANT_ID : user.getTenantId();
-		notificationSettingsService.saveNotificationSettings(tenantId, notificationSettings);
-		return notificationSettings;
-	}
-
-
-	@GetMapping("/notification/settings")
-	@PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-	public NotificationSettings getNotificationSettings(@AuthenticationPrincipal SecurityUser user) {
-		String tenantId = user.isSystemAdmin() ? SYS_TENANT_ID : user.getTenantId();
-		return notificationSettingsService.findNotificationSettings(tenantId);
-	}
-
-
-	@GetMapping("/notification/deliveryTypes")
-	@PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'MERCHANT_USER')")
-	public Set<NotificationDeliveryType> getAvailableDeliveryMethods(@AuthenticationPrincipal SecurityUser user) {
-		return notificationCenter.getAvailableDeliveryTypes(user.getTenantId());
-	}
-
-	@PostMapping("/notification/settings/user")
-	@PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'MERCHANT_USER')")
-	public UserNotificationSettings saveUserNotificationSettings(@RequestBody @Valid UserNotificationSettings settings,
-																 @AuthenticationPrincipal SecurityUser user) {
-		return notificationSettingsService.saveUserNotificationSettings(user.getTenantId(), user.getId(), settings);
-	}
-
-	@GetMapping("/notification/settings/user")
-	@PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'MERCHANT_USER')")
-	public UserNotificationSettings getUserNotificationSettings(@AuthenticationPrincipal SecurityUser user) {
-		return notificationSettingsService.getUserNotificationSettings(user.getTenantId(), user.getId(), true);
-	}
 
 }

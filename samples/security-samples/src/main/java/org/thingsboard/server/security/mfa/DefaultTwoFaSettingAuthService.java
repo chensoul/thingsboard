@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.thingsboard.common.exception.ThingsboardErrorCode;
 import org.thingsboard.common.exception.ThingsboardException;
 import org.thingsboard.domain.audit.ActionType;
-import org.thingsboard.domain.setting.mfa.TwoFaAuthController;
 import org.thingsboard.domain.setting.mfa.TwoFaSettingService;
 import org.thingsboard.domain.setting.mfa.TwoFaSystemSetting;
 import org.thingsboard.domain.setting.mfa.config.EmailTwoFaConfig;
@@ -19,12 +18,13 @@ import org.thingsboard.domain.setting.mfa.config.SmsTwoFaConfig;
 import org.thingsboard.domain.setting.mfa.config.TwoFaConfig;
 import org.thingsboard.domain.setting.mfa.provider.TwoFaProviderType;
 import org.thingsboard.domain.setting.security.SecuritySettingService;
+import org.thingsboard.domain.user.TwoFaAuthController;
 import org.thingsboard.domain.user.service.UserService;
 import org.thingsboard.server.security.SecurityUser;
 import static org.thingsboard.server.security.SecurityUtils.getCurrentUser;
 import org.thingsboard.server.security.jwt.JwtTokenFactory;
 import org.thingsboard.server.security.jwt.token.JwtPair;
-import org.thingsboard.server.security.rest.RestAuthenticationDetails;
+import org.thingsboard.server.security.rest.RestAuthenticationDetail;
 
 /**
  * TODO Comment
@@ -61,12 +61,12 @@ public class DefaultTwoFaSettingAuthService implements TwoFaSettingAuthService {
 		boolean verificationSuccess = twoFaSettingService.checkVerificationCode(user, verificationCode, accountConfig, checkLimits);
 
 		if (verificationSuccess) {
-			securitySettingService.logLoginAction(user, ActionType.LOGIN, null, new RestAuthenticationDetails(request), providerType.name());
+			securitySettingService.logLoginAction(user, ActionType.LOGIN, null, new RestAuthenticationDetail(request), providerType.name());
 			user = new SecurityUser(userService.findUserById(user.getId()), true, user.getUserPrincipal());
 			return tokenFactory.createTokenPair(user);
 		} else {
 			ThingsboardException error = new ThingsboardException("Verification code is incorrect", ThingsboardErrorCode.BAD_REQUEST_PARAMS);
-			securitySettingService.logLoginAction(user, ActionType.LOGIN, error, new RestAuthenticationDetails(request), providerType.name());
+			securitySettingService.logLoginAction(user, ActionType.LOGIN, error, new RestAuthenticationDetail(request), providerType.name());
 			throw error;
 		}
 	}

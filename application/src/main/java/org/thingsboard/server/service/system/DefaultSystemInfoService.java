@@ -17,11 +17,26 @@ package org.thingsboard.server.service.system;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.protobuf.ProtocolStringList;
+import jakarta.annotation.Nullable;
+import jakarta.annotation.PreDestroy;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.thingsboard.common.util.JacksonUtil;
+import static org.thingsboard.common.util.SystemUtil.getCpuCount;
+import static org.thingsboard.common.util.SystemUtil.getCpuUsage;
+import static org.thingsboard.common.util.SystemUtil.getDiscSpaceUsage;
+import static org.thingsboard.common.util.SystemUtil.getMemoryUsage;
+import static org.thingsboard.common.util.SystemUtil.getTotalDiscSpace;
+import static org.thingsboard.common.util.SystemUtil.getTotalMemory;
 import org.thingsboard.common.util.ThingsBoardThreadFactory;
 import org.thingsboard.rule.engine.api.MailService;
 import org.thingsboard.rule.engine.api.SmsService;
@@ -48,23 +63,6 @@ import org.thingsboard.server.queue.discovery.TbServiceInfoProvider;
 import org.thingsboard.server.queue.discovery.event.PartitionChangeEvent;
 import org.thingsboard.server.queue.util.TbCoreComponent;
 import org.thingsboard.server.service.telemetry.TelemetrySubscriptionService;
-
-import jakarta.annotation.Nullable;
-import jakarta.annotation.PreDestroy;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import static org.thingsboard.common.util.SystemUtil.getCpuCount;
-import static org.thingsboard.common.util.SystemUtil.getCpuUsage;
-import static org.thingsboard.common.util.SystemUtil.getDiscSpaceUsage;
-import static org.thingsboard.common.util.SystemUtil.getMemoryUsage;
-import static org.thingsboard.common.util.SystemUtil.getTotalDiscSpace;
-import static org.thingsboard.common.util.SystemUtil.getTotalMemory;
 
 @TbCoreComponent
 @Service

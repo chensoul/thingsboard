@@ -22,7 +22,7 @@ import org.thingsboard.domain.user.model.UserSettingType;
 
 public interface UserSettingService {
 
-	UserSetting updateUserSetting(Long userId, UserSettingType type, JsonNode settings);
+	UserSetting updateUserSetting(Long userId, UserSettingType type, JsonNode extra);
 
 	UserSetting saveUserSetting(UserSetting userSetting);
 

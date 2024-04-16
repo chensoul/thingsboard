@@ -17,11 +17,11 @@ package org.thingsboard.domain.setting.mfa;
 
 import java.util.Optional;
 import org.thingsboard.common.exception.ThingsboardException;
-import org.thingsboard.domain.user.model.User;
-import org.thingsboard.server.security.SecurityUser;
 import org.thingsboard.domain.setting.mfa.config.TwoFaConfig;
 import org.thingsboard.domain.setting.mfa.config.UserTwoFaSetting;
 import org.thingsboard.domain.setting.mfa.provider.TwoFaProviderType;
+import org.thingsboard.domain.user.model.User;
+import org.thingsboard.server.security.SecurityUser;
 
 public interface TwoFaSettingService {
 

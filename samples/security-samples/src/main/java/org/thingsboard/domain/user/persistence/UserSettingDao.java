@@ -22,4 +22,6 @@ import org.thingsboard.domain.user.model.UserSettingType;
 public interface UserSettingDao extends Dao<UserSetting> {
 
 	UserSetting findByUserIdAndType(Long userId, UserSettingType type);
+
+	void removeByUserId(Long userId);
 }

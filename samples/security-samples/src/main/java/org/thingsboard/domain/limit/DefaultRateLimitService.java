@@ -56,7 +56,7 @@ public class DefaultRateLimitService implements RateLimitService {
 		if (SecurityUtils.isSysTenantId(tenantId)) {
 			return false;
 		}
-		TenantProfile tenantProfile = tenantProfileService.findOrCreateDefaultTenantProfile(tenantId);
+		TenantProfile tenantProfile = tenantProfileService.findDefaultTenantProfile();
 		if (tenantProfile == null) {
 			throw new DataValidationException("Tenant profile not found!");
 		}

@@ -15,7 +15,6 @@
  */
 package org.thingsboard.common.service;
 
-import java.io.Serializable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -69,7 +68,13 @@ public abstract class DataValidator<D extends BaseData<?>> {
 		return null;
 	}
 
-	protected void validateDelete(Serializable id) {
+	public void validateDelete(D data) {
+		if (data == null) {
+			throw new DataValidationException("Data object can't be null!");
+		}
+		if (data.getId() == null) {
+			throw new DataValidationException("Can't delete object without id!");
+		}
 	}
 
 	protected boolean isSameData(D existentData, D actualData) {

@@ -40,7 +40,7 @@ public class TenantProfileValidator extends DataValidator<TenantProfile> {
 		}
 
 		if (tenantProfile.getIsDefault()) {
-			TenantProfile defaultTenantProfile = tenantProfileService.findDefaultTenantProfile(tenantProfile.getTenantId());
+			TenantProfile defaultTenantProfile = tenantProfileService.findDefaultTenantProfile();
 			if (defaultTenantProfile != null && !defaultTenantProfile.getId().equals(tenantProfile.getId())) {
 				throw new DataValidationException("Another default tenant profile is present");
 			}

@@ -2,9 +2,10 @@ package org.thingsboard.domain.user.persistence;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.thingsboard.common.aspect.SqlDao;
+import org.springframework.transaction.annotation.Transactional;
+import org.thingsboard.common.dao.aspect.SqlDao;
 import org.thingsboard.common.dao.DaoUtil;
 import org.thingsboard.common.dao.MybatisAbstractDao;
 import org.thingsboard.domain.user.model.UserCredential;
@@ -15,11 +16,11 @@ import org.thingsboard.domain.user.model.UserCredential;
  * @author <a href="mailto:ichensoul@gmail.com">chensoul</a>
  * @since TODO
  */
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Component
 @SqlDao
 public class MybatisUserCredentialDao extends MybatisAbstractDao<UserCredentialEntity, UserCredential> implements UserCredentialDao {
-	private UserCredentialMapper mapper;
+	private final UserCredentialMapper mapper;
 
 	@Override
 	protected Class<UserCredentialEntity> getEntityClass() {
@@ -47,6 +48,7 @@ public class MybatisUserCredentialDao extends MybatisAbstractDao<UserCredentialE
 	}
 
 	@Override
+	@Transactional
 	public void removeByUserId(Long userId) {
 		getRepository().delete(Wrappers.<UserCredentialEntity>lambdaQuery().eq(UserCredentialEntity::getUserId, userId));
 	}

@@ -24,10 +24,10 @@ import lombok.Builder;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.thingsboard.common.util.TemplateUtils;
-import org.thingsboard.domain.notification.settings.NotificationDeliveryMethodConfig;
-import org.thingsboard.domain.notification.settings.NotificationSettings;
+import org.thingsboard.domain.setting.notification.NotificationDeliveryMethodConfig;
+import org.thingsboard.domain.setting.notification.NotificationSetting;
 import org.thingsboard.domain.notification.template.NotificationDeliveryTemplate;
-import org.thingsboard.domain.notification.template.NotificationDeliveryType;
+import org.thingsboard.domain.notification.template.NotificationDeliveryMethod;
 import org.thingsboard.domain.notification.template.NotificationTemplate;
 import org.thingsboard.domain.notification.template.NotificationType;
 
@@ -36,24 +36,24 @@ public class NotificationContext {
 
 	@Getter
 	private final String tenantId;
-	private final NotificationSettings settings;
-	private final NotificationSettings systemSettings;
+	private final NotificationSetting settings;
+	private final NotificationSetting systemSettings;
 	@Getter
 	private final NotificationRequest request;
 	@Getter
-	private final Set<NotificationDeliveryType> deliveryTypes;
+	private final Set<NotificationDeliveryMethod> deliveryTypes;
 	@Getter
 	private final NotificationTemplate notificationTemplate;
 	@Getter
 	private final NotificationType notificationType;
 
-	private final Map<NotificationDeliveryType, NotificationDeliveryTemplate> deliveryTemplates;
+	private final Map<NotificationDeliveryMethod, NotificationDeliveryTemplate> deliveryTemplates;
 	@Getter
 	private final NotificationRequestStats stats;
 
 	@Builder
-	public NotificationContext(String tenantId, NotificationRequest request, Set<NotificationDeliveryType> deliveryTypes,
-							   NotificationTemplate template, NotificationSettings settings, NotificationSettings systemSettings) {
+	public NotificationContext(String tenantId, NotificationRequest request, Set<NotificationDeliveryMethod> deliveryTypes,
+                             NotificationTemplate template, NotificationSetting settings, NotificationSetting systemSettings) {
 		this.tenantId = tenantId;
 		this.request = request;
 		this.deliveryTypes = deliveryTypes;
@@ -61,7 +61,7 @@ public class NotificationContext {
 		this.systemSettings = systemSettings;
 		this.notificationTemplate = template;
 		this.notificationType = template.getType();
-		this.deliveryTemplates = new EnumMap<>(NotificationDeliveryType.class);
+		this.deliveryTemplates = new EnumMap<>(NotificationDeliveryMethod.class);
 		this.stats = new NotificationRequestStats();
 		init();
 	}
@@ -70,14 +70,14 @@ public class NotificationContext {
 		notificationTemplate.getConfig().getDeliveryTemplates().forEach((type, template) -> {
 			if (template.isEnabled()) {
 				template = processTemplate(template, null); // processing template with immutable params
-				deliveryTemplates.put(template.getDeliveryType(), template);
+				deliveryTemplates.put(template.getDeliveryMethod(), template);
 			}
 		});
 	}
 
-	public <C extends NotificationDeliveryMethodConfig> C getDeliveryMethodConfig(NotificationDeliveryType deliveryMethod) {
-		NotificationSettings settings;
-		if (deliveryMethod == NotificationDeliveryType.MOBILE_APP) {
+	public <C extends NotificationDeliveryMethodConfig> C getDeliveryMethodConfig(NotificationDeliveryMethod deliveryMethod) {
+		NotificationSetting settings;
+		if (deliveryMethod == NotificationDeliveryMethod.MOBILE_APP) {
 			settings = this.systemSettings;
 		} else {
 			settings = this.settings;
@@ -85,7 +85,7 @@ public class NotificationContext {
 		return (C) settings.getDeliveryMethodsConfigs().get(deliveryMethod);
 	}
 
-	public <T extends NotificationDeliveryTemplate> T getProcessedTemplate(NotificationDeliveryType deliveryMethod, NotificationRecipient recipient) {
+	public <T extends NotificationDeliveryTemplate> T getProcessedTemplate(NotificationDeliveryMethod deliveryMethod, NotificationRecipient recipient) {
 		T template = (T) deliveryTemplates.get(deliveryMethod);
 		if (recipient != null) {
 			Map<String, String> additionalTemplateContext = createTemplateContextForRecipient(recipient);

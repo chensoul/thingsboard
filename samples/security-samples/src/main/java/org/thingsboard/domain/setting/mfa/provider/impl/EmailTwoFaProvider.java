@@ -19,12 +19,12 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.thingsboard.common.exception.ThingsboardErrorCode;
 import org.thingsboard.common.exception.ThingsboardException;
-import org.thingsboard.domain.user.model.User;
-import org.thingsboard.server.mail.MailService;
-import org.thingsboard.server.security.SecurityUser;
 import org.thingsboard.domain.setting.mfa.config.EmailTwoFaConfig;
 import org.thingsboard.domain.setting.mfa.provider.EmailTwoFaProviderConfig;
 import org.thingsboard.domain.setting.mfa.provider.TwoFaProviderType;
+import org.thingsboard.domain.user.model.User;
+import org.thingsboard.domain.notification.channel.mail.MailService;
+import org.thingsboard.server.security.SecurityUser;
 
 @Component
 public class EmailTwoFaProvider extends OtpBasedTwoFaProvider<EmailTwoFaProviderConfig, EmailTwoFaConfig> {

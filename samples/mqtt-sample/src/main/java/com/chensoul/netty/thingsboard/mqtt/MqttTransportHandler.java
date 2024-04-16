@@ -15,9 +15,6 @@
  */
 package com.chensoul.netty.thingsboard.mqtt;
 
-import static com.chensoul.netty.thingsboard.mqtt.ReturnCode.BAD_USER_NAME_OR_PASSWORD;
-import com.chensoul.netty.thingsboard.mqtt.auth.TransportDeviceInfo;
-import com.chensoul.netty.thingsboard.mqtt.auth.ValidateDeviceCredentialsResponse;
 import com.chensoul.netty.thingsboard.mqtt.topic.MqttTopicMatcher;
 import com.chensoul.netty.thingsboard.mqtt.topic.MqttTopics;
 import io.netty.channel.ChannelHandlerContext;
@@ -44,6 +41,7 @@ import io.netty.handler.codec.mqtt.MqttTopicSubscription;
 import io.netty.handler.codec.mqtt.MqttUnsubscribeMessage;
 import io.netty.handler.codec.mqtt.MqttVersion;
 import io.netty.handler.ssl.SslHandler;
+import io.netty.util.CharsetUtil;
 import io.netty.util.ReferenceCountUtil;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
@@ -63,7 +61,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.thingsboard.common.util.EncryptionUtil;
 import org.thingsboard.common.util.SslUtil;
-import org.thingsboard.domain.iot.device.credential.DeviceTokenCredential;
+import org.thingsboard.domain.iot.device.model.DeviceTransportType;
+import org.thingsboard.domain.message.ValidateBasicMqttCredRequestMsg;
+import org.thingsboard.domain.message.ValidateDeviceCredentialsResponse;
+import org.thingsboard.transport.TransportService;
+import org.thingsboard.transport.TransportServiceCallback;
+import org.thingsboard.transport.auth.TransportDeviceInfo;
 
 /**
  * @author Andrew Shvayka
@@ -447,7 +450,9 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
 	}
 
 	void processConnect(ChannelHandlerContext ctx, MqttConnectMessage msg) {
-		log.debug("[{}][{}] Processing connect msg for client: {}!", address, sessionId, msg.payload().clientIdentifier());
+		String userName = msg.payload().userName();
+		log.debug("[{}][{}] Processing connect msg for client: {}!", address, sessionId, userName);
+
 		deviceSessionCtx.setMqttVersion(getMqttVersion(msg.variableHeader().version()));
 
 		X509Certificate cert;
@@ -462,18 +467,31 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
 		String userName = connectMessage.payload().userName();
 		log.debug("[{}][{}] Processing connect msg for client with user name: {}!", address, sessionId, userName);
 
-		if (StringUtils.isEmpty(userName)) {
-			ctx.writeAndFlush(createMqttConnAckMsg(BAD_USER_NAME_OR_PASSWORD, connectMessage));
-			ctx.close();
+		ValidateBasicMqttCredRequestMsg.ValidateBasicMqttCredRequestMsgBuilder request = ValidateBasicMqttCredRequestMsg.builder()
+			.clientId(connectMessage.payload().clientIdentifier());
+		if (userName != null) {
+			request.userName(userName);
+		}
+		byte[] passwordBytes = connectMessage.payload().passwordInBytes();
+		if (passwordBytes != null) {
+			String password = new String(passwordBytes, CharsetUtil.UTF_8);
+			request.password(password);
 		}
 
-		ValidateDeviceCredentialsResponse response = deviceSessionCtx.login(new DeviceTokenCredential(connectMessage.payload().userName()));
-		if (response.hasDeviceInfo()) {
-			onValidateDeviceResponse(response, ctx, connectMessage);
-		} else {
-			ctx.writeAndFlush(createMqttConnAckMsg(ReturnCode.SERVER_UNAVAILABLE_5, connectMessage));
-			closeCtx(ctx);
-		}
+		transportService.process(DeviceTransportType.MQTT, request.build(),
+			new TransportServiceCallback<>() {
+				@Override
+				public void onSuccess(ValidateDeviceCredentialsResponse msg) {
+					onValidateDeviceResponse(msg, ctx, connectMessage);
+				}
+
+				@Override
+				public void onError(Throwable e) {
+					log.trace("[{}] Failed to process credentials: {}", address, userName, e);
+					ctx.writeAndFlush(createMqttConnAckMsg(ReturnCode.SERVER_UNAVAILABLE_5, connectMessage));
+					closeCtx(ctx);
+				}
+			});
 	}
 
 	private void onValidateDeviceResponse(ValidateDeviceCredentialsResponse msg, ChannelHandlerContext ctx, MqttConnectMessage connectMessage) {

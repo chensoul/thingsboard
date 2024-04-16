@@ -59,34 +59,17 @@ import org.thingsboard.server.security.rest.RestPublicLoginProcessingFilter;
 @EnableMethodSecurity
 @Order(SecurityProperties.BASIC_AUTH_ORDER)
 public class SecurityConfiguration {
-
-
 	public static final String DEVICE_API_ENTRY_POINT = "/api/v1/**";
 	public static final String FORM_BASED_LOGIN_ENTRY_POINT = "/api/auth/login";
 	public static final String PUBLIC_LOGIN_ENTRY_POINT = "/api/auth/login/public";
 	public static final String TOKEN_REFRESH_ENTRY_POINT = "/api/auth/token";
-	protected static final String[] NON_TOKEN_BASED_AUTH_ENTRY_POINTS = new String[]{"/index.html", "/api/noauth/**"};
+	public static final String[] NON_TOKEN_BASED_AUTH_ENTRY_POINTS = new String[]{"/index.html", "/api/noauth/**"};
 	public static final String TOKEN_BASED_AUTH_ENTRY_POINT = "/api/**";
 	public static final String WS_ENTRY_POINT = "/api/ws/**";
-	public static final String MAIL_OAUTH2_PROCESSING_ENTRY_POINT = "/api/admin/mail/oauth2/code";
-	public static final String DEVICE_CONNECTIVITY_CERTIFICATE_DOWNLOAD_ENTRY_POINT = "/api/device-connectivity/mqtts/certificate/download";
+	public static final String MAIL_OAUTH2_PROCESSING_ENTRY_POINT = "/api/system/mail/oauth2/code";
 
 	@Autowired
 	private ErrorResponseExceptionHandler restAccessDeniedHandler;
-
-	@Autowired(required = false)
-	@Qualifier("oauth2AuthenticationSuccessHandler")
-	private AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler;
-
-	@Autowired(required = false)
-	@Qualifier("oauth2AuthenticationFailureHandler")
-	private AuthenticationFailureHandler oauth2AuthenticationFailureHandler;
-
-	@Autowired(required = false)
-	private HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
-
-	@Autowired(required = false)
-	private OAuth2AuthorizationRequestResolver oAuth2AuthorizationRequestResolver;
 
 	@Autowired
 	@Qualifier("defaultAuthenticationSuccessHandler")
@@ -103,9 +86,6 @@ public class SecurityConfiguration {
 	@Autowired
 	private RefreshTokenAuthenticationProvider refreshTokenAuthenticationProvider;
 
-	@Autowired(required = false)
-	OAuth2Configuration oauth2Configuration;
-
 	@Autowired
 	@Qualifier("jwtHeaderTokenExtractor")
 	private TokenExtractor jwtHeaderTokenExtractor;
@@ -115,6 +95,23 @@ public class SecurityConfiguration {
 
 	@Autowired
 	private RateLimitProcessingFilter rateLimitProcessingFilter;
+
+	@Autowired(required = false)
+	@Qualifier("oauth2AuthenticationSuccessHandler")
+	private AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler;
+
+	@Autowired(required = false)
+	@Qualifier("oauth2AuthenticationFailureHandler")
+	private AuthenticationFailureHandler oauth2AuthenticationFailureHandler;
+
+	@Autowired(required = false)
+	private HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
+
+	@Autowired(required = false)
+	private OAuth2AuthorizationRequestResolver oAuth2AuthorizationRequestResolver;
+
+	@Autowired(required = false)
+	OAuth2Configuration oauth2Configuration;
 
 	@Bean
 	protected PasswordEncoder passwordEncoder() {
@@ -138,8 +135,7 @@ public class SecurityConfiguration {
 	protected JwtTokenAuthenticationProcessingFilter buildJwtTokenAuthenticationProcessingFilter() throws Exception {
 		List<String> pathsToSkip = new ArrayList<>(Arrays.asList(NON_TOKEN_BASED_AUTH_ENTRY_POINTS));
 		pathsToSkip.addAll(Arrays.asList(WS_ENTRY_POINT, TOKEN_REFRESH_ENTRY_POINT, FORM_BASED_LOGIN_ENTRY_POINT,
-			PUBLIC_LOGIN_ENTRY_POINT, DEVICE_API_ENTRY_POINT, MAIL_OAUTH2_PROCESSING_ENTRY_POINT,
-			DEVICE_CONNECTIVITY_CERTIFICATE_DOWNLOAD_ENTRY_POINT));
+			PUBLIC_LOGIN_ENTRY_POINT, DEVICE_API_ENTRY_POINT, MAIL_OAUTH2_PROCESSING_ENTRY_POINT));
 
 		SkipPathRequestMatcher matcher = new SkipPathRequestMatcher(pathsToSkip, TOKEN_BASED_AUTH_ENTRY_POINT);
 		JwtTokenAuthenticationProcessingFilter filter
@@ -159,7 +155,7 @@ public class SecurityConfiguration {
 	public AuthenticationManager authenticationManager(ObjectPostProcessor<Object> objectPostProcessor) throws Exception {
 		DefaultAuthenticationEventPublisher eventPublisher = objectPostProcessor
 			.postProcess(new DefaultAuthenticationEventPublisher());
-		var auth = new AuthenticationManagerBuilder(objectPostProcessor);
+		AuthenticationManagerBuilder auth = new AuthenticationManagerBuilder(objectPostProcessor);
 		auth.authenticationEventPublisher(eventPublisher);
 		auth.authenticationProvider(restAuthenticationProvider);
 		auth.authenticationProvider(jwtAuthenticationProvider);
@@ -179,13 +175,12 @@ public class SecurityConfiguration {
 			.exceptionHandling(config -> {
 			})
 			.sessionManagement(config -> config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-			.authorizeRequests(config -> config
+			.authorizeHttpRequests(config -> config
 				.requestMatchers(DEVICE_API_ENTRY_POINT).permitAll() // Device HTTP Transport API
 				.requestMatchers(FORM_BASED_LOGIN_ENTRY_POINT).permitAll() // Login end-point
 				.requestMatchers(PUBLIC_LOGIN_ENTRY_POINT).permitAll() // Public login end-point
 				.requestMatchers(TOKEN_REFRESH_ENTRY_POINT).permitAll() // Token refresh end-point
 				.requestMatchers(MAIL_OAUTH2_PROCESSING_ENTRY_POINT).permitAll() // Mail oauth2 code processing url
-				.requestMatchers(DEVICE_CONNECTIVITY_CERTIFICATE_DOWNLOAD_ENTRY_POINT).permitAll() // Device connectivity certificate (public)
 				.requestMatchers(NON_TOKEN_BASED_AUTH_ENTRY_POINTS).permitAll()// static resources, user activation and password reset end-points
 				.requestMatchers(WS_ENTRY_POINT).permitAll() // Protected WebSocket API End-points
 				.requestMatchers(TOKEN_BASED_AUTH_ENTRY_POINT).authenticated()) // Protected API End-points
@@ -209,16 +204,4 @@ public class SecurityConfiguration {
 		}
 		return http.build();
 	}
-
-//	@Bean
-//	@ConditionalOnMissingBean(CorsFilter.class)
-//	public CorsFilter corsFilter(@Autowired MvcCorsProperties mvcCorsProperties) {
-//		if (mvcCorsProperties.getMappings().size() == 0) {
-//			return new CorsFilter(new UrlBasedCorsConfigurationSource());
-//		} else {
-//			UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//			source.setCorsConfigurations(mvcCorsProperties.getMappings());
-//			return new CorsFilter(source);
-//		}
-//	}
 }

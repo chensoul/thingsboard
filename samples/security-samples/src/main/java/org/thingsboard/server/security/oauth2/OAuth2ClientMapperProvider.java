@@ -19,7 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import org.thingsboard.domain.oauth2.MapperType;
+import org.thingsboard.domain.oauth2.model.MapperType;
+import org.thingsboard.server.security.oauth2.mapper.OAuth2ClientMapper;
 
 @Slf4j
 @Component

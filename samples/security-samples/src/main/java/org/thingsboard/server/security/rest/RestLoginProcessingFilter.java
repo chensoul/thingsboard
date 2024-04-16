@@ -39,7 +39,7 @@ import org.thingsboard.server.security.rest.model.LoginRequest;
 
 @Slf4j
 public class RestLoginProcessingFilter extends AbstractAuthenticationProcessingFilter {
-	private final AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource = new RestAuthenticationDetailsSource();
+	private final AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource = new RestAuthenticationDetailSource();
 	private final AuthenticationSuccessHandler successHandler;
 	private final AuthenticationFailureHandler failureHandler;
 
@@ -55,7 +55,7 @@ public class RestLoginProcessingFilter extends AbstractAuthenticationProcessingF
 		throws AuthenticationException, IOException, ServletException {
 		if (!HttpMethod.POST.name().equals(request.getMethod())) {
 			if (log.isDebugEnabled()) {
-				log.debug("Authentication method not supported. Request method: " + request.getMethod());
+				log.debug("{} authentication method not supported", request.getMethod());
 			}
 			throw new AuthMethodNotSupportedException("Authentication method not supported");
 		}
@@ -68,7 +68,7 @@ public class RestLoginProcessingFilter extends AbstractAuthenticationProcessingF
 		}
 
 		if (StringUtils.isBlank(loginRequest.getUsername()) || StringUtils.isEmpty(loginRequest.getPassword())) {
-			throw new AuthenticationServiceException("Username or Password not provided");
+			throw new AuthenticationServiceException("Username or password is empty");
 		}
 
 		UserPrincipal principal = new UserPrincipal(UserPrincipal.Type.USER_NAME, loginRequest.getUsername());

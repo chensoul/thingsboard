@@ -19,7 +19,7 @@ import java.io.Serializable;
 import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.thingsboard.common.dao.EntityDaoService;
+import org.thingsboard.common.dao.entity.EntityDaoService;
 import org.thingsboard.common.exception.ThingsboardException;
 import org.thingsboard.domain.user.model.User;
 import org.thingsboard.domain.user.model.UserCredential;
@@ -37,21 +37,21 @@ public interface UserService extends EntityDaoService {
 
 	void deleteUser(User user);
 
-	UserCredential findUserCredentialsByUserId(Serializable id);
+	UserCredential findUserCredentialByUserId(Serializable id);
 
-	UserCredential saveUserCredentials(UserCredential userCredential);
+	UserCredential saveUserCredential(UserCredential userCredential);
 
 	UserCredential requestExpiredPasswordReset(Serializable id);
 
-	UserCredential replaceUserCredentials(UserCredential userCredential);
+	UserCredential replaceUserCredential(UserCredential userCredential);
 
-	UserCredential findUserCredentialsByActivateToken(String activateToken);
+	UserCredential findUserCredentialByActivateToken(String activateToken);
 
-	UserCredential findUserCredentialsByResetToken(String resetToken);
+	UserCredential findUserCredentialByResetToken(String resetToken);
 
 	UserCredential requestPasswordReset(String email);
 
-	UserCredential activateUserCredentials(String activateToken, String encodedPassword);
+	UserCredential activateUserCredential(String activateToken, String encodedPassword);
 
 	void setUserCredentialsEnabled(Serializable userId, boolean userCredentialsEnabled);
 
@@ -67,13 +67,11 @@ public interface UserService extends EntityDaoService {
 
 	Page<User> findAllSysAdmins(Pageable pageable);
 
-	void resetFailedLoginAttempts(Serializable userId);
+	void resetFailedLoginAttempt(Serializable userId);
 
-	int increaseFailedLoginAttempts(Serializable userId);
+	int increaseFailedLoginAttempt(Serializable userId);
 
 	void setLastLoginTs(Serializable id);
 
 	SecurityUser changePassword(String currentPassword, String newPassword) throws ThingsboardException;
-
-
 }

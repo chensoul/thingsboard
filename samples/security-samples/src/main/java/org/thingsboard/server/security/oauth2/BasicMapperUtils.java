@@ -19,7 +19,7 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.springframework.util.StringUtils;
-import org.thingsboard.domain.oauth2.OAuth2MapperConfig;
+import org.thingsboard.domain.oauth2.model.OAuth2MapperConfig;
 
 @Slf4j
 public class BasicMapperUtils {
@@ -38,12 +38,12 @@ public class BasicMapperUtils {
 		if (!StringUtils.isEmpty(config.getBasic().getFirstNameAttributeKey())) {
 			firstName = getStringAttributeByKey(attributes, config.getBasic().getFirstNameAttributeKey());
 		}
-		oauth2User.setName(firstName + " " + lastName);
+		oauth2User.setName(StringUtils.isEmpty(lastName) ? firstName : firstName + " " + lastName);
 
-		if (!StringUtils.isEmpty(config.getBasic().getCustomerNamePattern())) {
+		if (!StringUtils.isEmpty(config.getBasic().getMerchantNamePattern())) {
 			StrSubstitutor sub = new StrSubstitutor(attributes, START_PLACEHOLDER_PREFIX, END_PLACEHOLDER_PREFIX);
-			String customerName = sub.replace(config.getBasic().getCustomerNamePattern());
-			oauth2User.setMerchantName(customerName);
+			String merchantName = sub.replace(config.getBasic().getMerchantNamePattern());
+			oauth2User.setMerchantName(merchantName);
 		}
 		return oauth2User;
 	}

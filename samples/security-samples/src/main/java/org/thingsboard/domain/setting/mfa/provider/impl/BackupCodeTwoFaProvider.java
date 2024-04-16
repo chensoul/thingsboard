@@ -23,12 +23,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.thingsboard.domain.setting.mfa.TwoFaSettingService;
 import org.thingsboard.domain.setting.mfa.config.BackupCodeTwoFaConfig;
 import org.thingsboard.domain.setting.mfa.provider.BackupCodeTwoFaProviderConfig;
 import org.thingsboard.domain.setting.mfa.provider.TwoFaProvider;
 import org.thingsboard.domain.setting.mfa.provider.TwoFaProviderType;
 import org.thingsboard.domain.user.model.User;
-import org.thingsboard.domain.setting.mfa.TwoFaSettingService;
 import org.thingsboard.server.security.SecurityUser;
 
 @Component

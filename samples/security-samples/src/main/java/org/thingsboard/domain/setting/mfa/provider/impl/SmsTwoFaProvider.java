@@ -21,12 +21,12 @@ import org.springframework.stereotype.Service;
 import org.thingsboard.common.exception.ThingsboardErrorCode;
 import org.thingsboard.common.exception.ThingsboardException;
 import org.thingsboard.common.util.FormatUtils;
-import org.thingsboard.domain.user.model.User;
-import org.thingsboard.server.security.SecurityUser;
 import org.thingsboard.domain.setting.mfa.config.SmsTwoFaConfig;
 import org.thingsboard.domain.setting.mfa.provider.SmsTwoFaProviderConfig;
 import org.thingsboard.domain.setting.mfa.provider.TwoFaProviderType;
-import org.thingsboard.server.sms.SmsService;
+import org.thingsboard.domain.user.model.User;
+import org.thingsboard.server.security.SecurityUser;
+import org.thingsboard.domain.notification.channel.sms.SmsService;
 
 @Service
 public class SmsTwoFaProvider extends OtpBasedTwoFaProvider<SmsTwoFaProviderConfig, SmsTwoFaConfig> {

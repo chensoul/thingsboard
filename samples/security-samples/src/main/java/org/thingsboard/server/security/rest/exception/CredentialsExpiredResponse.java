@@ -34,7 +34,6 @@ public class CredentialsExpiredResponse extends ErrorResponse {
         return new CredentialsExpiredResponse(message, resetToken);
     }
 
-    @Schema(description = "Password reset token", accessMode = Schema.AccessMode.READ_ONLY)
     public String getResetToken() {
         return resetToken;
     }

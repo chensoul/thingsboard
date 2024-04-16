@@ -15,15 +15,14 @@
  */
 package org.thingsboard.domain.user.event;
 
-import java.io.Serializable;
 import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 public class UserCredentialInvalidationEvent extends UserAuthDataChangedEvent {
-	private final Serializable userId;
+	private final Long userId;
 	private final long ts;
 
-	public UserCredentialInvalidationEvent(Serializable userId) {
+	public UserCredentialInvalidationEvent(Long userId) {
 		this.userId = userId;
 		this.ts = System.currentTimeMillis();
 	}

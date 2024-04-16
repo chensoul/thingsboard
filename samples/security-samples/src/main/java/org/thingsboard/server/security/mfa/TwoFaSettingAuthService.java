@@ -2,9 +2,8 @@ package org.thingsboard.server.security.mfa;
 
 import java.util.List;
 import org.thingsboard.common.exception.ThingsboardException;
-import org.thingsboard.domain.setting.mfa.TwoFaAuthController;
-import org.thingsboard.domain.setting.mfa.provider.TwoFaProvider;
 import org.thingsboard.domain.setting.mfa.provider.TwoFaProviderType;
+import org.thingsboard.domain.user.TwoFaAuthController;
 import org.thingsboard.server.security.SecurityUser;
 import org.thingsboard.server.security.jwt.token.JwtPair;
 

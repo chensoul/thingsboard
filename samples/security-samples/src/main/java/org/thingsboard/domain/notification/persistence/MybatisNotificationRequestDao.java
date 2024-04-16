@@ -3,6 +3,7 @@ package org.thingsboard.domain.notification.persistence;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.thingsboard.common.dao.aspect.SqlDao;
 import org.thingsboard.common.dao.MybatisAbstractDao;
 import org.thingsboard.domain.notification.NotificationRequest;
 
@@ -12,6 +13,7 @@ import org.thingsboard.domain.notification.NotificationRequest;
  * @author <a href="mailto:ichensoul@gmail.com">chensoul</a>
  * @since TODO
  */
+@SqlDao
 @RequiredArgsConstructor
 @Component
 public class MybatisNotificationRequestDao extends MybatisAbstractDao<NotificationRequestEntity, NotificationRequest> implements NotificationRequestDao {

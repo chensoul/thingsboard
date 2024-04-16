@@ -45,7 +45,7 @@ public abstract class NotificationDeliveryTemplate {
 	}
 
 	@JsonIgnore
-	public abstract NotificationDeliveryType getDeliveryType();
+	public abstract NotificationDeliveryMethod getDeliveryMethod();
 
 	@JsonIgnore
 	public abstract NotificationDeliveryTemplate copy();

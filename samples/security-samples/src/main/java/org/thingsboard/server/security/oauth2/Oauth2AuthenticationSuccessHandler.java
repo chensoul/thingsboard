@@ -32,13 +32,16 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import org.thingsboard.domain.oauth2.OAuth2Registration;
-import org.thingsboard.domain.oauth2.OAuth2Service;
-import static org.thingsboard.server.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository.PREV_URI_COOKIE_NAME;
-import org.thingsboard.server.security.jwt.token.JwtPair;
+import org.thingsboard.domain.audit.ActionType;
+import org.thingsboard.domain.oauth2.model.OAuth2Registration;
+import org.thingsboard.domain.oauth2.service.OAuth2Service;
+import org.thingsboard.domain.setting.security.SecuritySettingService;
 import org.thingsboard.server.security.SecurityUser;
 import org.thingsboard.server.security.jwt.JwtTokenFactory;
-import org.thingsboard.domain.setting.security.SecuritySettingService;
+import org.thingsboard.server.security.jwt.token.JwtPair;
+import static org.thingsboard.server.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository.PREV_URI_COOKIE_NAME;
+import org.thingsboard.server.security.oauth2.mapper.OAuth2ClientMapper;
+import org.thingsboard.server.security.rest.RestAuthenticationDetail;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -83,7 +86,7 @@ public class Oauth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
 			JwtPair tokenPair = tokenFactory.createTokenPair(securityUser);
 			getRedirectStrategy().sendRedirect(request, response, getRedirectUrl(baseUrl, tokenPair));
-//			systemSecurityService.logLoginAction(securityUser, new RestAuthenticationDetails(request), ActionType.LOGIN, registration.getName(), null);
+			securitySettingService.logLoginAction(securityUser, ActionType.LOGIN, null, new RestAuthenticationDetail(request), registration.getProviderId());
 		} catch (Exception e) {
 			log.debug("Error occurred during processing authentication success result. " +
 					  "request [{}], response [{}], authentication [{}]", request, response, authentication, e);

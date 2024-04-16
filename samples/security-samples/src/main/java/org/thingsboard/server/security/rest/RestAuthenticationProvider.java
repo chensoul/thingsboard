@@ -69,7 +69,7 @@ public class RestAuthenticationProvider implements AuthenticationProvider {
 			String username = userPrincipal.getValue();
 			String password = (String) authentication.getCredentials();
 
-			SecuritySetting securitySetting = securitySettingService.getSecuritySettings();
+			SecuritySetting securitySetting = securitySettingService.getSecuritySetting();
 			PasswordPolicy passwordPolicy = securitySetting.getPasswordPolicy();
 			if (Boolean.TRUE.equals(passwordPolicy.getForceUserToResetPasswordIfNotValid())) {
 				try {
@@ -100,13 +100,13 @@ public class RestAuthenticationProvider implements AuthenticationProvider {
 		}
 
 		try {
-			UserCredential userCredential = userService.findUserCredentialsByUserId(user.getId());
+			UserCredential userCredential = userService.findUserCredentialByUserId(user.getId());
 			if (userCredential == null) {
 				throw new UsernameNotFoundException("User credentials not found");
 			}
 
 			try {
-				securitySettingService.validateUserCredentials(user.getTenantId(), userCredential, username, password);
+				securitySettingService.validateUserCredential(user.getTenantId(), userCredential, username, password);
 			} catch (LockedException e) {
 				securitySettingService.logLoginAction(user, ActionType.LOCKOUT, e, authentication.getDetails(), null);
 				throw e;

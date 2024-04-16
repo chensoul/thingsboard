@@ -21,8 +21,8 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.stereotype.Component;
-import org.thingsboard.domain.oauth2.OAuth2Registration;
-import org.thingsboard.domain.oauth2.OAuth2Service;
+import org.thingsboard.domain.oauth2.model.OAuth2Registration;
+import org.thingsboard.domain.oauth2.service.OAuth2Service;
 
 @Component
 public class HybridClientRegistrationRepository implements ClientRegistrationRepository {
@@ -51,7 +51,7 @@ public class HybridClientRegistrationRepository implements ClientRegistrationRep
 			.userInfoUri(registration.getUserInfoUri())
 			.userNameAttributeName(registration.getUserNameAttributeName())
 			.jwkSetUri(registration.getJwkSetUri())
-			.clientAuthenticationMethod(new ClientAuthenticationMethod(registration.getClientAuthenticationMethod()))
+			.clientAuthenticationMethod(new ClientAuthenticationMethod(registration.getClientAuthenticationMethod().toLowerCase()))
 			.redirectUri(defaultRedirectUriTemplate)
 			.build();
 	}

@@ -15,20 +15,15 @@
  */
 package com.chensoul.netty.thingsboard.mqtt.session;
 
-import com.chensoul.netty.thingsboard.mqtt.auth.DeviceAuthResult;
 import com.chensoul.netty.thingsboard.mqtt.auth.DeviceAuthService;
-import com.chensoul.netty.thingsboard.mqtt.auth.TransportDeviceInfo;
-import com.chensoul.netty.thingsboard.mqtt.auth.ValidateDeviceCredentialsResponse;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.thingsboard.domain.iot.device.Device;
-import org.thingsboard.domain.iot.device.DeviceProfile;
-import org.thingsboard.domain.iot.device.credential.DeviceTokenCredential;
+import org.thingsboard.domain.iot.deviceprofile.DeviceProfile;
+import org.thingsboard.transport.auth.TransportDeviceInfo;
 
 /**
  * @author Andrew Shvayka
@@ -63,22 +58,6 @@ public abstract class DeviceAwareSessionContext implements SessionContext {
 		this.deviceId = deviceInfo.getDeviceId();
 	}
 
-	public ValidateDeviceCredentialsResponse login(DeviceTokenCredential credential) {
-		DeviceAuthResult result = authService.process(credential);
-		ValidateDeviceCredentialsResponse response = null;
-		if (result.isSuccess()) {
-			Optional<Device> deviceOpt = authService.findDeviceById(result.getDeviceId());
-			if (deviceOpt.isPresent()) {
-				Device device = deviceOpt.get();
-				response = ValidateDeviceCredentialsResponse.builder().deviceInfo(new TransportDeviceInfo()).credential(credential.getCredentialId()).build();
-			}
-			return response;
-		} else {
-			log.debug("Can't find device using credentials [{}] due to {}", credential, result.getErrorMsg());
-			return response;
-		}
-
-	}
 
 //	@Override
 //	public void onDeviceProfileUpdate(TransportProtos.SessionInfoProto sessionInfo, DeviceProfile deviceProfile) {

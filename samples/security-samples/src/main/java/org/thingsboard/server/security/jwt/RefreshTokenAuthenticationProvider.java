@@ -42,7 +42,7 @@ public class RefreshTokenAuthenticationProvider implements AuthenticationProvide
 	private final JwtTokenFactory tokenFactory;
 	private final UserService userService;
 	private final MerchantService merchantService;
-	private final TokenOutdatingService tokenOutdatingService;
+	private final TokenCacheService tokenCacheService;
 
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -68,7 +68,7 @@ public class RefreshTokenAuthenticationProvider implements AuthenticationProvide
 			throw new UsernameNotFoundException("User not found by refresh token");
 		}
 
-		UserCredential userCredential = userService.findUserCredentialsByUserId(user.getId());
+		UserCredential userCredential = userService.findUserCredentialByUserId(user.getId());
 		if (userCredential == null) {
 			throw new UsernameNotFoundException("User credentials not found");
 		}

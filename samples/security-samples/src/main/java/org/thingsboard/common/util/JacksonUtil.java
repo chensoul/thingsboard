@@ -155,6 +155,10 @@ public class JacksonUtil {
 		}
 	}
 
+	public static JsonNode toJsonNode(Object value) {
+		return toJsonNode(toString(value), OBJECT_MAPPER);
+	}
+
 	public static JsonNode toJsonNode(String value) {
 		return toJsonNode(value, OBJECT_MAPPER);
 	}

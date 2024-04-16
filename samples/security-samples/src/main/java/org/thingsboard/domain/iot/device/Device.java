@@ -15,6 +15,7 @@
  */
 package org.thingsboard.domain.iot.device;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +33,6 @@ import org.thingsboard.domain.iot.HasOtaPackage;
 @EqualsAndHashCode(callSuper = true)
 @Slf4j
 public class Device extends BaseDataWithExtra<String> implements HasLabel, HasName, HasTenantId, HasMerchantId, HasOtaPackage {
-
 	private static final long serialVersionUID = 2807343040519543363L;
 
 	private String tenantId;
@@ -55,10 +55,9 @@ public class Device extends BaseDataWithExtra<String> implements HasLabel, HasNa
 	@Length
 	private String label;
 
-	private Long deviceProfileId;
+	private JsonNode deviceData;
 
-	//{"gateway":true,"overwriteActivityTime":true}
-	private transient DeviceData deviceData;
+	private Long deviceProfileId;
 
 	private String firmwareId;
 

@@ -20,12 +20,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.thingsboard.domain.notification.NotificationRequest;
-import org.thingsboard.domain.notification.template.NotificationDeliveryType;
+import org.thingsboard.domain.notification.template.NotificationDeliveryMethod;
 
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class NotificationRequestInfo extends NotificationRequest {
 	private String templateName;
-	private List<NotificationDeliveryType> deliveryTypes;
+	private List<NotificationDeliveryMethod> deliveryTypes;
 }

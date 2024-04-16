@@ -3,13 +3,13 @@ package org.thingsboard.domain.user.persistence;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import java.util.Set;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
-import org.thingsboard.common.aspect.SqlDao;
+import org.thingsboard.common.dao.aspect.SqlDao;
 import org.thingsboard.common.dao.DaoUtil;
 import org.thingsboard.common.dao.MybatisAbstractDao;
 import org.thingsboard.domain.user.model.Authority;
@@ -23,9 +23,9 @@ import org.thingsboard.domain.user.model.User;
  */
 @SqlDao
 @Component
+@RequiredArgsConstructor
 public class MybatisUserDao extends MybatisAbstractDao<UserEntity, User> implements UserDao {
-	@Autowired
-	private UserMapper mapper;
+	private final UserMapper mapper;
 
 	@Override
 	protected Class<UserEntity> getEntityClass() {
@@ -39,9 +39,7 @@ public class MybatisUserDao extends MybatisAbstractDao<UserEntity, User> impleme
 
 	@Override
 	public User findByEmail(String email) {
-		UserEntity entity = mapper.selectOne(Wrappers.<UserEntity>lambdaQuery()
-			.eq(UserEntity::getEmail, email));
-		return DaoUtil.getData(entity);
+		return DaoUtil.getData(mapper.selectOne(Wrappers.<UserEntity>lambdaQuery().eq(UserEntity::getEmail, email)));
 	}
 
 	@Override

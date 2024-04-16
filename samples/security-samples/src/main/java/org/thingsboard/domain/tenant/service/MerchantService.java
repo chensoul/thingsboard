@@ -16,6 +16,7 @@
 package org.thingsboard.domain.tenant.service;
 
 
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.thingsboard.domain.tenant.model.Merchant;
@@ -27,10 +28,11 @@ public interface MerchantService {
 
 	Merchant saveMerchant(Merchant merchant);
 
-	Page<Merchant> findTenants(Pageable pageable, String tenantId, String textSearch);
+	Page<Merchant> findTenant(Pageable pageable, String tenantId, String textSearch);
 
 	void deleteMerchant(Merchant merchant);
 
-	void deleteMerchantsByTenantId(String tenantId);
+	void deleteMerchantByTenantId(String tenantId);
 
+	Optional<Merchant> findMerchantByTenantIdAndName(String tenantId, String customerName);
 }

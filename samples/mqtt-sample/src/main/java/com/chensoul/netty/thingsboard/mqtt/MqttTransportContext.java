@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.thingsboard.transport.TransportContext;
 
 /**
  * Created by ashvayka on 04.10.18.
@@ -80,7 +81,7 @@ public class MqttTransportContext extends TransportContext {
 	@PostConstruct
 	public void init() {
 		super.init();
-		transportService.createGaugeStats("openConnections", connectionsCounter);
+//		transportService.createGaugeStats("openConnections", connectionsCounter);
 	}
 
 	public void channelRegistered() {

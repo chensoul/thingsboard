@@ -23,21 +23,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Component;
 import org.thingsboard.common.util.JacksonUtil;
-import org.thingsboard.domain.setting.system.model.SystemSetting;
-import org.thingsboard.domain.setting.system.service.SystemSettingService;
-import org.thingsboard.domain.setting.system.model.SystemSettingType;
+import org.thingsboard.domain.setting.system.SystemSetting;
+import org.thingsboard.domain.setting.system.SystemSettingType;
+import org.thingsboard.domain.setting.system.SystemSettingService;
 import static org.thingsboard.server.security.SecurityUser.SYS_TENANT_ID;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class DefaultJwtSettingService implements JwtSettingService {
-
 	private final SystemSettingService systemSettingService;
-	//	private final Optional<TbClusterService> tbClusterService;
-//	private final Optional<NotificationCenter> notificationCenter;
 	private final JwtSettingValidator jwtSettingValidator;
 
+	public static final String TOKEN_SIGNING_KEY_DEFAULT = "defaultSigningKey";
 	private static final Integer tokenExpirationTime = 9000;
 	private static final Integer refreshTokenExpTime = 604800;
 	private static final String tokenIssuer = "thingsboard.io";
@@ -51,7 +49,7 @@ public class DefaultJwtSettingService implements JwtSettingService {
 	@Override
 	public void createRandomJwtSetting() {
 		if (getJwtSettingsFromDb() == null) {
-			log.info("Creating JWT admin settings...");
+			log.info("Creating JWT setting...");
 			this.jwtSetting = getDefaultJwtSetting();
 			if (isSigningKeyDefault(jwtSetting)) {
 				this.jwtSetting.setTokenSigningKey(Base64.getEncoder().encodeToString(
@@ -72,7 +70,7 @@ public class DefaultJwtSettingService implements JwtSettingService {
 			adminJwtSettings.setId(existedSettings.getId());
 		}
 
-		log.info("Saving new JWT admin settings. From this moment, the JWT parameters from YAML and ENV will be ignored");
+		log.info("Saving new JWT setting. From this moment, the JWT parameters from YAML and ENV will be ignored");
 		systemSettingService.saveSystemSetting(SYS_TENANT_ID, adminJwtSettings);
 
 //		tbClusterService.ifPresent(cs -> cs.broadcastEntityStateChangeEvent(TenantId.SYS_TENANT_ID, TenantId.SYS_TENANT_ID, ComponentLifecycleEvent.UPDATED));

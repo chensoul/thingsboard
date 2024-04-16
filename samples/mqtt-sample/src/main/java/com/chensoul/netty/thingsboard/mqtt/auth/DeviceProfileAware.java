@@ -15,7 +15,7 @@
  */
 package com.chensoul.netty.thingsboard.mqtt.auth;
 
-import org.thingsboard.domain.iot.device.DeviceProfile;
+import org.thingsboard.domain.iot.deviceprofile.DeviceProfile;
 
 public interface DeviceProfileAware {
 

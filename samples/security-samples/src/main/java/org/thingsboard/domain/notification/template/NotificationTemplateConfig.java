@@ -26,10 +26,10 @@ public class NotificationTemplateConfig {
 
 	@Valid
 	@NotEmpty
-	private Map<NotificationDeliveryType, NotificationDeliveryTemplate> deliveryTemplates;
+	private Map<NotificationDeliveryMethod, NotificationDeliveryTemplate> deliveryTemplates;
 
 	public NotificationTemplateConfig copy() {
-		Map<NotificationDeliveryType, NotificationDeliveryTemplate> templates = new HashMap<>(deliveryTemplates);
+		Map<NotificationDeliveryMethod, NotificationDeliveryTemplate> templates = new HashMap<>(deliveryTemplates);
 		templates.replaceAll((deliveryMethod, template) -> template.copy());
 		NotificationTemplateConfig copy = new NotificationTemplateConfig();
 		copy.setDeliveryTemplates(templates);

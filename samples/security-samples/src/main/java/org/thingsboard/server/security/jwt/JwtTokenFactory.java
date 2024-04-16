@@ -36,14 +36,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
-import org.thingsboard.domain.user.model.Authority;
 import org.thingsboard.domain.setting.jwt.JwtSettingService;
-import org.thingsboard.server.security.jwt.token.AccessJwtToken;
-import org.thingsboard.server.security.jwt.token.JwtPair;
-import org.thingsboard.server.security.jwt.token.JwtToken;
+import org.thingsboard.domain.user.model.Authority;
 import org.thingsboard.server.security.SecurityUser;
 import static org.thingsboard.server.security.SecurityUser.SYS_TENANT_ID;
 import org.thingsboard.server.security.UserPrincipal;
+import org.thingsboard.server.security.jwt.token.AccessJwtToken;
+import org.thingsboard.server.security.jwt.token.JwtPair;
+import org.thingsboard.server.security.jwt.token.JwtToken;
 
 @Component
 @RequiredArgsConstructor
@@ -60,7 +60,7 @@ public class JwtTokenFactory {
 	private static final String SESSION_ID = "sessionId";
 
 	private final JwtSettingService jwtSettingService;
-	private final TokenOutdatingService tokenOutdatingService;
+	private final TokenCacheService tokenCacheService;
 
 	/**
 	 * Factory method for issuing new JWT Tokens.
@@ -70,14 +70,13 @@ public class JwtTokenFactory {
 			throw new IllegalArgumentException("User doesn't have any privileges");
 		}
 
-		UserPrincipal principal = securityUser.getUserPrincipal();
-
 		JwtBuilder jwtBuilder = setUpToken(securityUser, securityUser.getAuthorities().stream()
 			.map(GrantedAuthority::getAuthority).collect(Collectors.toList()), jwtSettingService.getJwtSetting().getTokenExpirationTime());
 		jwtBuilder.claim(NAME, securityUser.getName())
 			.claim(ENABLED, securityUser.isEnabled())
-			.claim(IS_PUBLIC, principal.getType() == UserPrincipal.Type.PUBLIC_ID);
-		if (securityUser.getTenantId() != null) {
+			.claim(IS_PUBLIC, securityUser.getUserPrincipal().getType() == UserPrincipal.Type.PUBLIC_ID);
+
+		if (StringUtils.isNotBlank(securityUser.getTenantId())) {
 			jwtBuilder.claim(TENANT_ID, securityUser.getTenantId());
 		}
 		if (securityUser.getMerchantId() != null) {
@@ -85,7 +84,6 @@ public class JwtTokenFactory {
 		}
 
 		String token = jwtBuilder.compact();
-
 		return new AccessJwtToken(token);
 	}
 
@@ -117,9 +115,10 @@ public class JwtTokenFactory {
 			securityUser.setSessionId(claims.get(SESSION_ID, String.class));
 		}
 
-		if (tokenOutdatingService.isOutdated(securityUser.getId(), securityUser.getSessionId(), claims.getIssuedAt().getTime())) {
-			throw new JwtExpiredTokenException("Token is expired");
+		if (tokenCacheService.isExpired(securityUser.getId(), securityUser.getSessionId(), claims.getIssuedAt().getTime())) {
+			throw new JwtExpiredTokenException("Token has expired");
 		}
+
 		UserPrincipal principal;
 		if (securityUser.getAuthority() != Authority.PRE_VERIFICATION_TOKEN) {
 			securityUser.setName(claims.get(NAME, String.class));
@@ -164,6 +163,11 @@ public class JwtTokenFactory {
 		if (claims.get(SESSION_ID, String.class) != null) {
 			securityUser.setSessionId(claims.get(SESSION_ID, String.class));
 		}
+
+		if (tokenCacheService.isExpired(securityUser.getId(), securityUser.getSessionId(), claims.getIssuedAt().getTime())) {
+			throw new JwtExpiredTokenException("Token has expired");
+		}
+
 		return securityUser;
 	}
 
@@ -202,15 +206,11 @@ public class JwtTokenFactory {
 
 	public Jws<Claims> parseTokenClaims(String token) {
 		try {
-			return Jwts.parser()
-				.setSigningKey(jwtSettingService.getJwtSetting().getTokenSigningKey())
-				.parseClaimsJws(token);
+			return Jwts.parser().setSigningKey(jwtSettingService.getJwtSetting().getTokenSigningKey()).parseClaimsJws(token);
 		} catch (UnsupportedJwtException | MalformedJwtException | IllegalArgumentException ex) {
-			log.debug("Token is Invalid", ex);
-			throw new BadCredentialsException("Token is Invalid", ex);
+			throw new BadCredentialsException("Token has Invalid", ex);
 		} catch (SignatureException | ExpiredJwtException expiredEx) {
-			log.debug("Token is expired", expiredEx);
-			throw new JwtExpiredTokenException(token, "Token expired", expiredEx);
+			throw new JwtExpiredTokenException(token, "Token has expired", expiredEx);
 		}
 	}
 

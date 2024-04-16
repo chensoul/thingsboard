@@ -18,20 +18,20 @@ package org.thingsboard.domain.setting.security;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.AuthenticationException;
 import org.thingsboard.domain.audit.ActionType;
+import org.thingsboard.domain.setting.mfa.TwoFaSystemSetting;
 import org.thingsboard.domain.user.model.User;
 import org.thingsboard.domain.user.model.UserCredential;
 import org.thingsboard.server.security.SecurityUser;
-import org.thingsboard.domain.setting.mfa.TwoFaSystemSetting;
 
 public interface SecuritySettingService {
 
-	SecuritySetting getSecuritySettings();
+	SecuritySetting getSecuritySetting();
 
-	SecuritySetting saveSecuritySettings(SecuritySetting securitySetting);
+	SecuritySetting saveSecuritySetting(SecuritySetting securitySetting);
 
 	void validatePasswordByPolicy(String password, PasswordPolicy passwordPolicy);
 
-	void validateUserCredentials(String tenantId, UserCredential userCredential, String username, String password) throws AuthenticationException;
+	void validateUserCredential(String tenantId, UserCredential userCredential, String username, String password) throws AuthenticationException;
 
 	void validateTwoFaVerification(SecurityUser securityUser, boolean verificationSuccess, TwoFaSystemSetting twoFaSystemSettings);
 
@@ -39,6 +39,6 @@ public interface SecuritySettingService {
 
 	String getBaseUrl(HttpServletRequest httpServletRequest);
 
-	void logLoginAction(User user, ActionType actionType, Exception e, Object authenticationDetails, String provider);
+	void logLoginAction(User user, ActionType actionType, Exception e, Object authenticationDetails, String authProviderId);
 
 }

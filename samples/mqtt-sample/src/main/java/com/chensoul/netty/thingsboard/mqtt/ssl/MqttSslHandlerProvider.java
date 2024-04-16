@@ -15,7 +15,6 @@
  */
 package com.chensoul.netty.thingsboard.mqtt.ssl;
 
-import com.chensoul.netty.thingsboard.mqtt.TransportService;
 import io.netty.handler.ssl.SslHandler;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;

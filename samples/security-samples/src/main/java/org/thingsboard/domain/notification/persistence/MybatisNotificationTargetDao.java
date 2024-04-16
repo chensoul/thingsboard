@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+import org.thingsboard.common.dao.aspect.SqlDao;
 import org.thingsboard.common.dao.DaoUtil;
 import org.thingsboard.common.dao.MybatisAbstractDao;
 import org.thingsboard.domain.notification.targets.NotificationTarget;
@@ -22,6 +23,7 @@ import org.thingsboard.domain.notification.template.NotificationType;
  * @author <a href="mailto:ichensoul@gmail.com">chensoul</a>
  * @since TODO
  */
+@SqlDao
 @AllArgsConstructor
 @Component
 public class MybatisNotificationTargetDao extends MybatisAbstractDao<NotificationTargetEntity, NotificationTarget> implements NotificationTargetDao {

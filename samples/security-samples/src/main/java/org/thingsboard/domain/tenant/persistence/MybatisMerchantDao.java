@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+import org.thingsboard.common.dao.aspect.SqlDao;
 import org.thingsboard.common.dao.DaoUtil;
 import org.thingsboard.common.dao.MybatisAbstractDao;
 import org.thingsboard.domain.tenant.model.Merchant;
@@ -20,6 +21,7 @@ import org.thingsboard.domain.tenant.model.Merchant;
  * @author <a href="mailto:ichensoul@gmail.com">chensoul</a>
  * @since TODO
  */
+@SqlDao
 @RequiredArgsConstructor
 @Component
 public class MybatisMerchantDao extends MybatisAbstractDao<MerchantEntity, Merchant> implements MerchantDao {
@@ -36,7 +38,7 @@ public class MybatisMerchantDao extends MybatisAbstractDao<MerchantEntity, Merch
 	}
 
 	@Override
-	public Optional<Merchant> findMerchantsByTenantIdAndName(String tenantId, String name) {
+	public Optional<Merchant> findMerchantByTenantIdAndName(String tenantId, String name) {
 		MerchantEntity entity = getRepository().selectOne(Wrappers.<MerchantEntity>lambdaQuery().eq(MerchantEntity::getTenantId, tenantId).eq(MerchantEntity::getName, name));
 		return Optional.of(DaoUtil.getData(entity));
 	}

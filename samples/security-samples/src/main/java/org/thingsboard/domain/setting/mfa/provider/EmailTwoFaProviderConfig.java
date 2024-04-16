@@ -23,8 +23,8 @@ import lombok.EqualsAndHashCode;
 public class EmailTwoFaProviderConfig extends OtpBasedTwoFaProviderConfig {
 
     @Override
-    public TwoFaProviderType getProviderType() {
-        return TwoFaProviderType.EMAIL;
+	public TwoFaProviderType getProviderType() {
+		return TwoFaProviderType.EMAIL;
     }
 
 }

@@ -102,8 +102,8 @@ public class WebNotificationDeliveryTemplate extends NotificationDeliveryTemplat
 	}
 
 	@Override
-	public NotificationDeliveryType getDeliveryType() {
-		return NotificationDeliveryType.WEB;
+	public NotificationDeliveryMethod getDeliveryMethod() {
+		return NotificationDeliveryMethod.WEB;
 	}
 
 	@Override

@@ -19,9 +19,7 @@ import lombok.Data;
 
 @Data
 public class BasicMqttCredential {
-
     private String clientId;
     private String userName;
     private String password;
-
 }

@@ -21,16 +21,18 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.thingsboard.common.util.MiscUtils;
+import org.thingsboard.domain.oauth2.model.OAuth2ClientInfo;
+import org.thingsboard.domain.oauth2.model.OAuth2Info;
+import org.thingsboard.domain.oauth2.model.PlatformType;
+import org.thingsboard.domain.oauth2.service.OAuth2Service;
 import org.thingsboard.server.security.oauth2.OAuth2Configuration;
 
 @RestController
@@ -39,11 +41,9 @@ import org.thingsboard.server.security.oauth2.OAuth2Configuration;
 @RequiredArgsConstructor
 public class OAuth2Controller {
 	private final OAuth2Service oAuth2Service;
+	private final OAuth2Configuration oAuth2Configuration;
 
-	@Autowired
-	private OAuth2Configuration oAuth2Configuration;
-
-	@RequestMapping(value = "/noauth/oauth2Clients", method = RequestMethod.POST)
+	@GetMapping("/noauth/oauth2Clients")
 	public List<OAuth2ClientInfo> getOAuth2Clients(HttpServletRequest request,
 												   @RequestParam(required = false) String pkgName,
 												   @RequestParam(required = false) String platform) {
@@ -66,21 +66,20 @@ public class OAuth2Controller {
 	}
 
 	@PreAuthorize("hasAnyAuthority('SYS_ADMIN')")
-	@RequestMapping(value = "/oauth2/config", method = RequestMethod.GET, produces = "application/json")
+	@GetMapping("/oauth2/config")
 	public OAuth2Info getCurrentOAuth2Info() {
 		return oAuth2Service.findOAuth2Info();
 	}
 
 	@PreAuthorize("hasAnyAuthority('SYS_ADMIN')")
-	@RequestMapping(value = "/oauth2/config", method = RequestMethod.POST)
-	@ResponseStatus(value = HttpStatus.OK)
+	@PostMapping("/oauth2/config")
 	public OAuth2Info saveOAuth2Info(@RequestBody OAuth2Info oauth2Info) {
 		oAuth2Service.saveOAuth2Info(oauth2Info);
 		return oAuth2Service.findOAuth2Info();
 	}
 
 	@PreAuthorize("hasAnyAuthority('SYS_ADMIN')")
-	@RequestMapping(value = "/oauth2/loginProcessingUrl", method = RequestMethod.GET)
+	@GetMapping("/oauth2/loginProcessingUrl")
 	public String getLoginProcessingUrl() {
 		return oAuth2Configuration.getLoginProcessingUrl();
 	}

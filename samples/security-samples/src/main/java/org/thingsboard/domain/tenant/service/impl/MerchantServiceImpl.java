@@ -1,5 +1,6 @@
 package org.thingsboard.domain.tenant.service.impl;
 
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -31,6 +32,11 @@ public class MerchantServiceImpl implements MerchantService {
 	}
 
 	@Override
+	public Optional<Merchant> findMerchantByTenantIdAndName(String tenantId, String customerName) {
+		return merchantDao.findMerchantByTenantIdAndName(tenantId, customerName);
+	}
+
+	@Override
 	public Merchant saveMerchant(Merchant merchant) {
 		merchantValidator.validate(merchant);
 		Merchant save = merchantDao.save(merchant);
@@ -50,12 +56,12 @@ public class MerchantServiceImpl implements MerchantService {
 	}
 
 	@Override
-	public void deleteMerchantsByTenantId(String tenantId) {
+	public void deleteMerchantByTenantId(String tenantId) {
 		merchantDao.removeByTenantId(tenantId);
 	}
 
 	@Override
-	public Page<Merchant> findTenants(Pageable pageable, String tenantId, String search) {
+	public Page<Merchant> findTenant(Pageable pageable, String tenantId, String search) {
 		return merchantDao.findTenants(pageable, tenantId, search);
 	}
 }

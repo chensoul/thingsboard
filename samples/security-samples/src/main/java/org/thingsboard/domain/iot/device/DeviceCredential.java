@@ -18,6 +18,8 @@ package org.thingsboard.domain.iot.device;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.thingsboard.common.model.BaseData;
+import org.thingsboard.domain.iot.device.credential.DeviceCredentialFilter;
+import org.thingsboard.domain.iot.device.model.DeviceCredentialType;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

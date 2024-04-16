@@ -51,19 +51,19 @@ import org.thingsboard.common.util.JacksonUtil;
 import org.thingsboard.common.util.MiscUtils;
 import org.thingsboard.domain.audit.ActionType;
 import org.thingsboard.domain.audit.AuditLogService;
-import org.thingsboard.domain.setting.system.model.SystemSetting;
-import org.thingsboard.domain.setting.system.model.SystemSettingType;
-import org.thingsboard.domain.setting.system.service.SystemSettingService;
+import org.thingsboard.domain.notification.channel.mail.MailService;
+import org.thingsboard.domain.setting.mfa.TwoFaSystemSetting;
+import org.thingsboard.domain.setting.system.SystemSetting;
+import org.thingsboard.domain.setting.system.SystemSettingService;
+import org.thingsboard.domain.setting.system.SystemSettingType;
 import org.thingsboard.domain.user.model.User;
 import org.thingsboard.domain.user.model.UserCredential;
 import org.thingsboard.domain.user.service.UserService;
 import org.thingsboard.domain.user.service.impl.UserServiceImpl;
-import org.thingsboard.server.mail.MailService;
-import org.thingsboard.server.security.rest.RestAuthenticationDetails;
-import org.thingsboard.server.security.rest.exception.UserPasswordExpiredException;
 import org.thingsboard.server.security.SecurityUser;
 import static org.thingsboard.server.security.SecurityUser.SYS_TENANT_ID;
-import org.thingsboard.domain.setting.mfa.TwoFaSystemSetting;
+import org.thingsboard.server.security.rest.RestAuthenticationDetail;
+import org.thingsboard.server.security.rest.exception.UserPasswordExpiredException;
 import ua_parser.Client;
 
 @Service
@@ -89,16 +89,16 @@ public class DefaultSecuritySettingService implements SecuritySettingService {
 	@Autowired
 	private AuditLogService auditLogService;
 
-	@Cacheable(cacheNames = SECURITY_SETTINGS_CACHE, key = "'securitySettings'")
+	@Cacheable(cacheNames = SECURITY_SETTINGS_CACHE, key = "'securitySetting'")
 	@Override
-	public SecuritySetting getSecuritySettings() {
+	public SecuritySetting getSecuritySetting() {
 		SecuritySetting securitySetting = null;
 		SystemSetting systemSetting = systemSettingService.findSystemSettingByType(SYS_TENANT_ID, SystemSettingType.SECURITY);
 		if (systemSetting != null) {
 			try {
 				securitySetting = JacksonUtil.convertValue(systemSetting.getExtra(), SecuritySetting.class);
 			} catch (Exception e) {
-				throw new RuntimeException("Failed to load security settings!", e);
+				throw new RuntimeException("Failed to load security setting", e);
 			}
 		} else {
 			securitySetting = new SecuritySetting();
@@ -109,9 +109,9 @@ public class DefaultSecuritySettingService implements SecuritySettingService {
 		return securitySetting;
 	}
 
-	@CacheEvict(cacheNames = SECURITY_SETTINGS_CACHE, key = "'securitySettings'")
+	@CacheEvict(cacheNames = SECURITY_SETTINGS_CACHE, key = "'securitySetting'")
 	@Override
-	public SecuritySetting saveSecuritySettings(SecuritySetting securitySetting) {
+	public SecuritySetting saveSecuritySetting(SecuritySetting securitySetting) {
 		SystemSetting systemSetting = systemSettingService.findSystemSettingByType(SYS_TENANT_ID, SystemSettingType.SECURITY);
 		if (systemSetting == null) {
 			systemSetting = new SystemSetting();
@@ -123,37 +123,37 @@ public class DefaultSecuritySettingService implements SecuritySettingService {
 		try {
 			return JacksonUtil.convertValue(savedSystemSetting.getExtra(), SecuritySetting.class);
 		} catch (Exception e) {
-			throw new RuntimeException("Failed to load security settings!", e);
+			throw new RuntimeException("Failed to load security setting", e);
 		}
 	}
 
 	@Override
-	public void validateUserCredentials(String tenantId, UserCredential userCredential, String username, String password) throws AuthenticationException {
+	public void validateUserCredential(String tenantId, UserCredential userCredential, String username, String password) throws AuthenticationException {
 		if (!encoder.matches(password, userCredential.getPassword())) {
-			int failedLoginAttempts = userService.increaseFailedLoginAttempts(userCredential.getUserId());
-			SecuritySetting securitySetting = self.getSecuritySettings();
+			int failedLoginAttempts = userService.increaseFailedLoginAttempt(userCredential.getUserId());
+			SecuritySetting securitySetting = self.getSecuritySetting();
 			if (securitySetting.getMaxFailedLoginAttempts() != null && securitySetting.getMaxFailedLoginAttempts() > 0) {
 				if (failedLoginAttempts > securitySetting.getMaxFailedLoginAttempts() && userCredential.isEnabled()) {
 					lockAccount(userCredential.getUserId(), username, securitySetting.getUserLockoutNotificationEmail(), securitySetting.getMaxFailedLoginAttempts());
-					throw new LockedException("Authentication Failed. Username was locked due to security policy.");
+					throw new LockedException("User was locked due to security policy");
 				}
 			}
-			throw new BadCredentialsException("Authentication Failed. Username or Password not valid.");
+			throw new BadCredentialsException("Username or password not valid");
 		}
 
 		if (!userCredential.isEnabled()) {
 			throw new DisabledException("User is not active");
 		}
 
-		userService.resetFailedLoginAttempts(userCredential.getUserId());
+		userService.resetFailedLoginAttempt(userCredential.getUserId());
 
-		SecuritySetting securitySetting = self.getSecuritySettings();
+		SecuritySetting securitySetting = self.getSecuritySetting();
 		if (isPositiveInteger(securitySetting.getPasswordPolicy().getPasswordExpirationPeriodDays()) && userCredential.getCreatedTime() != 0) {
 			if ((userCredential.getCreatedTime()
 				 + TimeUnit.DAYS.toMillis(securitySetting.getPasswordPolicy().getPasswordExpirationPeriodDays()))
 				< System.currentTimeMillis()) {
 				userCredential = userService.requestExpiredPasswordReset(userCredential.getId());
-				throw new UserPasswordExpiredException("User password expired!", userCredential.getResetToken());
+				throw new UserPasswordExpiredException("User password has expired", userCredential.getResetToken());
 			}
 		}
 	}
@@ -164,9 +164,9 @@ public class DefaultSecuritySettingService implements SecuritySettingService {
 
 		int failedVerificationAttempts;
 		if (!verificationSuccess) {
-			failedVerificationAttempts = userService.increaseFailedLoginAttempts(userId);
+			failedVerificationAttempts = userService.increaseFailedLoginAttempt(userId);
 		} else {
-			userService.resetFailedLoginAttempts(userId);
+			userService.resetFailedLoginAttempt(userId);
 			return;
 		}
 
@@ -174,9 +174,9 @@ public class DefaultSecuritySettingService implements SecuritySettingService {
 		if (maxVerificationFailures != null && maxVerificationFailures > 0
 			&& failedVerificationAttempts >= maxVerificationFailures) {
 			userService.setUserCredentialsEnabled(userId, false);
-			SecuritySetting securitySetting = self.getSecuritySettings();
+			SecuritySetting securitySetting = self.getSecuritySetting();
 			lockAccount(userId, securityUser.getEmail(), securitySetting.getUserLockoutNotificationEmail(), maxVerificationFailures);
-			throw new LockedException("User account was locked due to exceeded 2FA verification attempts");
+			throw new LockedException("User was locked due to exceeded 2FA verification attempts");
 		}
 	}
 
@@ -193,7 +193,7 @@ public class DefaultSecuritySettingService implements SecuritySettingService {
 
 	@Override
 	public void validatePassword(String password, UserCredential userCredential) throws DataValidationException {
-		SecuritySetting securitySetting = self.getSecuritySettings();
+		SecuritySetting securitySetting = self.getSecuritySetting();
 		PasswordPolicy passwordPolicy = securitySetting.getPasswordPolicy();
 
 		validatePasswordByPolicy(password, passwordPolicy);
@@ -268,14 +268,14 @@ public class DefaultSecuritySettingService implements SecuritySettingService {
 	}
 
 	@Override
-	public void logLoginAction(User user, ActionType actionType, Exception e, Object authenticationDetails, String provider) {
+	public void logLoginAction(User user, ActionType actionType, Exception e, Object authenticationDetails, String authProviderId) {
 		String clientAddress = "Unknown";
 		String serverAddress = "Unknown";
 		String browser = "Unknown";
 		String os = "Unknown";
 		String device = "Unknown";
-		if (authenticationDetails instanceof RestAuthenticationDetails) {
-			RestAuthenticationDetails details = (RestAuthenticationDetails) authenticationDetails;
+		if (authenticationDetails instanceof RestAuthenticationDetail) {
+			RestAuthenticationDetail details = (RestAuthenticationDetail) authenticationDetails;
 			clientAddress = details.getClientAddress();
 			serverAddress = details.getServerAddress();
 			if (details.getUserAgent() != null) {
@@ -321,7 +321,7 @@ public class DefaultSecuritySettingService implements SecuritySettingService {
 		actionData.put("browser", browser);
 		actionData.put("os", os);
 		actionData.put("device", device);
-		actionData.put("provider", provider);
+		actionData.put("authProviderId", authProviderId);
 
 		auditLogService.logEntityAction(user, user, EntityType.USER, actionType, e, actionData);
 	}

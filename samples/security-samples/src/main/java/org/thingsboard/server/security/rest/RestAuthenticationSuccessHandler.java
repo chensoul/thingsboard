@@ -37,8 +37,8 @@ import org.thingsboard.server.security.jwt.JwtTokenFactory;
 import org.thingsboard.server.security.jwt.token.JwtPair;
 import org.thingsboard.server.security.jwt.token.TwoFaAuthenticationToken;
 
-@Component(value = "defaultAuthenticationSuccessHandler")
 @RequiredArgsConstructor
+@Component(value = "defaultAuthenticationSuccessHandler")
 public class RestAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 	private final JwtTokenFactory tokenFactory;
 	private final TwoFaSettingService twoFaSettingService;
@@ -47,15 +47,15 @@ public class RestAuthenticationSuccessHandler implements AuthenticationSuccessHa
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 										Authentication authentication) throws IOException, ServletException {
 		SecurityUser securityUser = (SecurityUser) authentication.getPrincipal();
-		JwtPair tokenPair = new JwtPair();
 
+		JwtPair tokenPair;
 		if (authentication instanceof TwoFaAuthenticationToken) {
 			int preVerificationTokenLifetime = twoFaSettingService.getTwoFaSystemSetting(true)
-				.flatMap(settings -> Optional.ofNullable(settings.getTotalAllowedTimeForVerification())
+				.flatMap(setting -> Optional.ofNullable(setting.getTotalAllowedTimeForVerification())
 					.filter(time -> time > 0))
 				.orElse((int) TimeUnit.MINUTES.toSeconds(30));
+			tokenPair = new JwtPair();
 			tokenPair.setToken(tokenFactory.createPreVerificationToken(securityUser, preVerificationTokenLifetime).getToken());
-			tokenPair.setRefreshToken(null);
 			tokenPair.setScope(Authority.PRE_VERIFICATION_TOKEN);
 		} else {
 			tokenPair = tokenFactory.createTokenPair(securityUser);
@@ -74,7 +74,6 @@ public class RestAuthenticationSuccessHandler implements AuthenticationSuccessHa
 	 */
 	protected final void clearAuthenticationAttributes(HttpServletRequest request) {
 		HttpSession session = request.getSession(false);
-
 		if (session == null) {
 			return;
 		}

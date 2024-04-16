@@ -25,11 +25,13 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
+import org.thingsboard.common.dao.aspect.SqlDao;
 import org.thingsboard.common.entity.BaseEntity;
 import org.thingsboard.common.model.BaseData;
 import org.thingsboard.common.util.JacksonUtil;
 
 @Slf4j
+@SqlDao
 public abstract class MybatisAbstractDao<E extends BaseEntity<? extends Serializable, D>, D extends BaseData>
 	extends DaoListeningExecutorService implements Dao<D> {
 

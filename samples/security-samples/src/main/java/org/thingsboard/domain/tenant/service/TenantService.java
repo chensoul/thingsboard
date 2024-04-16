@@ -24,6 +24,8 @@ public interface TenantService {
 
 	Tenant findTenantById(String tenantId);
 
+	Tenant findTenantByName(String name);
+
 	TenantInfo findTenantInfoById(String tenantId);
 
 	Tenant saveTenant(Tenant tenant);

@@ -2,11 +2,11 @@ package org.thingsboard.domain.user.persistence;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.thingsboard.common.aspect.SqlDao;
 import org.thingsboard.common.dao.DaoUtil;
 import org.thingsboard.common.dao.MybatisAbstractDao;
+import org.thingsboard.common.dao.aspect.SqlDao;
 import org.thingsboard.domain.user.model.UserSetting;
 import org.thingsboard.domain.user.model.UserSettingType;
 
@@ -16,11 +16,11 @@ import org.thingsboard.domain.user.model.UserSettingType;
  * @author <a href="mailto:ichensoul@gmail.com">chensoul</a>
  * @since TODO
  */
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Component
 @SqlDao
 public class MybatisUserSettingDao extends MybatisAbstractDao<UserSettingEntity, UserSetting> implements UserSettingDao {
-	private UserSettingMapper mapper;
+	private final UserSettingMapper mapper;
 
 	@Override
 	protected Class<UserSettingEntity> getEntityClass() {
@@ -36,5 +36,10 @@ public class MybatisUserSettingDao extends MybatisAbstractDao<UserSettingEntity,
 	public UserSetting findByUserIdAndType(Long userId, UserSettingType type) {
 		UserSettingEntity entity = getRepository().selectOne(Wrappers.<UserSettingEntity>lambdaQuery().eq(UserSettingEntity::getUserId, userId).eq(UserSettingEntity::getType, type.name().toLowerCase()));
 		return DaoUtil.getData(entity);
+	}
+
+	@Override
+	public void removeByUserId(Long userId) {
+		getRepository().delete(Wrappers.<UserSettingEntity>lambdaQuery().eq(UserSettingEntity::getUserId, userId));
 	}
 }

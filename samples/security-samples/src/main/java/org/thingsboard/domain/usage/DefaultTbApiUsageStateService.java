@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
@@ -46,13 +45,13 @@ import org.thingsboard.domain.kv.BasicTsKvEntry;
 import org.thingsboard.domain.kv.LongDataEntry;
 import org.thingsboard.domain.kv.StringDataEntry;
 import org.thingsboard.domain.kv.TsKvEntry;
+import org.thingsboard.domain.notification.channel.mail.MailExecutorService;
+import org.thingsboard.domain.notification.channel.mail.MailService;
 import org.thingsboard.domain.tenant.model.TenantProfile;
 import org.thingsboard.domain.tenant.model.TenantProfileConfiguration;
 import org.thingsboard.domain.tenant.model.TenantProfileData;
 import org.thingsboard.domain.tenant.service.TenantProfileService;
 import org.thingsboard.domain.tenant.service.TenantService;
-import org.thingsboard.server.mail.MailExecutorService;
-import org.thingsboard.server.mail.MailService;
 import static org.thingsboard.server.security.SecurityUser.SYS_TENANT_ID;
 
 @Slf4j
@@ -169,7 +168,7 @@ public class DefaultTbApiUsageStateService implements TbApiUsageStateService {
 	@Override
 	public void onTenantUpdate(String tenantId) {
 		log.info("[{}] On Tenant Update.", tenantId);
-		TenantProfile tenantProfile = tenantProfileService.findDefaultTenantProfile(tenantId);
+		TenantProfile tenantProfile = tenantProfileService.findDefaultTenantProfile();
 		updateLock.lock();
 		try {
 			TenantApiUsageState state = (TenantApiUsageState) myUsageStates.get(tenantId);
@@ -298,8 +297,7 @@ public class DefaultTbApiUsageStateService implements TbApiUsageStateService {
 					state.setCycles(state.getNextCycleTs(), SchedulerUtils.getStartOfNextNextMonth());
 					saveNewCounts(state, Arrays.asList(ApiUsageRecordKey.values()));
 					if (state.getEntityType() == EntityType.TENANT && !state.getEntityId().equals(SYS_TENANT_ID)) {
-						String tenantId = state.getTenantId();
-						updateTenantState((TenantApiUsageState) state, tenantProfileService.findDefaultTenantProfile(tenantId));
+						updateTenantState((TenantApiUsageState) state, tenantProfileService.findDefaultTenantProfile());
 					}
 				}
 			});

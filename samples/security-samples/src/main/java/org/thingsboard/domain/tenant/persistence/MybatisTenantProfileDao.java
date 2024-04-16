@@ -3,7 +3,7 @@ package org.thingsboard.domain.tenant.persistence;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import java.util.stream.Collectors;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.thingsboard.common.dao.DaoUtil;
 import org.thingsboard.common.dao.MybatisAbstractDao;
+import org.thingsboard.common.dao.aspect.SqlDao;
 import org.thingsboard.domain.tenant.model.TenantProfile;
 
 /**
@@ -19,10 +20,11 @@ import org.thingsboard.domain.tenant.model.TenantProfile;
  * @author <a href="mailto:ichensoul@gmail.com">chensoul</a>
  * @since TODO
  */
-@AllArgsConstructor
+@SqlDao
+@RequiredArgsConstructor
 @Component
 public class MybatisTenantProfileDao extends MybatisAbstractDao<TenantProfileEntity, TenantProfile> implements TenantProfileDao {
-	private TenantProfileMapper tenantProfileMapper;
+	private final TenantProfileMapper mapper;
 
 	@Override
 	protected Class<TenantProfileEntity> getEntityClass() {
@@ -31,13 +33,13 @@ public class MybatisTenantProfileDao extends MybatisAbstractDao<TenantProfileEnt
 
 	@Override
 	protected BaseMapper<TenantProfileEntity> getRepository() {
-		return tenantProfileMapper;
+		return mapper;
 	}
 
 	@Override
-	public TenantProfile findDefaultTenantProfile(String tenantId) {
+	public TenantProfile findDefaultTenantProfile() {
 		TenantProfileEntity entity = getRepository().selectOne(Wrappers.<TenantProfileEntity>lambdaQuery()
-			.eq(TenantProfileEntity::getTenantId, tenantId).eq(TenantProfileEntity::getIsDefault, true).last("limit 1"));
+			.eq(TenantProfileEntity::getIsDefault, true));
 
 		return DaoUtil.getData(entity);
 	}

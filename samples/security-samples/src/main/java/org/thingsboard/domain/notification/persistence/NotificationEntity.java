@@ -25,6 +25,7 @@ import org.thingsboard.common.entity.LongBaseEntity;
 import org.thingsboard.domain.notification.Notification;
 import org.thingsboard.domain.notification.NotificationStatus;
 import org.thingsboard.domain.notification.info.NotificationInfo;
+import org.thingsboard.domain.notification.template.NotificationDeliveryMethod;
 import org.thingsboard.domain.notification.template.NotificationType;
 
 @Data
@@ -37,6 +38,8 @@ public class NotificationEntity extends LongBaseEntity<Notification> {
 	private Long recipientId;
 
 	private NotificationType type;
+
+	private NotificationDeliveryMethod deliveryMethod;
 
 	private String subject;
 
@@ -58,6 +61,7 @@ public class NotificationEntity extends LongBaseEntity<Notification> {
 		notification.setRequestId(requestId);
 		notification.setRecipientId(recipientId);
 		notification.setType(type);
+		notification.setDeliveryMethod(deliveryMethod);
 		notification.setSubject(subject);
 		notification.setText(text);
 		notification.setConfig(config);

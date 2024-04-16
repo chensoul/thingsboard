@@ -19,19 +19,19 @@ import java.util.Arrays;
 import java.util.Set;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.thingsboard.domain.notification.template.NotificationDeliveryType;
+import org.thingsboard.domain.notification.template.NotificationDeliveryMethod;
 
 @RequiredArgsConstructor
 public enum NotificationTargetType {
 
-	PLATFORM_USER(Set.of(NotificationDeliveryType.WEB, NotificationDeliveryType.EMAIL, NotificationDeliveryType.SMS, NotificationDeliveryType.MOBILE_APP)),
-	SLACK(Set.of(NotificationDeliveryType.SLACK)),
-	MICROSOFT_TEAM(Set.of(NotificationDeliveryType.MICROSOFT_TEAM));
+	PLATFORM_USER(Set.of(NotificationDeliveryMethod.WEB, NotificationDeliveryMethod.EMAIL, NotificationDeliveryMethod.SMS, NotificationDeliveryMethod.MOBILE_APP)),
+	SLACK(Set.of(NotificationDeliveryMethod.SLACK)),
+	MICROSOFT_TEAM(Set.of(NotificationDeliveryMethod.MICROSOFT_TEAM));
 
 	@Getter
-	private final Set<NotificationDeliveryType> supportedDeliveryTypes;
+	private final Set<NotificationDeliveryMethod> supportedDeliveryTypes;
 
-	public static NotificationTargetType forDeliveryMethod(NotificationDeliveryType deliveryType) {
+	public static NotificationTargetType forDeliveryMethod(NotificationDeliveryMethod deliveryType) {
 		return Arrays.stream(values())
 			.filter(targetType -> targetType.getSupportedDeliveryTypes().contains(deliveryType))
 			.findFirst().orElse(null);

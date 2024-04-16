@@ -14,9 +14,9 @@ import static org.thingsboard.common.CacheConstants.USER_SETTINGS_CACHE;
 import org.thingsboard.common.exception.DataValidationException;
 import org.thingsboard.common.util.JacksonUtil;
 import org.thingsboard.common.validation.ConstraintValidator;
-import org.thingsboard.domain.user.persistence.UserSettingDao;
 import org.thingsboard.domain.user.model.UserSetting;
 import org.thingsboard.domain.user.model.UserSettingType;
+import org.thingsboard.domain.user.persistence.UserSettingDao;
 import org.thingsboard.domain.user.service.UserSettingService;
 
 /**
@@ -41,23 +41,23 @@ public class UserSettingServiceImpl implements UserSettingService {
 		newUserSetting.setType(type);
 		newUserSetting.setExtra(update(oldSettingsJson, settings));
 
-		return doSaveUserSettings(newUserSetting);
+		return doSaveUserSetting(newUserSetting);
 	}
 
 	@Override
-	@CacheEvict(cacheNames = USER_SETTINGS_CACHE, key = "'userSettings'")
+	@CacheEvict(cacheNames = USER_SETTINGS_CACHE, key = "'userSetting'")
 	public UserSetting saveUserSetting(UserSetting userSetting) {
-		return doSaveUserSettings(userSetting);
+		return doSaveUserSetting(userSetting);
 	}
 
 	@Override
-	@Cacheable(cacheNames = USER_SETTINGS_CACHE, key = "'userSettings'")
+	@Cacheable(cacheNames = USER_SETTINGS_CACHE, key = "'userSetting'")
 	public UserSetting findUserSetting(Long userId, UserSettingType type) {
 		return userSettingDao.findByUserIdAndType(userId, type);
 	}
 
 	@Override
-	@CacheEvict(cacheNames = USER_SETTINGS_CACHE, key = "'userSettings'")
+	@CacheEvict(cacheNames = USER_SETTINGS_CACHE, key = "'userSetting'")
 	public UserSetting deleteUserSetting(Long userId, UserSettingType type, List<String> jsonPaths) {
 		UserSetting userSetting = findUserSetting(userId, type);
 		if (userSetting == null) {
@@ -72,14 +72,14 @@ public class UserSettingServiceImpl implements UserSettingService {
 		return saveUserSetting(userSetting);
 	}
 
-	private UserSetting doSaveUserSettings(UserSetting userSetting) {
+	private UserSetting doSaveUserSetting(UserSetting userSetting) {
 		ConstraintValidator.validateFields(userSetting);
 		validateJsonKeys(userSetting.getExtra());
 		return userSettingDao.save(userSetting);
 	}
 
-	private void validateJsonKeys(JsonNode userSettings) {
-		Iterator<String> fieldNames = userSettings.fieldNames();
+	private void validateJsonKeys(JsonNode userSetting) {
+		Iterator<String> fieldNames = userSetting.fieldNames();
 		while (fieldNames.hasNext()) {
 			String fieldName = fieldNames.next();
 			if (fieldName.contains(".") || fieldName.contains(",")) {

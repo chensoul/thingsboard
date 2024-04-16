@@ -2,8 +2,8 @@ package org.thingsboard.domain.notification;
 
 import com.google.common.util.concurrent.FutureCallback;
 import java.util.Set;
-import org.thingsboard.domain.notification.settings.NotificationSettings;
-import org.thingsboard.domain.notification.template.NotificationDeliveryType;
+import org.thingsboard.domain.setting.notification.NotificationSetting;
+import org.thingsboard.domain.notification.template.NotificationDeliveryMethod;
 
 /**
  * TODO Comment
@@ -12,8 +12,8 @@ import org.thingsboard.domain.notification.template.NotificationDeliveryType;
  * @since TODO
  */
 public interface NotificationCenter {
-	NotificationRequest processNotificationRequest(NotificationRequest request, NotificationSettings settings, FutureCallback<NotificationRequestStats> callback);
+	NotificationRequest processNotificationRequest(NotificationRequest request, NotificationSetting settings, FutureCallback<NotificationRequestStats> callback);
 
-	Set<NotificationDeliveryType> getAvailableDeliveryTypes(String tenantId);
+	Set<NotificationDeliveryMethod> getAvailableDeliveryTypes(String tenantId);
 
 }

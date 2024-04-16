@@ -105,7 +105,7 @@ public class TbSqlBlockingQueue<E> implements TbSqlQueue<E> {
 
         logExecutor.scheduleAtFixedRate(() -> {
             if (queue.size() > 0 || stats.getTotal() > 0 || stats.getSuccessful() > 0 || stats.getFailed() > 0) {
-                log.info("Queue-{} [{}] queueSize [{}] totalAdded [{}] totalSaved [{}] totalFailed [{}]", index,
+                log.trace("Queue-{} [{}] queueSize [{}] totalAdded [{}] totalSaved [{}] totalFailed [{}]", index,
                         params.getLogName(), queue.size(), stats.getTotal(), stats.getSuccessful(), stats.getFailed());
                 stats.reset();
             }

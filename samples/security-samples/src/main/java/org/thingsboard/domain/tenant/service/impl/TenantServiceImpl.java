@@ -37,6 +37,11 @@ public class TenantServiceImpl implements TenantService {
 	}
 
 	@Override
+	public Tenant findTenantByName(String name) {
+		return tenantDao.findByName(name);
+	}
+
+	@Override
 	public TenantInfo findTenantInfoById(String tenantId) {
 		Tenant data = findTenantById(tenantId);
 
@@ -48,10 +53,9 @@ public class TenantServiceImpl implements TenantService {
 		BeanUtils.copyProperties(data, tenantInfo);
 
 		if (data.getTenantProfileId() == null) {
-			TenantProfile tenantProfile = this.tenantProfileService.findOrCreateDefaultTenantProfile(SYS_TENANT_ID);
-			tenantInfo.setTenantProfileId(tenantProfile.getId());
+			TenantProfile tenantProfile = this.tenantProfileService.findTenantProfileById(data.getTenantProfileId());
+			tenantInfo.setTenantProfileName(tenantProfile.getName());
 		}
-
 		return tenantInfo;
 	}
 

@@ -21,7 +21,7 @@ import org.thingsboard.common.dao.Dao;
 import org.thingsboard.domain.tenant.model.TenantProfile;
 
 public interface TenantProfileDao extends Dao<TenantProfile> {
-	TenantProfile findDefaultTenantProfile(String tenantId);
+	TenantProfile findDefaultTenantProfile();
 
 	Page<TenantProfile> findTenantProfiles(Pageable pageable,String tenantId,  String textSearch);
 

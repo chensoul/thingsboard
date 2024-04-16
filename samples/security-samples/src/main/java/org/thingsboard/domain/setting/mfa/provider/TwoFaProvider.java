@@ -16,9 +16,9 @@
 package org.thingsboard.domain.setting.mfa.provider;
 
 
+import org.thingsboard.domain.setting.mfa.config.TwoFaConfig;
 import org.thingsboard.domain.user.model.User;
 import org.thingsboard.server.security.SecurityUser;
-import org.thingsboard.domain.setting.mfa.config.TwoFaConfig;
 
 public interface TwoFaProvider<C extends TwoFaProviderConfig, A extends TwoFaConfig> {
 
