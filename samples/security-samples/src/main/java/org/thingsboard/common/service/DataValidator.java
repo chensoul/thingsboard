@@ -18,7 +18,7 @@ package org.thingsboard.common.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.thingsboard.common.exception.DataValidationException;
+import org.thingsboard.common.dao.exception.DataValidationException;
 import org.thingsboard.common.model.BaseData;
 import org.thingsboard.common.model.EntityType;
 import org.thingsboard.common.validation.ConstraintValidator;

@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.thingsboard.common.model.query;
+package org.thingsboard.domain.iot.alarm.query;
 
-public enum FilterPredicateType {
-    STRING,
-    NUMERIC,
-    BOOLEAN,
-    COMPLEX
+public enum DynamicValueSourceType {
+    CURRENT_TENANT,
+    CURRENT_CUSTOMER,
+    CURRENT_USER,
+    CURRENT_DEVICE
 }

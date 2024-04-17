@@ -17,7 +17,7 @@ package org.thingsboard.domain.setting.system;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.thingsboard.common.exception.DataValidationException;
+import org.thingsboard.common.dao.exception.DataValidationException;
 import org.thingsboard.common.service.DataValidator;
 import org.thingsboard.domain.setting.system.persistence.SystemSettingDao;
 

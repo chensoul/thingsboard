@@ -13,10 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.thingsboard.common.model.query;
+package org.thingsboard.domain.iot.alarm.query;
 
-public interface SimpleKeyFilterPredicate<T> extends KeyFilterPredicate {
+import java.util.List;
+import lombok.Data;
 
-    FilterPredicateValue<T> getValue();
+@Data
+public class ComplexFilterPredicate implements KeyFilterPredicate {
 
+    private ComplexOperation operation;
+    private List<KeyFilterPredicate> predicates;
+
+    @Override
+    public FilterPredicateType getType() {
+        return FilterPredicateType.COMPLEX;
+    }
+
+    public enum ComplexOperation {
+        AND,
+        OR
+    }
 }

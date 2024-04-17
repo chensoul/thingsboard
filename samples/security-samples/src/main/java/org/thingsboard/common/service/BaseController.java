@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.util.function.ThrowingFunction;
 import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
-import org.thingsboard.common.exception.DataValidationException;
+import org.thingsboard.common.dao.exception.DataValidationException;
 import org.thingsboard.common.exception.IncorrectParameterException;
 import org.thingsboard.common.exception.ThingsboardErrorCode;
 import org.thingsboard.common.exception.ThingsboardException;

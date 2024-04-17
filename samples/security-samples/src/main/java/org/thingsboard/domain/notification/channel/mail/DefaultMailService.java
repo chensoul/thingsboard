@@ -40,7 +40,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
-import org.thingsboard.common.exception.DataValidationException;
+import org.thingsboard.common.dao.exception.DataValidationException;
 import org.thingsboard.common.exception.ThingsboardErrorCode;
 import org.thingsboard.common.exception.ThingsboardException;
 import org.thingsboard.common.util.JacksonUtil;

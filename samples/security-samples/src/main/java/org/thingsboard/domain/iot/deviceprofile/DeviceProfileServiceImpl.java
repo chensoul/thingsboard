@@ -2,7 +2,7 @@ package org.thingsboard.domain.iot.deviceprofile;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.thingsboard.common.exception.DataValidationException;
+import org.thingsboard.common.dao.exception.DataValidationException;
 import org.thingsboard.common.util.JacksonUtil;
 import org.thingsboard.domain.iot.device.model.DeviceTransportType;
 import org.thingsboard.domain.iot.deviceprofile.model.DefaultDeviceProfileConfiguration;

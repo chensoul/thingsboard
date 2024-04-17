@@ -17,7 +17,7 @@ package org.thingsboard.domain.tenant.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.thingsboard.common.exception.DataValidationException;
+import org.thingsboard.common.dao.exception.DataValidationException;
 import org.thingsboard.common.service.DataValidator;
 import org.thingsboard.domain.tenant.model.Tenant;
 import org.thingsboard.domain.tenant.persistence.TenantDao;

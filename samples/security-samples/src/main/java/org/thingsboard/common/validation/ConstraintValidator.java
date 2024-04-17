@@ -34,7 +34,7 @@ import org.hibernate.validator.internal.engine.ConfigurationImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-import org.thingsboard.common.exception.DataValidationException;
+import org.thingsboard.common.dao.exception.DataValidationException;
 
 @Slf4j
 @Configuration

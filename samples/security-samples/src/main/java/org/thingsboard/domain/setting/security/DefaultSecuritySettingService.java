@@ -44,7 +44,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import static org.thingsboard.common.CacheConstants.SECURITY_SETTINGS_CACHE;
-import org.thingsboard.common.exception.DataValidationException;
+import org.thingsboard.common.dao.exception.DataValidationException;
 import org.thingsboard.common.exception.ThingsboardException;
 import org.thingsboard.common.model.EntityType;
 import org.thingsboard.common.util.JacksonUtil;

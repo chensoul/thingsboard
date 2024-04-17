@@ -13,17 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.thingsboard.common.exception;
+package org.thingsboard.domain.iot.alarm;
 
-public class DataValidationException extends RuntimeException {
+/**
+ * Created by ashvayka on 11.05.17.
+ */
+public enum AlarmSeverity {
 
-    private static final long serialVersionUID = 7659985660312721830L;
+    CRITICAL, MAJOR, MINOR, WARNING, INDETERMINATE;
 
-    public DataValidationException(String message) {
-        super(message);
-    }
-
-    public DataValidationException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }

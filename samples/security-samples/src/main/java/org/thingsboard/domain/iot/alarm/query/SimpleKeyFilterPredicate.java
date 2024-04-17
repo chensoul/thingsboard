@@ -13,20 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.thingsboard.domain.iot.deviceprofile.model;
+package org.thingsboard.domain.iot.alarm.query;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
-import org.thingsboard.domain.iot.alarm.query.FilterPredicateValue;
+public interface SimpleKeyFilterPredicate<T> extends KeyFilterPredicate {
 
-@Data
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class RepeatingAlarmConditionSpec implements AlarmConditionSpec {
+    FilterPredicateValue<T> getValue();
 
-    private FilterPredicateValue<Integer> predicate;
-
-    @Override
-    public AlarmConditionSpecType getType() {
-        return AlarmConditionSpecType.REPEATING;
-    }
 }

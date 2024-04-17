@@ -13,24 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.thingsboard.common.model.query;
+package org.thingsboard.domain.iot.alarm.query;
 
-import java.util.List;
+import jakarta.validation.Valid;
 import lombok.Data;
 
 @Data
-public class ComplexFilterPredicate implements KeyFilterPredicate {
+public class StringFilterPredicate implements SimpleKeyFilterPredicate<String> {
 
-    private ComplexOperation operation;
-    private List<KeyFilterPredicate> predicates;
+    private StringOperation operation;
+    @Valid
+    private FilterPredicateValue<String> value;
+    private boolean ignoreCase;
 
     @Override
     public FilterPredicateType getType() {
-        return FilterPredicateType.COMPLEX;
+        return FilterPredicateType.STRING;
     }
 
-    public enum ComplexOperation {
-        AND,
-        OR
+    public enum StringOperation {
+        EQUAL,
+        NOT_EQUAL,
+        STARTS_WITH,
+        ENDS_WITH,
+        CONTAINS,
+        NOT_CONTAINS,
+        IN,
+        NOT_IN
     }
 }

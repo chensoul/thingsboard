@@ -22,7 +22,7 @@ import java.util.TreeMap;
 import lombok.Data;
 import org.thingsboard.common.validation.Length;
 import org.thingsboard.common.validation.NoXss;
-import org.thingsboard.domain.iot.AlarmSeverity;
+import org.thingsboard.domain.iot.alarm.AlarmSeverity;
 
 @Data
 public class DeviceProfileAlarm implements Serializable {

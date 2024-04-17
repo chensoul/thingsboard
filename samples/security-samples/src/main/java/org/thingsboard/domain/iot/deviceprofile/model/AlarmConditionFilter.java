@@ -18,8 +18,8 @@ package org.thingsboard.domain.iot.deviceprofile.model;
 import jakarta.validation.Valid;
 import java.io.Serializable;
 import lombok.Data;
-import org.thingsboard.common.model.query.EntityKeyValueType;
-import org.thingsboard.common.model.query.KeyFilterPredicate;
+import org.thingsboard.domain.iot.alarm.query.EntityKeyValueType;
+import org.thingsboard.domain.iot.alarm.query.KeyFilterPredicate;
 import org.thingsboard.common.validation.NoXss;
 
 @Data

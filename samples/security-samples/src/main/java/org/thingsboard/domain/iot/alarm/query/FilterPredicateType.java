@@ -13,27 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.thingsboard.common.model.query;
+package org.thingsboard.domain.iot.alarm.query;
 
-import lombok.Data;
-
-@Data
-public class NumericFilterPredicate implements SimpleKeyFilterPredicate<Double>  {
-
-    private NumericOperation operation;
-    private FilterPredicateValue<Double> value;
-
-    @Override
-    public FilterPredicateType getType() {
-        return FilterPredicateType.NUMERIC;
-    }
-
-    public enum NumericOperation {
-        EQUAL,
-        NOT_EQUAL,
-        GREATER,
-        LESS,
-        GREATER_OR_EQUAL,
-        LESS_OR_EQUAL
-    }
+public enum FilterPredicateType {
+    STRING,
+    NUMERIC,
+    BOOLEAN,
+    COMPLEX
 }

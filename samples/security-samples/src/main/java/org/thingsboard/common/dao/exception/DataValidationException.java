@@ -13,32 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.thingsboard.common.model.query;
+package org.thingsboard.common.dao.exception;
 
-import jakarta.validation.Valid;
-import lombok.Data;
+public class DataValidationException extends RuntimeException {
 
-@Data
-public class StringFilterPredicate implements SimpleKeyFilterPredicate<String> {
+    private static final long serialVersionUID = 7659985660312721830L;
 
-    private StringOperation operation;
-    @Valid
-    private FilterPredicateValue<String> value;
-    private boolean ignoreCase;
-
-    @Override
-    public FilterPredicateType getType() {
-        return FilterPredicateType.STRING;
+    public DataValidationException(String message) {
+        super(message);
     }
 
-    public enum StringOperation {
-        EQUAL,
-        NOT_EQUAL,
-        STARTS_WITH,
-        ENDS_WITH,
-        CONTAINS,
-        NOT_CONTAINS,
-        IN,
-        NOT_IN
+    public DataValidationException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

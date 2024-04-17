@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 import org.thingsboard.common.model.event.ActionEntityEvent;
 import org.thingsboard.common.model.event.DeleteEntityEvent;
 import org.thingsboard.common.model.event.SaveEntityEvent;
-import org.thingsboard.common.exception.DataValidationException;
+import org.thingsboard.common.dao.exception.DataValidationException;
 import org.thingsboard.common.exception.ThingsboardErrorCode;
 import org.thingsboard.common.exception.ThingsboardException;
 import org.thingsboard.common.model.EntityType;

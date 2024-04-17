@@ -18,7 +18,7 @@ package org.thingsboard.domain.iot.deviceprofile.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.concurrent.TimeUnit;
 import lombok.Data;
-import org.thingsboard.common.model.query.FilterPredicateValue;
+import org.thingsboard.domain.iot.alarm.query.FilterPredicateValue;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)

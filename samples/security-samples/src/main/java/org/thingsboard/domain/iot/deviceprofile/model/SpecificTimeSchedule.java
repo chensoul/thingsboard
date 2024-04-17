@@ -17,7 +17,7 @@ package org.thingsboard.domain.iot.deviceprofile.model;
 
 import java.util.Set;
 import lombok.Data;
-import org.thingsboard.common.model.query.DynamicValue;
+import org.thingsboard.domain.iot.alarm.query.DynamicValue;
 
 @Data
 public class SpecificTimeSchedule implements AlarmSchedule {

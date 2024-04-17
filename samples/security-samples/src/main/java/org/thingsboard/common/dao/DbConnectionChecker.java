@@ -13,11 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.thingsboard.common.model.query;
+package org.thingsboard.common.dao;
 
-public enum EntityKeyValueType {
-    STRING,
-    NUMERIC,
-    BOOLEAN,
-    DATE_TIME
+public interface DbConnectionChecker {
+
+    boolean isDbConnected();
+
+    /**
+     * should be used for tests only
+     */
+    void setDbConnected(boolean value);
+
 }
