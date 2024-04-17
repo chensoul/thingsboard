@@ -23,21 +23,21 @@ import org.thingsboard.common.model.EntityType;
 
 public interface Dao<D> {
 
-	List<D> find();
-
 	D findById(Serializable id);
 
+	List<D> find();
+
+	ListenableFuture<D> findByIdAsync(Serializable id);
+
 	boolean existsById(Serializable id);
+
+	ListenableFuture<Boolean> existsByIdAsync(Serializable id);
 
 	D save(D t);
 
 	boolean removeById(Serializable id);
 
 	void removeByIds(Collection<Serializable> ids);
-
-	ListenableFuture<Boolean> existsByIdAsync(Serializable id);
-
-	ListenableFuture<D> findByIdAsync(Serializable id);
 
 	default EntityType getEntityType() {
 		return null;

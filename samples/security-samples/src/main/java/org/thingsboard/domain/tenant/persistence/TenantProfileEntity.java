@@ -20,7 +20,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
-import org.thingsboard.common.entity.LongBaseEntity;
+import org.thingsboard.common.dao.mybatis.LongBaseEntity;
 import org.thingsboard.common.util.JacksonUtil;
 import org.thingsboard.domain.tenant.model.TenantProfile;
 

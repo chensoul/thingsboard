@@ -3,7 +3,7 @@ package org.thingsboard.domain.iot.device;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.thingsboard.common.dao.MybatisAbstractDao;
+import org.thingsboard.common.dao.mybatis.AbstractMybatisDao;
 import org.thingsboard.common.dao.aspect.SqlDao;
 
 /**
@@ -15,7 +15,7 @@ import org.thingsboard.common.dao.aspect.SqlDao;
 @SqlDao
 @RequiredArgsConstructor
 @Component
-public class MybatisDeviceDao extends MybatisAbstractDao<DeviceEntity, Device> implements DeviceDao {
+public class MybatisDeviceDao extends AbstractMybatisDao<DeviceEntity, Device> implements DeviceDao {
 	private final DeviceMapper mapper;
 
 	@Override

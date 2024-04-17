@@ -16,7 +16,8 @@
 package com.chensoul.netty.thingsboard.mqtt.limits;
 
 import com.chensoul.netty.thingsboard.mqtt.MqttTransportContext;
-import com.chensoul.netty.thingsboard.mqtt.MqttTransportService;
+import static com.chensoul.netty.thingsboard.mqtt.MqttTransportServerInitializer.ADDRESS;
+import com.chensoul.netty.thingsboard.mqtt.MqttTransportStarter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.ipfilter.AbstractRemoteAddressFilter;
 import java.net.InetSocketAddress;
@@ -35,7 +36,7 @@ public class IpFilter extends AbstractRemoteAddressFilter<InetSocketAddress> {
 		log.info("[{}] Received msg: {}", ctx.channel().id(), remoteAddress);
 		if (context.checkAddress(remoteAddress)) {
 			log.info("[{}] Setting address: {}", ctx.channel().id(), remoteAddress);
-			ctx.channel().attr(MqttTransportService.ADDRESS).set(remoteAddress);
+			ctx.channel().attr(ADDRESS).set(remoteAddress);
 			return true;
 		} else {
 			return false;

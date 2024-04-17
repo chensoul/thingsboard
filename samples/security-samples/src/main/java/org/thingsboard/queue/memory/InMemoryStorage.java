@@ -16,7 +16,7 @@
 package org.thingsboard.queue.memory;
 
 import java.util.List;
-import org.thingsboard.domain.message.TbQueueMsg;
+import org.thingsboard.domain.message.QueueMsg;
 
 public interface InMemoryStorage {
 
@@ -24,8 +24,8 @@ public interface InMemoryStorage {
 
     int getLagTotal();
 
-    boolean put(String topic, TbQueueMsg msg);
+    boolean put(String topic, QueueMsg msg);
 
-    <T extends TbQueueMsg> List<T> get(String topic) throws InterruptedException;
+    <T extends QueueMsg> List<T> get(String topic) throws InterruptedException;
 
 }

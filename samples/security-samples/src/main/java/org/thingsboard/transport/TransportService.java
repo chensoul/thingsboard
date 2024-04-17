@@ -18,7 +18,7 @@ import org.thingsboard.domain.message.ValidateDeviceTokenRequestMsg;
 public interface TransportService {
 	GetDeviceResponseMsg getDevice(GetDeviceRequestMsg requestMsg);
 
-	GetDeviceCredentialsResponseMsg getDeviceCredentials(GetDeviceCredentialsRequestMsg requestMsg);
+	GetDeviceCredentialsResponseMsg getDeviceCredential(GetDeviceCredentialsRequestMsg requestMsg);
 
 	void process(DeviceTransportType transportType, ValidateDeviceTokenRequestMsg msg,
 				 TransportServiceCallback<ValidateDeviceCredentialsResponse> callback);

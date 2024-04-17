@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Arrays;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.thingsboard.common.entity.LongBaseEntity;
+import org.thingsboard.common.dao.mybatis.LongBaseEntity;
 import org.thingsboard.domain.oauth2.model.MapperType;
 import org.thingsboard.domain.oauth2.model.OAuth2BasicMapperConfig;
 import org.thingsboard.domain.oauth2.model.OAuth2ClientRegistrationTemplate;

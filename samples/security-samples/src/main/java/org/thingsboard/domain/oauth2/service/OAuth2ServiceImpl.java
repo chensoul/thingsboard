@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-import org.thingsboard.common.event.SaveEntityEvent;
+import org.thingsboard.common.model.event.SaveEntityEvent;
 import org.thingsboard.common.exception.DataValidationException;
 import org.thingsboard.common.model.BaseData;
 import org.thingsboard.domain.oauth2.model.OAuth2ClientInfo;

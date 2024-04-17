@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.thingsboard.common.dao.DaoUtil;
-import org.thingsboard.common.dao.MybatisAbstractDao;
+import org.thingsboard.common.dao.mybatis.AbstractMybatisDao;
 import org.thingsboard.common.dao.aspect.SqlDao;
 
 /**
@@ -16,7 +16,7 @@ import org.thingsboard.common.dao.aspect.SqlDao;
 @SqlDao
 @RequiredArgsConstructor
 @Component
-public class MybatisDeviceProfileDao extends MybatisAbstractDao<DeviceProfileEntity, DeviceProfile> implements DeviceProfileDao {
+public class MybatisDeviceProfileDao extends AbstractMybatisDao<DeviceProfileEntity, DeviceProfile> implements DeviceProfileDao {
 	private final DeviceProfileMapper mapper;
 
 	@Override

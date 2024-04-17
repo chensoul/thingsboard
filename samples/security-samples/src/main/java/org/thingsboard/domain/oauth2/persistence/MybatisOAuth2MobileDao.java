@@ -5,7 +5,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.thingsboard.common.dao.aspect.SqlDao;
-import org.thingsboard.common.dao.MybatisAbstractDao;
+import org.thingsboard.common.dao.mybatis.AbstractMybatisDao;
 import org.thingsboard.domain.oauth2.model.OAuth2Mobile;
 
 /**
@@ -17,7 +17,7 @@ import org.thingsboard.domain.oauth2.model.OAuth2Mobile;
 @SqlDao
 @Component
 @RequiredArgsConstructor
-public class MybatisOAuth2MobileDao extends MybatisAbstractDao<OAuth2MobileEntity, OAuth2Mobile> implements OAuth2MobileDao {
+public class MybatisOAuth2MobileDao extends AbstractMybatisDao<OAuth2MobileEntity, OAuth2Mobile> implements OAuth2MobileDao {
 	private final OAuth2MobileMapper mapper;
 
 	@Override

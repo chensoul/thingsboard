@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.thingsboard.common.dao.aspect.SqlDao;
 import org.thingsboard.common.dao.DaoUtil;
-import org.thingsboard.common.dao.MybatisAbstractDao;
+import org.thingsboard.common.dao.mybatis.AbstractMybatisDao;
 import org.thingsboard.domain.notification.Notification;
 import org.thingsboard.domain.notification.NotificationStatus;
 
@@ -21,7 +21,7 @@ import org.thingsboard.domain.notification.NotificationStatus;
 @SqlDao
 @RequiredArgsConstructor
 @Component
-public class MybatisNotificationDao extends MybatisAbstractDao<NotificationEntity, Notification> implements NotificationDao {
+public class MybatisNotificationDao extends AbstractMybatisDao<NotificationEntity, Notification> implements NotificationDao {
 	private final NotificationMapper mapper;
 
 	@Override

@@ -17,7 +17,7 @@ package org.thingsboard.domain.iot.deviceprofile.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
-import org.thingsboard.common.query.FilterPredicateValue;
+import org.thingsboard.common.model.query.FilterPredicateValue;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)

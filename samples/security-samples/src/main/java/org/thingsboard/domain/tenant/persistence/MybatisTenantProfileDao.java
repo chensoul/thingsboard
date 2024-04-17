@@ -10,7 +10,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.thingsboard.common.dao.DaoUtil;
-import org.thingsboard.common.dao.MybatisAbstractDao;
+import org.thingsboard.common.dao.mybatis.AbstractMybatisDao;
 import org.thingsboard.common.dao.aspect.SqlDao;
 import org.thingsboard.domain.tenant.model.TenantProfile;
 
@@ -23,7 +23,7 @@ import org.thingsboard.domain.tenant.model.TenantProfile;
 @SqlDao
 @RequiredArgsConstructor
 @Component
-public class MybatisTenantProfileDao extends MybatisAbstractDao<TenantProfileEntity, TenantProfile> implements TenantProfileDao {
+public class MybatisTenantProfileDao extends AbstractMybatisDao<TenantProfileEntity, TenantProfile> implements TenantProfileDao {
 	private final TenantProfileMapper mapper;
 
 	@Override

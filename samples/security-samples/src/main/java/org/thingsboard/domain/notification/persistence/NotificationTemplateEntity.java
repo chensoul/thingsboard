@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.thingsboard.common.entity.LongBaseEntity;
+import org.thingsboard.common.dao.mybatis.LongBaseEntity;
 import org.thingsboard.domain.notification.template.NotificationTemplate;
 import org.thingsboard.domain.notification.template.NotificationTemplateConfig;
 import org.thingsboard.domain.notification.template.NotificationType;

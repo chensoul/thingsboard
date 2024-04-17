@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.io.Serializable;
-import org.thingsboard.common.query.DynamicValue;
+import org.thingsboard.common.model.query.DynamicValue;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(

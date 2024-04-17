@@ -6,8 +6,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.thingsboard.common.event.DeleteEntityEvent;
-import org.thingsboard.common.event.SaveEntityEvent;
+import org.thingsboard.common.model.event.DeleteEntityEvent;
+import org.thingsboard.common.model.event.SaveEntityEvent;
 import org.thingsboard.domain.tenant.model.Tenant;
 import org.thingsboard.domain.tenant.model.TenantInfo;
 import org.thingsboard.domain.tenant.model.TenantProfile;
@@ -15,7 +15,6 @@ import org.thingsboard.domain.tenant.persistence.TenantDao;
 import org.thingsboard.domain.tenant.service.TenantProfileService;
 import org.thingsboard.domain.tenant.service.TenantService;
 import org.thingsboard.domain.tenant.service.TenantValidator;
-import static org.thingsboard.server.security.SecurityUser.SYS_TENANT_ID;
 
 /**
  * TODO Comment
@@ -62,7 +61,7 @@ public class TenantServiceImpl implements TenantService {
 	@Override
 	public Tenant saveTenant(Tenant tenant) {
 		if (tenant.getTenantProfileId() == null) {
-			TenantProfile tenantProfile = tenantProfileService.findOrCreateDefaultTenantProfile(SYS_TENANT_ID);
+			TenantProfile tenantProfile = tenantProfileService.findOrCreateDefaultTenantProfile();
 			tenant.setTenantProfileId(tenantProfile.getId());
 		}
 

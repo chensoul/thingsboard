@@ -12,7 +12,7 @@ import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.thingsboard.common.anntation.AfterStartUp;
+import org.thingsboard.common.util.AfterStartUp;
 import org.thingsboard.common.stats.MessagesStats;
 import org.thingsboard.common.stats.StatsFactory;
 import org.thingsboard.common.stats.StatsType;
@@ -24,7 +24,7 @@ import org.thingsboard.domain.message.GetDeviceCredentialsRequestMsg;
 import org.thingsboard.domain.message.GetDeviceCredentialsResponseMsg;
 import org.thingsboard.domain.message.GetDeviceRequestMsg;
 import org.thingsboard.domain.message.GetDeviceResponseMsg;
-import org.thingsboard.domain.message.TbProtoQueueMsg;
+import org.thingsboard.domain.message.ProtoQueueMsg;
 import org.thingsboard.domain.message.ToTransportMsg;
 import org.thingsboard.domain.message.TransportApiRequestMsg;
 import org.thingsboard.domain.message.TransportApiResponseMsg;
@@ -33,9 +33,10 @@ import org.thingsboard.domain.message.ValidateDeviceCredentialsResponse;
 import org.thingsboard.domain.message.ValidateDeviceCredentialsResponseMsg;
 import org.thingsboard.domain.message.ValidateDeviceTokenRequestMsg;
 import org.thingsboard.queue.common.AsyncCallbackTemplate;
-import org.thingsboard.queue.spi.TbQueueConsumer;
-import org.thingsboard.queue.spi.TbQueueRequestTemplate;
+import org.thingsboard.queue.spi.QueueConsumer;
+import org.thingsboard.queue.spi.QueueRequestTemplate;
 import org.thingsboard.transport.auth.TransportDeviceInfo;
+import org.thingsboard.transport.queue.TransportQueueFactory;
 import org.thingsboard.transport.session.SessionMetaData;
 import org.thingsboard.transport.session.SessionMsgListener;
 
@@ -48,26 +49,26 @@ import org.thingsboard.transport.session.SessionMsgListener;
 @Slf4j
 @Component
 public class DefaultTransportService implements TransportService {
-	protected TbQueueRequestTemplate<TbProtoQueueMsg<TransportApiRequestMsg>, TbProtoQueueMsg<TransportApiResponseMsg>> transportApiRequestTemplate;
+	protected QueueRequestTemplate<ProtoQueueMsg<TransportApiRequestMsg>, ProtoQueueMsg<TransportApiResponseMsg>> transportApiRequestTemplate;
 
 	@Value("${queue.transport.poll_interval}")
 	private int notificationsPollDuration;
 
 	public final ConcurrentMap<String, SessionMetaData> sessions = new ConcurrentHashMap<>();
 
-	protected TbQueueConsumer<TbProtoQueueMsg<ToTransportMsg>> transportNotificationsConsumer;
+	protected QueueConsumer<ProtoQueueMsg<ToTransportMsg>> transportNotificationsConsumer;
 
 	protected MessagesStats transportApiStats;
 
 	private StatsFactory statsFactory;
-	private TbTransportQueueFactory queueProvider;
+	private TransportQueueFactory queueProvider;
 
 	private ExecutorService transportCallbackExecutor;
 	private ExecutorService mainConsumerExecutor;
 
 	private volatile boolean stopped = false;
 
-	public DefaultTransportService(StatsFactory statsFactory, TbTransportQueueFactory queueProvider) {
+	public DefaultTransportService(StatsFactory statsFactory, TransportQueueFactory queueProvider) {
 		this.statsFactory = statsFactory;
 		this.queueProvider = queueProvider;
 	}
@@ -93,7 +94,7 @@ public class DefaultTransportService implements TransportService {
 		mainConsumerExecutor.execute(() -> {
 			while (!stopped) {
 				try {
-					List<TbProtoQueueMsg<ToTransportMsg>> records = transportNotificationsConsumer.poll(notificationsPollDuration);
+					List<ProtoQueueMsg<ToTransportMsg>> records = transportNotificationsConsumer.poll(notificationsPollDuration);
 					if (records.size() == 0) {
 						continue;
 					}
@@ -143,23 +144,23 @@ public class DefaultTransportService implements TransportService {
 	}
 
 	@Override
-	public GetDeviceCredentialsResponseMsg getDeviceCredentials(GetDeviceCredentialsRequestMsg requestMsg) {
+	public GetDeviceCredentialsResponseMsg getDeviceCredential(GetDeviceCredentialsRequestMsg requestMsg) {
 		return null;
 	}
 
 	@Override
 	public void process(DeviceTransportType transportType, ValidateDeviceTokenRequestMsg msg, TransportServiceCallback<ValidateDeviceCredentialsResponse> callback) {
-		TbProtoQueueMsg<TransportApiRequestMsg> protoMsg = new TbProtoQueueMsg<>();
+		ProtoQueueMsg<TransportApiRequestMsg> protoMsg = new ProtoQueueMsg<>();
 		doProcess(transportType, protoMsg, callback);
 	}
 
 	@Override
 	public void process(DeviceTransportType transportType, ValidateBasicMqttCredRequestMsg msg, TransportServiceCallback<ValidateDeviceCredentialsResponse> callback) {
-		TbProtoQueueMsg<TransportApiRequestMsg> protoMsg = new TbProtoQueueMsg<>();
+		ProtoQueueMsg<TransportApiRequestMsg> protoMsg = new ProtoQueueMsg<>();
 		doProcess(transportType, protoMsg, callback);
 	}
 
-	private void doProcess(DeviceTransportType transportType, TbProtoQueueMsg<TransportApiRequestMsg> protoMsg,
+	private void doProcess(DeviceTransportType transportType, ProtoQueueMsg<TransportApiRequestMsg> protoMsg,
 						   TransportServiceCallback<ValidateDeviceCredentialsResponse> callback) {
 		ListenableFuture<ValidateDeviceCredentialsResponse> response = Futures.transform(transportApiRequestTemplate.send(protoMsg), tmp -> {
 			ValidateDeviceCredentialsResponseMsg msg = tmp.getValue().getValidateCredResponseMsg();

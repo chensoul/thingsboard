@@ -12,10 +12,12 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.util.function.ThrowingFunction;
 import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 import org.thingsboard.common.exception.DataValidationException;
+import org.thingsboard.common.exception.IncorrectParameterException;
 import org.thingsboard.common.exception.ThingsboardErrorCode;
 import org.thingsboard.common.exception.ThingsboardException;
 import org.thingsboard.common.model.BaseData;
 import org.thingsboard.common.model.EntityType;
+import org.thingsboard.common.model.HasId;
 import org.thingsboard.common.model.HasTenantId;
 import static org.thingsboard.common.validation.Validator.validateId;
 import org.thingsboard.domain.audit.ActionType;
@@ -75,13 +77,13 @@ public class BaseController {
 	@Autowired
 	private AuditLogService auditLogService;
 
-	protected <E extends BaseData<I> & HasTenantId, I extends Serializable> E checkEntity(E entity, EntityType entityType, Operation operation) {
+	protected <E extends HasId<I> & HasTenantId, I extends Serializable> E checkEntity(E entity, EntityType entityType, Operation operation) {
 		checkNotNull(entity, "Entity not found");
 		accessControlService.checkPermission(getCurrentUser(), Resource.of(entityType), operation, entity.getId(), entity);
 		return entity;
 	}
 
-	protected <E extends BaseData<I> & HasTenantId, I extends Serializable> E checkEntityId(I entityId, ThrowingFunction<I, E> findingFunction, EntityType entityType, Operation operation) {
+	protected <E extends HasId<I> & HasTenantId, I extends Serializable> E checkEntityId(I entityId, ThrowingFunction<I, E> findingFunction, EntityType entityType, Operation operation) {
 		if (entityId == null) {
 			return null;
 		}
@@ -96,40 +98,40 @@ public class BaseController {
 		}
 	}
 
-//	protected <I extends Serializable, T extends BaseData<I> & HasTenantId> void checkEntity(T entity, EntityType entityType) throws ThingsboardException {
-//		if (entity.getId() == null) {
-//			accessControlService.checkPermission(getCurrentUser(), Resource.of(entityType), Operation.POST, null, entity);
-//		} else {
-//			checkEntityId(entity.getId(), entityType, Operation.POST);
-//		}
-//	}
-//
-//	protected void checkEntityId(Serializable entityId, EntityType entityType, Operation operation) {
-//		try {
-//			if (entityId == null) {
-//				throw new ThingsboardException("Parameter entityId can't be empty!", ThingsboardErrorCode.BAD_REQUEST_PARAMS);
-//			}
-//			validateId(entityId, id -> "Incorrect entityId " + id);
-//			switch (entityType) {
-//				case MERCHANT:
-//					checkMerchantId((Long) entityId, operation);
-//					return;
-//				case TENANT:
-//					checkTenantId((String) entityId, operation);
-//					return;
-//				case TENANT_PROFILE:
-//					checkTenantProfileId((Long) entityId, operation);
-//					return;
-//				case USER:
-//					checkUserId((Long) entityId, operation);
-//					return;
-//				default:
-//					return;
-//			}
-//		} catch (Exception e) {
-//			throw handleException(e, false);
-//		}
-//	}
+	protected <I extends Serializable, T extends BaseData<I> & HasTenantId> void checkEntity(T entity, EntityType entityType) throws ThingsboardException {
+		if (entity.getId() == null) {
+			accessControlService.checkPermission(getCurrentUser(), Resource.of(entityType), Operation.CREATE, null, entity);
+		} else {
+			checkEntityId(entity.getId(), entityType, Operation.WRITE);
+		}
+	}
+
+	protected void checkEntityId(Serializable entityId, EntityType entityType, Operation operation) {
+		try {
+			if (entityId == null) {
+				throw new ThingsboardException("Parameter entityId can't be empty!", ThingsboardErrorCode.BAD_REQUEST_PARAMS);
+			}
+			validateId(entityId, id -> "Incorrect entityId " + id);
+			switch (entityType) {
+				case MERCHANT:
+					checkMerchantId((Long) entityId, operation);
+					return;
+				case TENANT:
+					checkTenantId((String) entityId, operation);
+					return;
+				case TENANT_PROFILE:
+					checkTenantProfileId((Long) entityId, operation);
+					return;
+				case USER:
+					checkUserId((Long) entityId, operation);
+					return;
+				default:
+					return;
+			}
+		} catch (Exception e) {
+			throw handleException(e, false);
+		}
+	}
 
 	protected Merchant checkMerchantId(Long merchantId, Operation operation) {
 		return checkEntityId(merchantId, merchantService::findMerchantById, EntityType.MERCHANT, operation);
@@ -147,8 +149,16 @@ public class BaseController {
 		return checkEntityId(tenantId, tenantService::findTenantInfoById, EntityType.TENANT, operation);
 	}
 
-	protected TenantProfile checkTenantProfileId(Long tenantProfileId, Operation operation) {
-		return checkEntityId(tenantProfileId, tenantProfileService::findTenantProfileById, EntityType.TENANT, operation);
+	protected TenantProfile checkTenantProfileId(Long tenantProfileId, Operation operation) throws ThingsboardException {
+		try {
+			validateId(tenantProfileId, id -> "Incorrect tenantProfileId " + id);
+			TenantProfile tenantProfile = tenantProfileService.findTenantProfileById(tenantProfileId);
+			checkNotNull(tenantProfile, "Tenant profile with id [" + tenantProfileId + "] is not found");
+			accessControlService.checkPermission(getCurrentUser(), Resource.TENANT_PROFILE, operation);
+			return tenantProfile;
+		} catch (Exception e) {
+			throw handleException(e, false);
+		}
 	}
 
 	protected Device checkDeviceId(String deviceId, Operation operation) throws ThingsboardException {
@@ -172,7 +182,7 @@ public class BaseController {
 		if (exception instanceof ThingsboardException) {
 			return (ThingsboardException) exception;
 		} else if (exception instanceof IllegalArgumentException || exception instanceof DataValidationException
-				   || exception instanceof DataValidationException || cause.contains("DataValidationException")) {
+				   || exception instanceof IncorrectParameterException || cause.contains("IncorrectParameterException")) {
 			return new ThingsboardException(exception.getMessage(), ThingsboardErrorCode.BAD_REQUEST_PARAMS);
 		} else if (exception instanceof MessagingException) {
 			return new ThingsboardException("Unable to send mail: " + exception.getMessage(), ThingsboardErrorCode.GENERAL);

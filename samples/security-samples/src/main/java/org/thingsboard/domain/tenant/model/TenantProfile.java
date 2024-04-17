@@ -24,13 +24,12 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.thingsboard.common.model.BaseDataWithExtra;
 import org.thingsboard.common.model.HasName;
-import org.thingsboard.common.model.HasTenantId;
 import org.thingsboard.common.validation.Length;
 import org.thingsboard.common.validation.NoXss;
 
 @Data
 @Slf4j
-public class TenantProfile extends BaseDataWithExtra<Long> implements HasTenantId, HasName {
+public class TenantProfile extends BaseDataWithExtra<Long> implements HasName {
 
 	private static final long serialVersionUID = 2628320657987010348L;
 
@@ -44,9 +43,6 @@ public class TenantProfile extends BaseDataWithExtra<Long> implements HasTenantI
 	private String description;
 
 	private Boolean isDefault;
-
-	@NotBlank(message = "Tenant profile should be assigned to tenant")
-	private String tenantId;
 
 	@JsonIgnore
 	public Optional<DefaultTenantProfileConfiguration> getProfileConfiguration() {

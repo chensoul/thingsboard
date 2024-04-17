@@ -37,6 +37,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.thingsboard.common.util.SslUtil;
+import org.thingsboard.transport.TransportService;
 
 /**
  * Created by valerii.sosliuk on 11/6/16.

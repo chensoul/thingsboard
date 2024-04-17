@@ -37,7 +37,7 @@ public class WebSocketApiLimitService {
 	private final ConcurrentMap<Long, Set<String>> publicUserSessionsMap = new ConcurrentHashMap<>();
 
 	public DefaultTenantProfileConfiguration getTenantProfileConfiguration(WebSocketSessionRef sessionRef) {
-		return Optional.ofNullable(tenantProfileService.findDefaultTenantProfile())
+		return Optional.ofNullable(tenantProfileService.findTenantProfileByTenantId(sessionRef.getSecurityCtx().getTenantId()))
 			.map(TenantProfile::getDefaultProfileConfiguration).orElse(null);
 	}
 

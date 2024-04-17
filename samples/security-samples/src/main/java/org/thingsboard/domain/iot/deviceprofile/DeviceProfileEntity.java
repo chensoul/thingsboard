@@ -3,7 +3,7 @@ package org.thingsboard.domain.iot.deviceprofile;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.thingsboard.common.entity.LongBaseEntity;
+import org.thingsboard.common.dao.mybatis.LongBaseEntity;
 import org.thingsboard.domain.iot.device.model.DeviceTransportType;
 
 /**

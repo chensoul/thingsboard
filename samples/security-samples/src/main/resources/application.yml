@@ -1,5 +1,42 @@
+# HTTP server parameters
 server:
-  port: 8090
+  # Shutdown type (graceful or immediate)
+  shutdown: "${SERVER_SHUTDOWN:graceful}"
+  # HTTP Server bind address (has no effect if web-environment is disabled)
+  address: "${HTTP_BIND_ADDRESS:0.0.0.0}"
+  # HTTP Server bind port (has no effect if web-environment is disabled)
+  port: "${HTTP_BIND_PORT:8090}"
+  # Log errors with stacktrace when REST API throws exception
+  log_controller_error_stack_trace: "${HTTP_LOG_CONTROLLER_ERROR_STACK_TRACE:false}"
+  # Server SSL configuration
+  ssl:
+    # Enable/disable SSL support
+    enabled: "${SSL_ENABLED:false}"
+    # Server SSL credentials
+    credentials:
+      # Server credentials type (PEM - pem certificate file; KEYSTORE - java keystore)
+      type: "${SSL_CREDENTIALS_TYPE:PEM}"
+      # PEM server credentials
+      pem:
+        # Path to the server certificate file (holds server certificate or certificate chain, may include server private key)
+        cert_file: "${SSL_PEM_CERT:server.pem}"
+        # Path to the server certificate private key file. Optional by default. Required if the private key is not present in server certificate file
+        key_file: "${SSL_PEM_KEY:server_key.pem}"
+        # Server certificate private key password (optional)
+        key_password: "${SSL_PEM_KEY_PASSWORD:server_key_password}"
+      # Keystore server credentials
+      keystore:
+        # Type of the key store (JKS or PKCS12)
+        type: "${SSL_KEY_STORE_TYPE:PKCS12}"
+        # Path to the key store that holds the SSL certificate
+        store_file: "${SSL_KEY_STORE:classpath:keystore/keystore.p12}"
+        # Password used to access the key store
+        store_password: "${SSL_KEY_STORE_PASSWORD:thingsboard_mqtt_broker}"
+        # Key alias
+        key_alias: "${SSL_KEY_ALIAS:tomcat}"
+        # Password used to access the key
+        key_password: "${SSL_KEY_PASSWORD:thingsboard_mqtt_broker}"
+
 
 spring.main.allow-circular-references: "true"
 spring.mvc.async.request-timeout: "${SPRING_MVC_ASYNC_REQUEST_TIMEOUT:30000}" # The default timeout for asynchronous requests in milliseconds
@@ -57,10 +94,6 @@ spring:
       # This property increases the number of connections in the pool as demand increases. At the same time, the property ensures that the pool doesn't grow to the point of exhausting a system's resources, which ultimately affects an application's performance and availability
       maximumPoolSize: "${SPRING_DATASOURCE_MAXIMUM_POOL_SIZE:16}"
       registerMbeans: "${SPRING_DATASOURCE_HIKARI_REGISTER_MBEANS:false}" # true - enable MBean to diagnose pools state via JMX
-
-spring.data.redis:
-  host: localhost
-  password: dev-pwd
 
 mybatis-plus:
   global-config:
@@ -331,3 +364,96 @@ queue:
     notifications_topic: "${TB_QUEUE_TRANSPORT_NOTIFICATIONS_TOPIC:tb_transport.notifications}"
     # Interval in milliseconds to poll messages
     poll_interval: "${TB_QUEUE_TRANSPORT_NOTIFICATIONS_POLL_INTERVAL_MS:25}"
+
+
+
+# Cache parameters
+cache:
+  # Cache type: caffeine or redis
+  type: "${CACHE_TYPE:caffeine}"
+  stats:
+    # Enable/disable cache stats logging
+    enabled: "${CACHE_STATS_ENABLED:true}"
+    # Cache stats logging interval in seconds
+    intervalSec: "${CACHE_STATS_INTERVAL_SEC:60}"
+  specs:
+    packetIdAndSerialNumber:
+      # Cache TTL in minutes
+      timeToLiveInMinutes: "${CACHE_SPECS_PACKET_ID_SERIAL_NUMBER_TTL:1440}"
+      # Cache max size. 0 means the cache is disabled in case CACHE_TYPE=caffeine
+      maxSize: "${CACHE_SPECS_PACKET_ID_SERIAL_NUMBER_MAX_SIZE:10000}"
+    mqttClientCredentials:
+      # Cache TTL in minutes
+      timeToLiveInMinutes: "${CACHE_SPECS_MQTT_CLIENT_CREDENTIALS_TTL:1440}"
+      # Cache max size. 0 means the cache is disabled in case CACHE_TYPE=caffeine
+      maxSize: "${CACHE_SPECS_MQTT_CLIENT_CREDENTIALS_MAX_SIZE:0}"
+    basicCredentialsPassword:
+      # Cache TTL in minutes. It is recommended to set this TTL as a small value to not store them for a long time (e.g. 1-5 minutes)
+      timeToLiveInMinutes: "${CACHE_SPECS_BASIC_CREDENTIALS_PASSWORD_TTL:1}"
+      # Cache max size. 0 means the cache is disabled in case CACHE_TYPE=caffeine
+      maxSize: "${CACHE_SPECS_BASIC_CREDENTIALS_PASSWORD_MAX_SIZE:0}"
+
+# Redis configuration parameters
+redis:
+  connection:
+    # Connection type: standalone or cluster or sentinel
+    type: "${REDIS_CONNECTION_TYPE:standalone}"
+  standalone:
+    # Redis connection host
+    host: "${REDIS_HOST:localhost}"
+    # Redis connection port
+    port: "${REDIS_PORT:6379}"
+    # Use the default Redis configuration file
+    useDefaultClientConfig: "${REDIS_USE_DEFAULT_CLIENT_CONFIG:true}"
+    # This value may be used only if you did not use the default ClientConfig, to specify client name
+    clientName: "${REDIS_CLIENT_NAME:standalone}"
+    # This value may be used only if you did not use the default ClientConfig, to specify connection timeout
+    connectTimeout: "${REDIS_CLIENT_CONNECT_TIMEOUT:30000}"
+    # This value may be used only if you did not use the default ClientConfig, to specify read timeout
+    readTimeout: "${REDIS_CLIENT_READ_TIMEOUT:60000}"
+    # This value may be used only if you did not use the default ClientConfig, to use pool config section
+    usePoolConfig: "${REDIS_CLIENT_USE_POOL_CONFIG:false}"
+  cluster:
+    # Comma-separated list of "host:port" pairs to bootstrap from
+    nodes: "${REDIS_NODES:}"
+    # Maximum number of redirects to follow when executing commands across the cluster
+    maxRedirects: "${REDIS_MAX_REDIRECTS:12}"
+    # If set false will be used pool config build from values of the pool config section
+    useDefaultPoolConfig: "${REDIS_CLUSTER_USE_DEFAULT_POOL_CONFIG:true}"
+  sentinel:
+    # Name of master node
+    master: "${REDIS_MASTER:}"
+    # Comma-separated list of "host:port" pairs of sentinels
+    sentinels: "${REDIS_SENTINELS:}"
+    # Password to authenticate with sentinel
+    password: "${REDIS_SENTINEL_PASSWORD:}"
+    # If set false will be used pool config build from values of the pool config section
+    useDefaultPoolConfig: "${REDIS_SENTINEL_USE_DEFAULT_POOL_CONFIG:true}"
+  # DB index
+  db: "${REDIS_DB:0}"
+  # DB password
+  password: "${REDIS_PASSWORD:}"
+  # Pool config
+  pool_config:
+    # Maximum number of connections that can be allocated by the connection pool
+    maxTotal: "${REDIS_POOL_CONFIG_MAX_TOTAL:128}"
+    # Maximum number of idle connections that can be maintained in the pool without being closed
+    maxIdle: "${REDIS_POOL_CONFIG_MAX_IDLE:128}"
+    # Minimum number of idle connections that can be maintained in the pool without being closed
+    minIdle: "${REDIS_POOL_CONFIG_MIN_IDLE:16}"
+    # Enable/Disable PING command sent when a connection is borrowed
+    testOnBorrow: "${REDIS_POOL_CONFIG_TEST_ON_BORROW:true}"
+    # The property is used to specify whether to test the connection before returning it to the connection pool
+    testOnReturn: "${REDIS_POOL_CONFIG_TEST_ON_RETURN:true}"
+    # Indicates whether to use the ping command to monitor the connection validity during idle resource monitoring. Invalid connections will be destroyed
+    testWhileIdle: "${REDIS_POOL_CONFIG_TEST_WHILE_IDLE:true}"
+    # Minimum time the connection should be idle before it can be evicted from the connection pool. The value is set in milliseconds
+    minEvictableMs: "${REDIS_POOL_CONFIG_MIN_EVICTABLE_MS:60000}"
+    # Specifies the time interval in milliseconds between two consecutive eviction runs
+    evictionRunsMs: "${REDIS_POOL_CONFIG_EVICTION_RUNS_MS:30000}"
+    # Maximum time in milliseconds where a client is willing to wait for a connection from the pool when all connections are exhausted
+    maxWaitMills: "${REDIS_POOL_CONFIG_MAX_WAIT_MS:60000}"
+    # Specifies the number of connections to test for eviction during each eviction run
+    numberTestsPerEvictionRun: "${REDIS_POOL_CONFIG_NUMBER_TESTS_PER_EVICTION_RUN:3}"
+    # Determines the behavior when a thread requests a connection from the pool, but there are no available connections, and the pool cannot create more due to the maxTotal configuration
+    blockWhenExhausted: "${REDIS_POOL_CONFIG_BLOCK_WHEN_EXHAUSTED:true}"

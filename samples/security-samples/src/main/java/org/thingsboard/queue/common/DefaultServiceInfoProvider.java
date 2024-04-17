@@ -46,13 +46,10 @@ public class DefaultServiceInfoProvider implements ServiceInfoProvider {
 	@PostConstruct
 	public void init() {
 		if (StringUtils.isEmpty(serviceId)) {
-			try {
-				serviceId = InetAddress.getLocalHost().getHostName();
-			} catch (UnknownHostException e) {
-				serviceId = RandomStringUtils.randomAlphabetic(10);
-			}
+			serviceId = generateServiceId();
 		}
 		log.info("Current Service ID: {}", serviceId);
+
 		if (serviceType.equalsIgnoreCase("monolith")) {
 			serviceTypes = List.of(ServiceType.values());
 		} else {
@@ -60,5 +57,11 @@ public class DefaultServiceInfoProvider implements ServiceInfoProvider {
 		}
 	}
 
-
+	private String generateServiceId() {
+		try {
+			return InetAddress.getLocalHost().getHostName();
+		} catch (UnknownHostException e) {
+			return RandomStringUtils.randomAlphabetic(10);
+		}
+	}
 }

@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.thingsboard.common.dao.DaoUtil;
-import org.thingsboard.common.dao.MybatisAbstractDao;
+import org.thingsboard.common.dao.mybatis.AbstractMybatisDao;
 import org.thingsboard.common.dao.aspect.SqlDao;
 import org.thingsboard.domain.user.model.UserSetting;
 import org.thingsboard.domain.user.model.UserSettingType;
@@ -19,7 +19,7 @@ import org.thingsboard.domain.user.model.UserSettingType;
 @RequiredArgsConstructor
 @Component
 @SqlDao
-public class MybatisUserSettingDao extends MybatisAbstractDao<UserSettingEntity, UserSetting> implements UserSettingDao {
+public class MybatisUserSettingDao extends AbstractMybatisDao<UserSettingEntity, UserSetting> implements UserSettingDao {
 	private final UserSettingMapper mapper;
 
 	@Override

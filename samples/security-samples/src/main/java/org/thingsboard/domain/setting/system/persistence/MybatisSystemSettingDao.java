@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.thingsboard.common.dao.DaoUtil;
-import org.thingsboard.common.dao.MybatisAbstractDao;
+import org.thingsboard.common.dao.mybatis.AbstractMybatisDao;
 import org.thingsboard.domain.setting.system.SystemSetting;
 import org.thingsboard.domain.setting.system.SystemSettingType;
 
@@ -17,7 +17,7 @@ import org.thingsboard.domain.setting.system.SystemSettingType;
  */
 @AllArgsConstructor
 @Component
-public class MybatisSystemSettingDao extends MybatisAbstractDao<SystemSettingEntity, SystemSetting> implements SystemSettingDao {
+public class MybatisSystemSettingDao extends AbstractMybatisDao<SystemSettingEntity, SystemSetting> implements SystemSettingDao {
 	private SystemSettingMapper mapper;
 
 	@Override

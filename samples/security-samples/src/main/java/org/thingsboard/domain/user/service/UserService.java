@@ -19,7 +19,7 @@ import java.io.Serializable;
 import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.thingsboard.common.dao.entity.EntityDaoService;
+import org.thingsboard.common.dao.EntityDaoService;
 import org.thingsboard.common.exception.ThingsboardException;
 import org.thingsboard.domain.user.model.User;
 import org.thingsboard.domain.user.model.UserCredential;

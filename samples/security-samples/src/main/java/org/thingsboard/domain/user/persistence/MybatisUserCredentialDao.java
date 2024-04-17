@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.thingsboard.common.dao.aspect.SqlDao;
 import org.thingsboard.common.dao.DaoUtil;
-import org.thingsboard.common.dao.MybatisAbstractDao;
+import org.thingsboard.common.dao.mybatis.AbstractMybatisDao;
 import org.thingsboard.domain.user.model.UserCredential;
 
 /**
@@ -19,7 +19,7 @@ import org.thingsboard.domain.user.model.UserCredential;
 @RequiredArgsConstructor
 @Component
 @SqlDao
-public class MybatisUserCredentialDao extends MybatisAbstractDao<UserCredentialEntity, UserCredential> implements UserCredentialDao {
+public class MybatisUserCredentialDao extends AbstractMybatisDao<UserCredentialEntity, UserCredential> implements UserCredentialDao {
 	private final UserCredentialMapper mapper;
 
 	@Override

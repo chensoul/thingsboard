@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.thingsboard.common.dao.aspect.SqlDao;
 import org.thingsboard.common.dao.DaoUtil;
-import org.thingsboard.common.dao.MybatisAbstractDao;
+import org.thingsboard.common.dao.mybatis.AbstractMybatisDao;
 import org.thingsboard.domain.user.model.Authority;
 import org.thingsboard.domain.user.model.User;
 
@@ -24,7 +24,7 @@ import org.thingsboard.domain.user.model.User;
 @SqlDao
 @Component
 @RequiredArgsConstructor
-public class MybatisUserDao extends MybatisAbstractDao<UserEntity, User> implements UserDao {
+public class MybatisUserDao extends AbstractMybatisDao<UserEntity, User> implements UserDao {
 	private final UserMapper mapper;
 
 	@Override

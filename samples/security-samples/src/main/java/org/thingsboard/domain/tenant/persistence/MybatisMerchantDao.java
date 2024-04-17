@@ -12,7 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.thingsboard.common.dao.aspect.SqlDao;
 import org.thingsboard.common.dao.DaoUtil;
-import org.thingsboard.common.dao.MybatisAbstractDao;
+import org.thingsboard.common.dao.mybatis.AbstractMybatisDao;
 import org.thingsboard.domain.tenant.model.Merchant;
 
 /**
@@ -24,7 +24,7 @@ import org.thingsboard.domain.tenant.model.Merchant;
 @SqlDao
 @RequiredArgsConstructor
 @Component
-public class MybatisMerchantDao extends MybatisAbstractDao<MerchantEntity, Merchant> implements MerchantDao {
+public class MybatisMerchantDao extends AbstractMybatisDao<MerchantEntity, Merchant> implements MerchantDao {
 	private final MerchantMapper mapper;
 
 	@Override

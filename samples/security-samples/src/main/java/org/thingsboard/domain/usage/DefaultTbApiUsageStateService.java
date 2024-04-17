@@ -168,7 +168,7 @@ public class DefaultTbApiUsageStateService implements TbApiUsageStateService {
 	@Override
 	public void onTenantUpdate(String tenantId) {
 		log.info("[{}] On Tenant Update.", tenantId);
-		TenantProfile tenantProfile = tenantProfileService.findDefaultTenantProfile();
+		TenantProfile tenantProfile = tenantProfileService.findTenantProfileByTenantId(tenantId);
 		updateLock.lock();
 		try {
 			TenantApiUsageState state = (TenantApiUsageState) myUsageStates.get(tenantId);
@@ -297,7 +297,7 @@ public class DefaultTbApiUsageStateService implements TbApiUsageStateService {
 					state.setCycles(state.getNextCycleTs(), SchedulerUtils.getStartOfNextNextMonth());
 					saveNewCounts(state, Arrays.asList(ApiUsageRecordKey.values()));
 					if (state.getEntityType() == EntityType.TENANT && !state.getEntityId().equals(SYS_TENANT_ID)) {
-						updateTenantState((TenantApiUsageState) state, tenantProfileService.findDefaultTenantProfile());
+						updateTenantState((TenantApiUsageState) state, tenantProfileService.findTenantProfileByTenantId(state.getTenantId()));
 					}
 				}
 			});

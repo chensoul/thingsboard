@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.thingsboard.common.model.EntityType;
 import org.thingsboard.common.service.BaseController;
 import org.thingsboard.domain.tenant.model.TenantProfile;
-import org.thingsboard.server.security.SecurityUtils;
 import static org.thingsboard.server.security.SecurityUtils.getTenantId;
 import org.thingsboard.server.security.permission.Operation;
 
@@ -44,7 +43,7 @@ public class TenantProfileController extends BaseController {
 	@RequestMapping(value = "/tenantProfile", method = RequestMethod.POST)
 	public TenantProfile saveTenantProfile(@RequestBody @Valid TenantProfile tenantProfile) throws Exception {
 		TenantProfile old = checkTenantProfileId(tenantProfile.getId(), Operation.WRITE);
-		return doSaveAndLog(tenantProfile, old, EntityType.MERCHANT, (t) -> tenantProfileService.saveTenantProfile(SecurityUtils.getTenantId(), tenantProfile));
+		return doSaveAndLog(tenantProfile, old, EntityType.MERCHANT, (t) -> tenantProfileService.saveTenantProfile(tenantProfile));
 	}
 
 	@PreAuthorize("hasAuthority('SYS_ADMIN')")

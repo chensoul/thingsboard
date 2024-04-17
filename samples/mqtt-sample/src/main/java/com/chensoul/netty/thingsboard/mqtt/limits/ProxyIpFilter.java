@@ -16,7 +16,7 @@
 package com.chensoul.netty.thingsboard.mqtt.limits;
 
 import com.chensoul.netty.thingsboard.mqtt.MqttTransportContext;
-import com.chensoul.netty.thingsboard.mqtt.MqttTransportService;
+import static com.chensoul.netty.thingsboard.mqtt.MqttTransportServerInitializer.ADDRESS;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -44,7 +44,7 @@ public class ProxyIpFilter extends ChannelInboundHandlerAdapter {
 					closeChannel(ctx);
 				} else {
 					log.trace("[{}] Setting address: {}", ctx.channel().id(), address);
-					ctx.channel().attr(MqttTransportService.ADDRESS).set(address);
+					ctx.channel().attr(ADDRESS).set(address);
 					// We no longer need this channel in the pipeline. Similar to HAProxyMessageDecoder
 					ctx.pipeline().remove(this);
 				}

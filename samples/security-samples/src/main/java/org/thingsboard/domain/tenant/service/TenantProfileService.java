@@ -22,9 +22,11 @@ import org.thingsboard.domain.tenant.model.TenantProfile;
 public interface TenantProfileService {
 	TenantProfile findTenantProfileById(Long tenantProfileId);
 
-	TenantProfile findOrCreateDefaultTenantProfile(String tenantId);
+	TenantProfile findTenantProfileByTenantId(String tenantId);
 
-	TenantProfile saveTenantProfile(String tenantId, TenantProfile tenantProfile);
+	TenantProfile findOrCreateDefaultTenantProfile();
+
+	TenantProfile saveTenantProfile(TenantProfile tenantProfile);
 
 	TenantProfile findDefaultTenantProfile();
 

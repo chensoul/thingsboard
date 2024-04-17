@@ -15,6 +15,7 @@
  */
 package com.chensoul.netty.thingsboard.mqtt;
 
+import static com.chensoul.netty.thingsboard.mqtt.MqttTransportServerInitializer.ADDRESS;
 import com.chensoul.netty.thingsboard.mqtt.topic.MqttTopicMatcher;
 import com.chensoul.netty.thingsboard.mqtt.topic.MqttTopics;
 import io.netty.channel.ChannelHandlerContext;
@@ -635,7 +636,7 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
 	}
 
 	InetSocketAddress getAddress(ChannelHandlerContext ctx) {
-		var address = ctx.channel().attr(MqttTransportService.ADDRESS).get();
+		var address = ctx.channel().attr(ADDRESS).get();
 		if (address == null) {
 			log.trace("[{}] Received empty address.", ctx.channel().id());
 			InetSocketAddress remoteAddress = (InetSocketAddress) ctx.channel().remoteAddress();

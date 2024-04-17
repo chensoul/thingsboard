@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.thingsboard.common.dao.aspect.SqlDao;
 import org.thingsboard.common.dao.DaoUtil;
-import org.thingsboard.common.dao.MybatisAbstractDao;
+import org.thingsboard.common.dao.mybatis.AbstractMybatisDao;
 import org.thingsboard.domain.notification.targets.NotificationTarget;
 import org.thingsboard.domain.notification.targets.NotificationTargetType;
 import org.thingsboard.domain.notification.targets.UserFilterType;
@@ -26,7 +26,7 @@ import org.thingsboard.domain.notification.template.NotificationType;
 @SqlDao
 @AllArgsConstructor
 @Component
-public class MybatisNotificationTargetDao extends MybatisAbstractDao<NotificationTargetEntity, NotificationTarget> implements NotificationTargetDao {
+public class MybatisNotificationTargetDao extends AbstractMybatisDao<NotificationTargetEntity, NotificationTarget> implements NotificationTargetDao {
 	private NotificationTargetMapper mapper;
 
 	@Override

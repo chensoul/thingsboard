@@ -24,11 +24,15 @@ import io.netty.handler.codec.haproxy.HAProxyMessageDecoder;
 import io.netty.handler.codec.mqtt.MqttDecoder;
 import io.netty.handler.codec.mqtt.MqttEncoder;
 import io.netty.handler.ssl.SslHandler;
+import io.netty.util.AttributeKey;
+import java.net.InetSocketAddress;
 
 /**
  * @author Andrew Shvayka
  */
 public class MqttTransportServerInitializer extends ChannelInitializer<SocketChannel> {
+	public static AttributeKey<InetSocketAddress> ADDRESS = AttributeKey.newInstance("SRC_ADDRESS");
+
 	private final MqttTransportContext context;
 	private final boolean sslEnabled;
 

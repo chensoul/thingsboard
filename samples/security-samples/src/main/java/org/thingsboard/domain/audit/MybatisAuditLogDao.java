@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.thingsboard.common.dao.aspect.SqlDao;
-import org.thingsboard.common.dao.MybatisAbstractDao;
+import org.thingsboard.common.dao.mybatis.AbstractMybatisDao;
 
 /**
  * TODO Comment
@@ -18,7 +18,7 @@ import org.thingsboard.common.dao.MybatisAbstractDao;
 @SqlDao
 @RequiredArgsConstructor
 @Component
-public class MybatisAuditLogDao extends MybatisAbstractDao<AuditLogEntity, AuditLog> implements AuditLogDao {
+public class MybatisAuditLogDao extends AbstractMybatisDao<AuditLogEntity, AuditLog> implements AuditLogDao {
 	private final AuditLogMapper mapper;
 
 	@Override

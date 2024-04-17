@@ -17,7 +17,7 @@ package org.thingsboard.domain.iot.device;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.thingsboard.common.entity.StringBaseEntity;
+import org.thingsboard.common.dao.mybatis.StringBaseEntity;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

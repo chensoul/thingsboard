@@ -17,7 +17,7 @@ package org.thingsboard.domain.audit;
 
 import java.util.Optional;
 import lombok.Getter;
-import org.thingsboard.common.event.MsgType;
+import org.thingsboard.common.model.event.MsgType;
 
 public enum ActionType {
 

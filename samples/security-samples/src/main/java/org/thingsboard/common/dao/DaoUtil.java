@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.thingsboard.common.model.ToData;
@@ -32,6 +33,14 @@ public abstract class DaoUtil {
 		T object = null;
 		if (data != null) {
 			object = data.toData();
+		}
+		return object;
+	}
+
+	public static <T> T getData(Optional<? extends ToData<T>> data) {
+		T object = null;
+		if (data.isPresent()) {
+			object = data.get().toData();
 		}
 		return object;
 	}

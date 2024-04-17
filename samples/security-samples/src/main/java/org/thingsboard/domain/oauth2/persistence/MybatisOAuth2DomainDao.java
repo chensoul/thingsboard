@@ -6,7 +6,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.thingsboard.common.dao.DaoUtil;
-import org.thingsboard.common.dao.MybatisAbstractDao;
+import org.thingsboard.common.dao.mybatis.AbstractMybatisDao;
 import org.thingsboard.common.dao.aspect.SqlDao;
 import org.thingsboard.domain.oauth2.model.OAuth2Domain;
 
@@ -19,7 +19,7 @@ import org.thingsboard.domain.oauth2.model.OAuth2Domain;
 @SqlDao
 @Component
 @RequiredArgsConstructor
-public class MybatisOAuth2DomainDao extends MybatisAbstractDao<OAuth2DomainEntity, OAuth2Domain> implements OAuth2DomainDao {
+public class MybatisOAuth2DomainDao extends AbstractMybatisDao<OAuth2DomainEntity, OAuth2Domain> implements OAuth2DomainDao {
 	private final OAuth2DomainMapper mapper;
 
 	@Override

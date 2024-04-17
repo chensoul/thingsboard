@@ -15,7 +15,7 @@
  */
 package org.thingsboard.domain.iot.deviceprofile.model;
 
-import org.thingsboard.common.query.DynamicValue;
+import org.thingsboard.common.model.query.DynamicValue;
 
 public class AnyTimeSchedule implements AlarmSchedule {
 
