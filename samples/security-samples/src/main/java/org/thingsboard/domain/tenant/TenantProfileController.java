@@ -15,10 +15,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.thingsboard.common.dao.jpa.PageData;
+import org.thingsboard.common.dao.jpa.PageLink;
 import org.thingsboard.common.model.EntityType;
 import org.thingsboard.common.service.BaseController;
 import org.thingsboard.domain.tenant.model.TenantProfile;
-import static org.thingsboard.server.security.SecurityUtils.getTenantId;
 import org.thingsboard.server.security.permission.Operation;
 
 /**
@@ -63,8 +64,8 @@ public class TenantProfileController extends BaseController {
 
 	@PreAuthorize("hasAuthority('SYS_ADMIN')")
 	@RequestMapping(value = "/tenantProfiles", method = RequestMethod.GET)
-	public Page<TenantProfile> getTenants(Pageable pageable, @RequestParam(required = false) String textSearch) {
-		return tenantProfileService.findTenantProfiles(pageable, getTenantId(), textSearch);
+	public PageData<TenantProfile> getTenants(PageLink pageLink) {
+		return tenantProfileService.findTenantProfiles(pageLink);
 	}
 
 }

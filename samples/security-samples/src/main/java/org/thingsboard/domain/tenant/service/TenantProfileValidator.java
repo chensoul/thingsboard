@@ -39,7 +39,7 @@ public class TenantProfileValidator extends DataValidator<TenantProfile> {
 			throw new DataValidationException("Tenant profile extra should be specified");
 		}
 
-		if (tenantProfile.getIsDefault()) {
+		if (tenantProfile.isDefaulted()) {
 			TenantProfile defaultTenantProfile = tenantProfileService.findDefaultTenantProfile();
 			if (defaultTenantProfile != null && !defaultTenantProfile.getId().equals(tenantProfile.getId())) {
 				throw new DataValidationException("Another default tenant profile is present");

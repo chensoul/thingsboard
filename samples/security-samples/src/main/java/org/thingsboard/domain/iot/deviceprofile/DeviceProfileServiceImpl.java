@@ -59,7 +59,7 @@ public class DeviceProfileServiceImpl implements DeviceProfileService {
 	private DeviceProfile doCreateDefaultDeviceProfile(String tenantId, String profileName, boolean defaultProfile) {
 		DeviceProfile deviceProfile = new DeviceProfile();
 		deviceProfile.setTenantId(tenantId);
-		deviceProfile.setDefault(defaultProfile);
+		deviceProfile.setDefaulted(defaultProfile);
 		deviceProfile.setName(profileName);
 		deviceProfile.setType(DeviceProfileType.DEFAULT);
 		deviceProfile.setTransportType(DeviceTransportType.DEFAULT);
@@ -135,13 +135,13 @@ public class DeviceProfileServiceImpl implements DeviceProfileService {
 	@Override
 	public DeviceProfile setDefaultDeviceProfile(String tenantId, Long deviceProfileId) {
 		DeviceProfile deviceProfile = deviceProfileDao.findById(deviceProfileId);
-		if (!deviceProfile.isDefault()) {
-			deviceProfile.setDefault(true);
+		if (!deviceProfile.isDefaulted()) {
+			deviceProfile.setDefaulted(true);
 			DeviceProfile previousDefaultDeviceProfile = findDefaultDeviceProfile(tenantId);
 			if (previousDefaultDeviceProfile == null) {
 				return deviceProfileDao.save(deviceProfile);
 			} else if (!previousDefaultDeviceProfile.getId().equals(deviceProfile.getId())) {
-				previousDefaultDeviceProfile.setDefault(false);
+				previousDefaultDeviceProfile.setDefaulted(false);
 				deviceProfileDao.save(previousDefaultDeviceProfile);
 				return deviceProfileDao.save(deviceProfile);
 			}

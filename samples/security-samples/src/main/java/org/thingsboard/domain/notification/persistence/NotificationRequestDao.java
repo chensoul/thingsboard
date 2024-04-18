@@ -18,7 +18,7 @@ package org.thingsboard.domain.notification.persistence;
 import org.thingsboard.common.dao.Dao;
 import org.thingsboard.domain.notification.NotificationRequest;
 
-public interface NotificationRequestDao extends Dao<NotificationRequest> {
+public interface NotificationRequestDao extends Dao<NotificationRequest, Long> {
 
 //    PageData<NotificationRequest> findByTenantIdAndOriginatorTypeAndPageLink(TenantId tenantId, EntityType originatorType, PageLink pageLink);
 //

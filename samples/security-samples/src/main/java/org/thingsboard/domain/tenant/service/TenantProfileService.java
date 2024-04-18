@@ -17,6 +17,8 @@ package org.thingsboard.domain.tenant.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.thingsboard.common.dao.jpa.PageData;
+import org.thingsboard.common.dao.jpa.PageLink;
 import org.thingsboard.domain.tenant.model.TenantProfile;
 
 public interface TenantProfileService {
@@ -34,5 +36,5 @@ public interface TenantProfileService {
 
 	TenantProfile setDefaultTenantProfile(TenantProfile tenantProfile);
 
-	Page<TenantProfile> findTenantProfiles(Pageable pageable, String tenantId, String textSearch);
+	PageData<TenantProfile> findTenantProfiles(PageLink pageLink);
 }

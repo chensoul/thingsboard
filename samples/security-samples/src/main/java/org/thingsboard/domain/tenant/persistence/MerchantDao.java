@@ -16,18 +16,18 @@
 package org.thingsboard.domain.tenant.persistence;
 
 import java.util.Optional;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.thingsboard.common.dao.Dao;
+import org.thingsboard.common.dao.jpa.PageData;
+import org.thingsboard.common.dao.jpa.PageLink;
 import org.thingsboard.domain.tenant.model.Merchant;
 
 /**
  * The Interface CustomerDao.
  */
-public interface MerchantDao extends Dao<Merchant> {
+public interface MerchantDao extends Dao<Merchant, Long> {
 	Optional<Merchant> findMerchantByTenantIdAndName(String tenantId, String name);
 
 	void removeByTenantId(String tenantId);
 
-	Page<Merchant> findTenants(Pageable pageable,String tenantId, String textSearch);
+	PageData<Merchant> findTenants(String tenantId, PageLink pageLink);
 }

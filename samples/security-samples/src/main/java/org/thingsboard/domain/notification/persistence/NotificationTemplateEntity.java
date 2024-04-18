@@ -15,20 +15,26 @@
  */
 package org.thingsboard.domain.notification.persistence;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.thingsboard.common.dao.jpa.JsonConverter;
 import org.thingsboard.common.dao.mybatis.LongBaseEntity;
+import org.thingsboard.common.util.JacksonUtil;
 import org.thingsboard.domain.notification.template.NotificationTemplate;
 import org.thingsboard.domain.notification.template.NotificationTemplateConfig;
 import org.thingsboard.domain.notification.template.NotificationType;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "notification_template", autoResultMap = true)
+@Entity
+@Table(name = "notification_template")
 public class NotificationTemplateEntity extends LongBaseEntity<NotificationTemplate> {
 
 	private String tenantId;
@@ -37,9 +43,12 @@ public class NotificationTemplateEntity extends LongBaseEntity<NotificationTempl
 
 	private String description;
 
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
 	private NotificationType type;
 
-	@TableField(typeHandler = JacksonTypeHandler.class)
+	@Convert(converter = JsonConverter.class)
+	@Column(columnDefinition = "jsonb")
 	private JsonNode config;
 
 	@Override
@@ -50,7 +59,7 @@ public class NotificationTemplateEntity extends LongBaseEntity<NotificationTempl
 		notificationTemplate.setTenantId(tenantId);
 		notificationTemplate.setName(name);
 		notificationTemplate.setType(type);
-		notificationTemplate.setConfig(fromJson(config, NotificationTemplateConfig.class));
+		notificationTemplate.setConfig(JacksonUtil.convertValue(config, NotificationTemplateConfig.class));
 		return notificationTemplate;
 	}
 

@@ -1,9 +1,9 @@
 package org.thingsboard.common.util;
 
-import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 /**
  * The utility class of text format
@@ -46,9 +46,9 @@ public abstract class FormatUtils {
         String template2 = template.toString();
         String value;
         for (final Map.Entry<String, ?> entry : map.entrySet()) {
-            value = Objects.toString(entry.getValue(), StringPool.EMPTY);
-            if (entry.getValue().equals(StringPool.NULL)) {
-                value = StringPool.EMPTY;
+			value = Objects.toString(entry.getValue(), EMPTY);
+			if (entry.getValue().equals("null")) {
+				value = EMPTY;
             }
             if (!StringUtils.isEmpty(value)) {
                 template2 = StringUtils.replace(template2, prefix + entry.getKey() + suffix, value);

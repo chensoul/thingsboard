@@ -15,12 +15,16 @@
  */
 package org.thingsboard.domain.iot.device;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.thingsboard.common.dao.mybatis.StringBaseEntity;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
+@Entity
+@Table(name = "device")
 public class DeviceEntity extends StringBaseEntity<Device> {
 
 	private String tenantId;

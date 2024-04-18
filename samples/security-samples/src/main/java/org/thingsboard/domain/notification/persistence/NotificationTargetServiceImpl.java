@@ -1,14 +1,14 @@
 package org.thingsboard.domain.notification.persistence;
 
-import static com.baomidou.mybatisplus.core.toolkit.ObjectUtils.isNotEmpty;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.thingsboard.common.dao.jpa.PageData;
+import org.thingsboard.common.dao.jpa.PageLink;
 import org.thingsboard.domain.notification.targets.MerchantUserFilter;
 import org.thingsboard.domain.notification.targets.NotificationTarget;
 import org.thingsboard.domain.notification.targets.NotificationTargetConfig;
@@ -19,11 +19,12 @@ import org.thingsboard.domain.notification.targets.UserFilter;
 import org.thingsboard.domain.notification.targets.UserFilterType;
 import org.thingsboard.domain.notification.targets.UserListFilter;
 import org.thingsboard.domain.notification.template.NotificationType;
+import org.thingsboard.domain.user.model.Authority;
 import org.thingsboard.domain.user.model.User;
 import org.thingsboard.domain.user.service.UserService;
-import org.thingsboard.server.security.SecurityUtils;
 import org.thingsboard.server.security.SecurityUser;
 import static org.thingsboard.server.security.SecurityUser.SYS_TENANT_ID;
+import org.thingsboard.server.security.SecurityUtils;
 
 /**
  * TODO Comment
@@ -54,10 +55,10 @@ public class NotificationTargetServiceImpl implements NotificationTargetService 
 	}
 
 	@Override
-	public Page<User> findRecipientsForNotificationTargetConfig(Pageable pageable, String tenantId, Long id) {
+	public PageData<User> findRecipientsForNotificationTargetConfig(String tenantId, Long id, PageLink pageLink) {
 		NotificationTargetConfig targetConfig = findNotificationTargetById(id).getConfig();
 		if (!(targetConfig instanceof PlatformUserNotificationTargetConfig)) {
-			return Page.empty();
+			return PageData.empty();
 		}
 		checkTargetUsers(SecurityUtils.getCurrentUser(), targetConfig);
 
@@ -66,40 +67,36 @@ public class NotificationTargetServiceImpl implements NotificationTargetService 
 		switch (userFilter.getType()) {
 			case USER_LIST: {
 				UserListFilter filter = (UserListFilter) userFilter;
-				return userService.findUsers(pageable, filter.getUserIds(), null);
+				return userService.findUsersByIds(filter.getUserIds(), pageLink);
 			}
 			case MERCHANT_USER: {
 				if (tenantId.equals(SYS_TENANT_ID)) {
 					throw new IllegalArgumentException("Customer users target is not supported for system administrator");
 				}
 				MerchantUserFilter filter = (MerchantUserFilter) userFilter;
-				return userService.findMerchantUsers(pageable, filter.getMerchantIds(), null);
+				return userService.findUsersByMerchantIds(filter.getMerchantIds(), pageLink);
 			}
 			case TENANT_ADMIN: {
 				TenantAdminFilter filter = (TenantAdminFilter) userFilter;
-				if (!tenantId.equals(SYS_TENANT_ID)) {
-					return userService.findTenantAdminsByTenantsIds(pageable, Set.of(tenantId));
+				if (!tenantId.equals(SYS_TENANT_ID) || isNotEmpty(filter.getTenantIds())) {
+					return userService.findUsersByTenantIdsAndAuthority(filter.getTenantIds(), Authority.TENANT_ADMIN, pageLink);
 				} else {
-					if (isNotEmpty(filter.getTenantIds())) {
-						return userService.findTenantAdminsByTenantsIds(pageable, filter.getTenantIds());
-					} else {
-						return userService.findAllTenantAdmins(pageable);
-					}
+					return userService.findUsersByTenantIdsAndAuthority(filter.getTenantIds(), Authority.TENANT_ADMIN, pageLink);
 				}
 			}
 			case TENANT_USER:
 				if (!tenantId.equals(SYS_TENANT_ID)) {
-					return userService.findTenantUsers(pageable, tenantId, null);
+					return userService.findUsersByTenantIdsAndAuthority(Set.of(tenantId), Authority.MERCHANT_USER, pageLink);
 				} else {
-					return userService.findUsers(pageable, null, null);
+					return userService.findUsersByAuthority(Authority.MERCHANT_USER, pageLink);
 				}
-			case SYSTEM_ADMIN:
-				return userService.findAllSysAdmins(pageable);
+			case SYS_ADMIN:
+				return userService.findUsersByTenantIdsAndAuthority(Set.of(SYS_TENANT_ID), Authority.SYS_ADMIN, pageLink);
 			case ALL_USER: {
 				if (!tenantId.equals(SYS_TENANT_ID)) {
-					return userService.findTenantUsers(pageable, tenantId, null);
+					return userService.findUsersByTenantId(tenantId, pageLink);
 				} else {
-					return userService.findUsers(pageable, null, null);
+					return userService.findUsersByIds(null, pageLink);
 				}
 			}
 			default:
@@ -119,8 +116,8 @@ public class NotificationTargetServiceImpl implements NotificationTargetService 
 	}
 
 	@Override
-	public Page<NotificationTarget> findNotificationTargetsByTenantId(Pageable pageable, String tenantId, NotificationType notificationType, String textSearch) {
-		return notificationTargetDao.findNotificationTargetsByTenantId(pageable, tenantId, notificationType, textSearch);
+	public PageData<NotificationTarget> findNotificationTargetsByTenantId(String tenantId, NotificationType notificationType, PageLink pageLink) {
+		return notificationTargetDao.findNotificationTargetsByTenantId(tenantId, notificationType, pageLink);
 	}
 
 	@Override
@@ -142,7 +139,7 @@ public class NotificationTargetServiceImpl implements NotificationTargetService 
 			case MERCHANT_USER:
 				Set<Long> merchantIds = ((MerchantUserFilter) usersFilter).getMerchantIds();
 				break;
-			case SYSTEM_ADMIN:
+			case SYS_ADMIN:
 				throw new AccessDeniedException("");
 		}
 	}

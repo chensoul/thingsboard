@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.thingsboard.domain.setting.system.persistence.SystemSettingDao;
 import org.thingsboard.domain.notification.channel.mail.MailService;
-import static org.thingsboard.server.security.SecurityUser.SYS_TENANT_ID;
 import org.thingsboard.domain.notification.channel.sms.SmsService;
+import org.thingsboard.domain.setting.system.persistence.SystemSettingDao;
+import static org.thingsboard.server.security.SecurityUser.SYS_TENANT_ID;
 
 /**
  * TODO Comment
@@ -37,8 +37,8 @@ public class SystemSettingServiceImpl implements SystemSettingService {
 	public SystemSetting saveSystemSetting(String tenantId, SystemSetting systemSetting) {
 		systemSettingValidator.validate(systemSetting);
 
-		if (systemSetting.getType().equals(SystemSettingType.MAIL)) {
-			SystemSetting mailSetting = findSystemSettingByType(tenantId, SystemSettingType.MAIL);
+		if (systemSetting.getType().equals(SystemSettingType.EMAIL)) {
+			SystemSetting mailSetting = findSystemSettingByType(tenantId, SystemSettingType.EMAIL);
 			if (mailSetting != null) {
 				JsonNode newJsonValue = systemSetting.getExtra();
 				JsonNode oldJsonValue = mailSetting.getExtra();
@@ -56,7 +56,7 @@ public class SystemSettingServiceImpl implements SystemSettingService {
 		}
 		SystemSetting newSystemSetting = systemSettingDao.save(systemSetting);
 
-		if (systemSetting.getType().equals(SystemSettingType.MAIL)) {
+		if (systemSetting.getType().equals(SystemSettingType.EMAIL)) {
 			mailService.updateMailConfiguration();
 			((ObjectNode) systemSetting.getExtra()).remove("password");
 			((ObjectNode) systemSetting.getExtra()).remove("refreshToken");
@@ -67,8 +67,8 @@ public class SystemSettingServiceImpl implements SystemSettingService {
 	}
 
 	@Override
-	public boolean deleteSystemSettingByTenantIdAndType(String tenantId, SystemSettingType type) {
-		return systemSettingDao.removeByTenantIdAndKey(tenantId, type);
+	public void deleteSystemSettingByTenantIdAndType(String tenantId, SystemSettingType type) {
+		systemSettingDao.removeByTenantIdAndType(tenantId, type);
 	}
 
 	@Override

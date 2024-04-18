@@ -132,7 +132,7 @@ public class MailSender extends JavaMailSenderImpl {
 		lock.lock();
 		try {
 			if (System.currentTimeMillis() > getTokenExpires()) {
-				SystemSetting settings = systemSettingDao.findByType(SYS_TENANT_ID, SystemSettingType.MAIL);
+				SystemSetting settings = systemSettingDao.findByType(SYS_TENANT_ID, SystemSettingType.EMAIL);
 				MailConfiguration mailConfiguration = JacksonUtil.convertValue(settings.getExtra(), MailConfiguration.class);
 
 				String clientId = mailConfiguration.getClientId();

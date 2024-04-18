@@ -48,7 +48,7 @@ public class RefreshTokenExpCheckService {
 		fixedDelayString = "${mail.oauth2.refreshTokenCheckingInterval}",
 		timeUnit = TimeUnit.SECONDS)
 	public void check() throws IOException {
-		SystemSetting settings = systemSettingService.findSystemSettingByType(SYS_TENANT_ID, SystemSettingType.MAIL);
+		SystemSetting settings = systemSettingService.findSystemSettingByType(SYS_TENANT_ID, SystemSettingType.EMAIL);
 		if (settings != null && settings.getExtra().has("enableOauth2") && settings.getExtra().get("enableOauth2").asBoolean()) {
 			JsonNode jsonValue = settings.getExtra();
 			if (OFFICE_365.name().equals(jsonValue.get("providerId").asText()) && jsonValue.has("refreshToken")

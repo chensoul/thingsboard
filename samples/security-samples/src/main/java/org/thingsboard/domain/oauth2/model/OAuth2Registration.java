@@ -28,7 +28,7 @@ import org.thingsboard.common.model.HasName;
 @Data
 @ToString(exclude = {"clientSecret"})
 @NoArgsConstructor
-public class OAuth2Registration extends BaseDataWithExtra<Long> implements HasName {
+public class OAuth2Registration extends BaseDataWithExtra<String> implements HasName {
 
 	private Long oauth2ParamId;
 	private String providerId;

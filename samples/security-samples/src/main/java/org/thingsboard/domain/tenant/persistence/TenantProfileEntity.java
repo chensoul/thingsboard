@@ -15,17 +15,20 @@
  */
 package org.thingsboard.domain.tenant.persistence;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Data;
+import org.thingsboard.common.dao.jpa.JsonConverter;
 import org.thingsboard.common.dao.mybatis.LongBaseEntity;
 import org.thingsboard.common.util.JacksonUtil;
 import org.thingsboard.domain.tenant.model.TenantProfile;
 
 @Data
-@TableName(value = "tenant_profile", autoResultMap = true)
+@Entity
+@Table(name = "tenant_profile")
 public class TenantProfileEntity extends LongBaseEntity<TenantProfile> {
 
 	private static final long serialVersionUID = 2628320657987010348L;
@@ -34,12 +37,10 @@ public class TenantProfileEntity extends LongBaseEntity<TenantProfile> {
 
 	private String description;
 
-	private String tenantId;
+	private boolean defaulted;
 
-	@TableField(value = "is_default")
-	private Boolean isDefault;
-
-	@TableField(typeHandler = JacksonTypeHandler.class)
+	@Convert(converter = JsonConverter.class)
+	@Column(columnDefinition = "jsonb")
 	private JsonNode extra;
 
 	@Override

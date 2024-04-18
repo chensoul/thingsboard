@@ -13,6 +13,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.thingsboard.common.CacheConstants;
+import static org.thingsboard.common.CacheConstants.NOTIFICATION_SETTING_CACHE;
 import org.thingsboard.common.util.JacksonUtil;
 import org.thingsboard.domain.notification.persistence.DefaultNotifications;
 import org.thingsboard.domain.notification.persistence.NotificationTargetService;
@@ -54,7 +55,7 @@ public class NotificationSettingServiceImpl implements NotificationSettingServic
 	private final DefaultNotifications defaultNotifications;
 	private final UserSettingService userSettingService;
 
-	@CacheEvict(cacheNames = CacheConstants.NOTIFICATION_SETTING_CACHE, key = "#tenantId")
+	@CacheEvict(cacheNames = NOTIFICATION_SETTING_CACHE, key = "#tenantId")
 	@Override
 	public void saveNotificationSetting(String tenantId, NotificationSetting settings) {
 		if (!tenantId.equals(SYS_TENANT_ID) && settings.getDeliveryMethodsConfigs().containsKey(NotificationDeliveryMethod.MOBILE_APP.MOBILE_APP)) {
@@ -72,7 +73,7 @@ public class NotificationSettingServiceImpl implements NotificationSettingServic
 	}
 
 	@Override
-	@Cacheable(cacheNames = CacheConstants.NOTIFICATION_SETTING_CACHE, key = "#tenantId")
+	@Cacheable(cacheNames = NOTIFICATION_SETTING_CACHE, key = "#tenantId")
 	public NotificationSetting findNotificationSetting(String tenantId) {
 		return Optional.ofNullable(systemSettingService.findSystemSettingByType(tenantId, NOTIFICATION))
 			.map(adminSettings -> JacksonUtil.treeToValue(adminSettings.getExtra(), NotificationSetting.class))
@@ -84,7 +85,7 @@ public class NotificationSettingServiceImpl implements NotificationSettingServic
 	}
 
 	@Override
-	@CacheEvict(cacheNames = CacheConstants.NOTIFICATION_SETTING_CACHE, key = "#tenantId")
+	@CacheEvict(cacheNames = NOTIFICATION_SETTING_CACHE, key = "#tenantId")
 	public void deleteNotificationSetting(String tenantId) {
 		systemSettingService.deleteSystemSettingByTenantIdAndType(tenantId, NOTIFICATION);
 	}
@@ -157,7 +158,7 @@ public class NotificationSettingServiceImpl implements NotificationSettingServic
 				return;
 			}
 
-			NotificationTarget sysAdmins = notificationTargetService.findNotificationTargetsByTenantIdAndUserFilterType(tenantId, UserFilterType.SYSTEM_ADMIN).stream()
+			NotificationTarget sysAdmins = notificationTargetService.findNotificationTargetsByTenantIdAndUserFilterType(tenantId, UserFilterType.SYS_ADMIN).stream()
 				.findFirst().orElseGet(() -> createTarget(tenantId, "System administrators", new SystemAdminFilter(), "All system administrators"));
 			NotificationTarget affectedTenantAdmins = notificationTargetService.findNotificationTargetsByTenantIdAndUserFilterType(tenantId, UserFilterType.AFFECTED_TENANT_ADMIN).stream()
 				.findFirst().orElseGet(() -> createTarget(tenantId, "Affected tenant's administrators", new AffectedTenantAdminFilter(), ""));

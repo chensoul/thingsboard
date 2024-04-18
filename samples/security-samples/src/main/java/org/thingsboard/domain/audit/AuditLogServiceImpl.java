@@ -9,10 +9,10 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.thingsboard.common.dao.DaoExecutorService;
+import org.thingsboard.common.dao.jpa.PageData;
+import org.thingsboard.common.dao.jpa.PageLink;
 import org.thingsboard.common.model.BaseData;
 import org.thingsboard.common.model.EntityType;
 import org.thingsboard.common.util.JacksonUtil;
@@ -37,23 +37,23 @@ public class AuditLogServiceImpl implements AuditLogService {
 	private final AuditLogValidator auditLogValidator;
 
 	@Override
-	public Page<AuditLog> findAuditLogsByTenantIdAndMerchantId(Pageable pageable, String tenantId, Long merchantId, List<ActionType> actionTypes) {
-		return auditLogDao.findAuditLogsByTenantIdAndMerchantId(pageable, tenantId, merchantId, actionTypes);
+	public PageData<AuditLog> findAuditLogsByTenantIdAndMerchantId(String tenantId, Long merchantId, List<ActionType> actionTypes, PageLink pageLink) {
+		return auditLogDao.findAuditLogsByTenantIdAndMerchantId(tenantId, merchantId, actionTypes, pageLink);
 	}
 
 	@Override
-	public Page<AuditLog> findAuditLogsByTenantIdAndUserId(Pageable pageable, String tenantId, Long userId, List<ActionType> actionTypes) {
-		return auditLogDao.findAuditLogsByTenantIdAndUserId(pageable, tenantId, userId, actionTypes);
+	public PageData<AuditLog> findAuditLogsByTenantIdAndUserId(String tenantId, Long userId, List<ActionType> actionTypes, PageLink pageLink) {
+		return auditLogDao.findAuditLogsByTenantIdAndUserId(tenantId, userId, actionTypes, pageLink);
 	}
 
 	@Override
-	public Page<AuditLog> findAuditLogsByTenantIdAndEntityId(Pageable pageable, String tenantId, String entityId, List<ActionType> actionTypes) {
-		return auditLogDao.findAuditLogsByTenantIdAndEntityId(pageable, tenantId, entityId, actionTypes);
+	public PageData<AuditLog> findAuditLogsByTenantIdAndEntityId(String tenantId, String entityId, List<ActionType> actionTypes, PageLink pageLink) {
+		return auditLogDao.findAuditLogsByTenantIdAndEntityId(tenantId, entityId, actionTypes, pageLink);
 	}
 
 	@Override
-	public Page<AuditLog> findAuditLogsByTenantId(Pageable pageable, String tenantId, List<ActionType> actionTypes) {
-		return auditLogDao.findAuditLogsByTenantId(pageable, tenantId, actionTypes);
+	public PageData<AuditLog> findAuditLogsByTenantId(String tenantId, List<ActionType> actionTypes, PageLink pageLink) {
+		return auditLogDao.findAuditLogsByTenantId(tenantId, actionTypes, pageLink);
 	}
 
 	@Override

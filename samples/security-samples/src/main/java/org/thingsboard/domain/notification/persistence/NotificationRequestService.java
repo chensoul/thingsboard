@@ -15,7 +15,8 @@
  */
 package org.thingsboard.domain.notification.persistence;
 
-import org.springframework.data.domain.Page;
+import org.thingsboard.common.dao.jpa.PageData;
+import org.thingsboard.common.dao.jpa.PageLink;
 import org.thingsboard.common.model.EntityType;
 import org.thingsboard.domain.notification.NotificationRequest;
 
@@ -29,7 +30,7 @@ public interface NotificationRequestService {
 
 	//	PageData<NotificationRequest> findNotificationRequestsByTenantIdAndOriginatorType(TenantId tenantId, EntityType originatorType, PageLink pageLink);
 //
-	Page<NotificationRequestInfo> findNotificationRequestsInfosByTenantIdAndOriginatorType(String tenantId, EntityType originatorType);
+	PageData<NotificationRequestInfo> findNotificationRequestsInfosByTenantIdAndOriginatorType(String tenantId, EntityType originatorType, PageLink pageLink);
 
 	//
 //	List<NotificationRequestId> findNotificationRequestsIdsByStatusAndRuleId(TenantId tenantId, NotificationRequestStatus requestStatus, NotificationRuleId ruleId);

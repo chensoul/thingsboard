@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.servlet.http.HttpServletRequest;
-import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
@@ -13,23 +12,25 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.thingsboard.common.model.event.ActionEntityEvent;
-import org.thingsboard.common.model.event.DeleteEntityEvent;
-import org.thingsboard.common.model.event.SaveEntityEvent;
 import org.thingsboard.common.dao.exception.DataValidationException;
+import org.thingsboard.common.dao.jpa.PageData;
+import org.thingsboard.common.dao.jpa.PageLink;
 import org.thingsboard.common.exception.ThingsboardErrorCode;
 import org.thingsboard.common.exception.ThingsboardException;
 import org.thingsboard.common.model.EntityType;
 import org.thingsboard.common.model.HasId;
+import org.thingsboard.common.model.event.ActionEntityEvent;
+import org.thingsboard.common.model.event.DeleteEntityEvent;
+import org.thingsboard.common.model.event.SaveEntityEvent;
 import org.thingsboard.common.util.JacksonUtil;
 import static org.thingsboard.common.validation.Validator.validateString;
 import org.thingsboard.domain.audit.ActionType;
@@ -79,7 +80,7 @@ public class UserServiceImpl implements UserService {
 	private final UserSettingDao userSettingDao;
 
 	@Override
-	public User findUserById(Serializable id) {
+	public User findUserById(Long id) {
 		return userDao.findById(id);
 	}
 
@@ -154,7 +155,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserCredential findUserCredentialByUserId(Serializable userId) {
+	public UserCredential findUserCredentialByUserId(Long userId) {
 		return userCredentialDao.findByUserId((Long) userId);
 	}
 
@@ -214,7 +215,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void setUserCredentialsEnabled(Serializable userId, boolean userCredentialsEnabled) {
+	public void setUserCredentialsEnabled(Long userId, boolean userCredentialsEnabled) {
 		UserCredential userCredential = findUserCredentialByUserId(userId);
 		userCredential.setEnabled(userCredentialsEnabled);
 		saveUserCredential(userCredential);
@@ -235,44 +236,53 @@ public class UserServiceImpl implements UserService {
 		saveUser(user);
 	}
 
-	public Page<User> findMerchantUsers(Pageable pageable, Set<Long> merchantIds, String textSearch) {
-		return userDao.findTenantAndCustomerUsers(pageable, null, merchantIds, null, null, textSearch);
+	public PageData<User> findUsersByMerchantIds(Set<Long> merchantIds, PageLink pageLink) {
+		if (CollectionUtils.isEmpty(merchantIds)) {
+			return PageData.empty();
+		}
+		return userDao.findByMerchantIds(merchantIds, pageLink);
 	}
 
 	@Override
-	public Page<User> findTenantUsers(Pageable pageable, String tenantId, String textSearch) {
-		return userDao.findTenantAndCustomerUsers(pageable, Set.of(tenantId), null, null, null, textSearch);
+	public PageData<User> findUsersByTenantId(String tenantId, PageLink pageLink) {
+		return userDao.findByTenantId(tenantId, pageLink);
 	}
 
 	@Override
-	public Page<User> findUsers(Pageable pageable, Set<Long> ids, String textSearch) {
-		return userDao.findTenantAndCustomerUsers(pageable, null, null, ids, null, textSearch);
+	public PageData<User> findUsersByIds(Set<Long> ids, PageLink pageLink) {
+		if (CollectionUtils.isEmpty(ids)) {
+			return PageData.empty();
+		}
+		return userDao.findUsersByIds(ids, pageLink);
 	}
 
 	@Override
-	public Page<User> findTenantAdminsByTenantsIds(Pageable pageable, Set<String> tenantIds) {
-		return userDao.findTenantAndCustomerUsers(pageable, tenantIds, null, null, Authority.TENANT_ADMIN, null);
+	public PageData<User> findUsers(PageLink pageLink) {
+		return userDao.findUsers(pageLink);
 	}
 
 	@Override
-	public Page<User> findAllTenantAdmins(Pageable pageable) {
-		return userDao.findTenantAndCustomerUsers(pageable, null, null, null, Authority.TENANT_ADMIN, null);
+	public PageData<User> findUsersByTenantIdsAndAuthority(Set<String> tenantIds, Authority authority, PageLink pageLink) {
+		if (CollectionUtils.isEmpty(tenantIds)) {
+			return PageData.empty();
+		}
+		return userDao.findByTenantIdsAndAuthority(tenantIds, authority, pageLink);
 	}
 
 	@Override
-	public Page<User> findAllSysAdmins(Pageable pageable) {
-		return userDao.findTenantAndCustomerUsers(pageable, null, null, null, Authority.SYS_ADMIN, null);
+	public PageData<User> findUsersByAuthority(Authority authority, PageLink pageLink) {
+		return userDao.findByAuthority(authority, pageLink);
 	}
 
 	@Override
-	public void resetFailedLoginAttempt(Serializable userId) {
+	public void resetFailedLoginAttempt(Long userId) {
 		User user = findUserById(userId);
 		resetFailedLoginAttempts(user);
 		saveUser(user);
 	}
 
 	@Override
-	public int increaseFailedLoginAttempt(Serializable userId) {
+	public int increaseFailedLoginAttempt(Long userId) {
 		User user = findUserById(userId);
 		int failedLoginAttempts = increaseFailedLoginAttempts(user);
 		saveUser(user);
@@ -295,7 +305,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserCredential requestExpiredPasswordReset(Serializable id) {
+	public UserCredential requestExpiredPasswordReset(Long id) {
 		UserCredential userCredential = findUserCredentialByUserId(id);
 		if (!userCredential.isEnabled()) {
 			throw new DataValidationException("Unable to reset password for inactive user");
@@ -353,7 +363,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void setLastLoginTs(Serializable id) {
+	public void setLastLoginTs(Long id) {
 		User user = findUserById(id);
 		JsonNode additionalInfo = user.getExtra();
 		if (!(additionalInfo instanceof ObjectNode)) {
@@ -392,7 +402,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Optional<HasId<? extends Serializable>> findEntity(Serializable id) {
+	public Optional<HasId<Long>> findEntity(Long id) {
 		return Optional.ofNullable(findUserById(id));
 	}
 

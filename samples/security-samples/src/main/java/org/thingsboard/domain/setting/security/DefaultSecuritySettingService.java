@@ -43,7 +43,7 @@ import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import static org.thingsboard.common.CacheConstants.SECURITY_SETTINGS_CACHE;
+import static org.thingsboard.common.CacheConstants.SECURITY_SETTING_CACHE;
 import org.thingsboard.common.dao.exception.DataValidationException;
 import org.thingsboard.common.exception.ThingsboardException;
 import org.thingsboard.common.model.EntityType;
@@ -89,7 +89,7 @@ public class DefaultSecuritySettingService implements SecuritySettingService {
 	@Autowired
 	private AuditLogService auditLogService;
 
-	@Cacheable(cacheNames = SECURITY_SETTINGS_CACHE, key = "'securitySetting'")
+	@Cacheable(cacheNames = SECURITY_SETTING_CACHE, key = "'securitySetting'")
 	@Override
 	public SecuritySetting getSecuritySetting() {
 		SecuritySetting securitySetting = null;
@@ -109,7 +109,7 @@ public class DefaultSecuritySettingService implements SecuritySettingService {
 		return securitySetting;
 	}
 
-	@CacheEvict(cacheNames = SECURITY_SETTINGS_CACHE, key = "'securitySetting'")
+	@CacheEvict(cacheNames = SECURITY_SETTING_CACHE, key = "'securitySetting'")
 	@Override
 	public SecuritySetting saveSecuritySetting(SecuritySetting securitySetting) {
 		SystemSetting systemSetting = systemSettingService.findSystemSettingByType(SYS_TENANT_ID, SystemSettingType.SECURITY);

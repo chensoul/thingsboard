@@ -17,8 +17,8 @@ package org.thingsboard.domain.notification.persistence;
 
 import java.util.List;
 import java.util.Set;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.thingsboard.common.dao.jpa.PageData;
+import org.thingsboard.common.dao.jpa.PageLink;
 import org.thingsboard.common.exception.ThingsboardException;
 import org.thingsboard.domain.notification.targets.NotificationTarget;
 import org.thingsboard.domain.notification.targets.UserFilterType;
@@ -31,13 +31,13 @@ public interface NotificationTargetService {
 
 	NotificationTarget findNotificationTargetById(Long id);
 
-	Page<User> findRecipientsForNotificationTargetConfig(Pageable pageable, String tenantId, Long id) throws ThingsboardException;
+	PageData<User> findRecipientsForNotificationTargetConfig(String tenantId, Long id, PageLink pageLink) throws ThingsboardException;
 
 	List<NotificationTarget> findNotificationTargetsByTenantIdAndIds(String tenantId, Set<Long> ids);
 
 	List<NotificationTarget> findNotificationTargetsByTenantIdAndUserFilterType(String tenantId, UserFilterType filterType);
 
-	Page<NotificationTarget> findNotificationTargetsByTenantId(Pageable pageable, String tenantId, NotificationType notificationType, String textSearch);
+	PageData<NotificationTarget> findNotificationTargetsByTenantId(String tenantId, NotificationType notificationType, PageLink pageLink);
 
 	void deleteNotificationTargetById(Long id);
 }

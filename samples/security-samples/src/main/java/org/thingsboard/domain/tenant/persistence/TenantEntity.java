@@ -15,19 +15,22 @@
  */
 package org.thingsboard.domain.tenant.persistence;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.thingsboard.common.dao.jpa.JsonConverter;
 import org.thingsboard.common.dao.mybatis.StringBaseEntity;
 import org.thingsboard.common.util.JacksonUtil;
 import org.thingsboard.domain.tenant.model.Tenant;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "tenant", autoResultMap = true)
+@Entity
+@Table(name = "tenant")
 public final class TenantEntity extends StringBaseEntity<Tenant> {
 	private String name;
 
@@ -47,7 +50,8 @@ public final class TenantEntity extends StringBaseEntity<Tenant> {
 
 	private String email;
 
-	@TableField(typeHandler = JacksonTypeHandler.class)
+	@Convert(converter = JsonConverter.class)
+	@Column(columnDefinition = "jsonb")
 	private JsonNode extra;
 
 	private Long tenantProfileId;

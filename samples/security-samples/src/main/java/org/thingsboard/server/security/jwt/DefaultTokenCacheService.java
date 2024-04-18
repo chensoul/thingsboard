@@ -16,31 +16,27 @@
 package org.thingsboard.server.security.jwt;
 
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.event.EventListener;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
-import org.thingsboard.domain.setting.jwt.JwtSettingService;
+import static org.thingsboard.common.CacheConstants.JWT_TOKEN_CACHE;
 import org.thingsboard.domain.user.event.UserAuthDataChangedEvent;
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
 public class DefaultTokenCacheService implements TokenCacheService {
-	private final StringRedisTemplate redisTemplate;
-	private final JwtSettingService jwtSettingService;
+	private final CacheManager cacheManager;
 
 	@EventListener(classes = UserAuthDataChangedEvent.class)
 	public void onUserAuthDataChanged(UserAuthDataChangedEvent event) {
 		if (event.getId() != null) {
 			log.info("User [{}] auth data changed ad {}, update token redis cache", event.getId(), event.getTs());
 
-			//缓存用户的 token 过期时间为当前事件的时间，并设置该缓存的过期时间为 jwt 过期时间
-			redisTemplate.opsForValue().set(event.getId().toString(), String.valueOf(event.getTs()),
-				jwtSettingService.getJwtSetting().getTokenExpirationTime(), TimeUnit.SECONDS);
+			cacheManager.getCache(JWT_TOKEN_CACHE).put(event.getId().toString(), event.getTs());
 		}
 	}
 
@@ -54,7 +50,7 @@ public class DefaultTokenCacheService implements TokenCacheService {
 	}
 
 	private Boolean isTokenExpired(String sessionId, long issueTime) {
-		return Optional.ofNullable(redisTemplate.opsForValue().get(sessionId)).map(expiredTime -> isTokenExpired(issueTime, Long.parseLong(expiredTime))).orElse(false);
+		return Optional.ofNullable(cacheManager.getCache(JWT_TOKEN_CACHE).get(sessionId)).map(op -> isTokenExpired(issueTime, (Long) op.get())).orElse(false);
 	}
 
 	private boolean isTokenExpired(long issueTime, Long expiredTime) {

@@ -20,19 +20,21 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.thingsboard.common.dao.jpa.PageData;
+import org.thingsboard.common.dao.jpa.PageLink;
 import org.thingsboard.common.model.BaseData;
 import org.thingsboard.common.model.EntityType;
 import org.thingsboard.domain.user.model.User;
 
 public interface AuditLogService {
 
-	Page<AuditLog> findAuditLogsByTenantIdAndMerchantId(Pageable pageable, String tenantId, Long merchantId, List<ActionType> actionTypes);
+	PageData<AuditLog> findAuditLogsByTenantIdAndMerchantId( String tenantId, Long merchantId, List<ActionType> actionTypes, PageLink pageLink);
 
-	Page<AuditLog> findAuditLogsByTenantIdAndUserId(Pageable pageable, String tenantId, Long userId, List<ActionType> actionTypes);
+	PageData<AuditLog> findAuditLogsByTenantIdAndUserId( String tenantId, Long userId, List<ActionType> actionTypes, PageLink pageLink);
 
-	Page<AuditLog> findAuditLogsByTenantIdAndEntityId(Pageable pageable, String tenantId, String entityId, List<ActionType> actionTypes);
+	PageData<AuditLog> findAuditLogsByTenantIdAndEntityId(String tenantId, String entityId, List<ActionType> actionTypes, PageLink pageLink);
 
-	Page<AuditLog> findAuditLogsByTenantId(Pageable pageable, String tenantId, List<ActionType> actionTypes);
+	PageData<AuditLog> findAuditLogsByTenantId( String tenantId, List<ActionType> actionTypes, PageLink pageLink);
 
 	<E extends BaseData> ListenableFuture<Void> logEntityAction(
 		User user,

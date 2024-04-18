@@ -18,7 +18,7 @@ package org.thingsboard.domain.setting.system;
 public enum SystemSettingType {
 	GENERAL,
 	JWT,
-	MAIL,
+	EMAIL,
 	SMS,
 	MFA,
 	SECURITY,

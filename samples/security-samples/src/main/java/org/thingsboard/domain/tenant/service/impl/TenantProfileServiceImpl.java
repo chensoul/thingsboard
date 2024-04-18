@@ -5,6 +5,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.thingsboard.common.dao.jpa.PageData;
+import org.thingsboard.common.dao.jpa.PageLink;
 import org.thingsboard.common.model.event.DeleteEntityEvent;
 import org.thingsboard.common.model.event.SaveEntityEvent;
 import org.thingsboard.common.util.JacksonUtil;
@@ -36,7 +38,7 @@ public class TenantProfileServiceImpl implements TenantProfileService {
 		TenantProfile defaultTenantProfile = findDefaultTenantProfile();
 		if (defaultTenantProfile == null) {
 			defaultTenantProfile = new TenantProfile();
-			defaultTenantProfile.setIsDefault(true);
+			defaultTenantProfile.setDefaulted(true);
 			defaultTenantProfile.setName("Default");
 			defaultTenantProfile.setDescription("Default tenant profile");
 
@@ -61,10 +63,10 @@ public class TenantProfileServiceImpl implements TenantProfileService {
 	}
 
 	@Override
-	public void deleteTenantProfile(TenantProfile tenantProfileId) {
-		if (tenantProfileId != null) {
-			tenantProfileDao.removeById(tenantProfileId);
-			eventPublisher.publishEvent(DeleteEntityEvent.builder().entity(tenantProfileId).entityId(tenantProfileId).build());
+	public void deleteTenantProfile(TenantProfile tenantProfile) {
+		if (tenantProfile != null) {
+			tenantProfileDao.removeById(tenantProfile.getId());
+			eventPublisher.publishEvent(DeleteEntityEvent.builder().entity(tenantProfile).entityId(tenantProfile.getId()).build());
 		}
 	}
 
@@ -86,13 +88,13 @@ public class TenantProfileServiceImpl implements TenantProfileService {
 
 	@Override
 	public TenantProfile setDefaultTenantProfile(TenantProfile tenantProfile) {
-		if (tenantProfile != null && !tenantProfile.getIsDefault()) {
-			tenantProfile.setIsDefault(true);
+		if (tenantProfile != null && !tenantProfile.isDefaulted()) {
+			tenantProfile.setDefaulted(true);
 			TenantProfile previousDefaultTenantProfile = findDefaultTenantProfile();
 			if (previousDefaultTenantProfile == null) {
 				saveTenantProfile(tenantProfile);
 			} else if (!previousDefaultTenantProfile.getId().equals(tenantProfile.getId())) {
-				previousDefaultTenantProfile.setIsDefault(false);
+				previousDefaultTenantProfile.setDefaulted(false);
 				saveTenantProfile(previousDefaultTenantProfile);
 				saveTenantProfile(tenantProfile);
 			}
@@ -101,7 +103,7 @@ public class TenantProfileServiceImpl implements TenantProfileService {
 	}
 
 	@Override
-	public Page<TenantProfile> findTenantProfiles(Pageable pageable, String tenantId, String textSearch) {
-		return tenantProfileDao.findTenantProfiles(pageable, tenantId, textSearch);
+	public PageData<TenantProfile> findTenantProfiles(PageLink pageLink) {
+		return tenantProfileDao.findTenantProfiles(pageLink);
 	}
 }

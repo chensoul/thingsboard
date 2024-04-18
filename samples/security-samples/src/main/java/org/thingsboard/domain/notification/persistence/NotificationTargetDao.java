@@ -21,19 +21,21 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.thingsboard.common.dao.Dao;
 import org.thingsboard.common.dao.TenantEntityDao;
+import org.thingsboard.common.dao.jpa.PageData;
+import org.thingsboard.common.dao.jpa.PageLink;
 import org.thingsboard.domain.notification.targets.NotificationTarget;
 import org.thingsboard.domain.notification.targets.NotificationTargetType;
 import org.thingsboard.domain.notification.targets.UserFilterType;
 import org.thingsboard.domain.notification.template.NotificationType;
 
-public interface NotificationTargetDao extends Dao<NotificationTarget>, TenantEntityDao {
+public interface NotificationTargetDao extends Dao<NotificationTarget, Long>, TenantEntityDao {
 	List<NotificationTarget> findByTenantIdAndIds(String tenantId, Set<Long> ids);
 
 	List<NotificationTarget> findByTenantIdAndUserFilterType(String tenantId, UserFilterType filterType);
 
-	Page<NotificationTarget> findByTenantIdAndSupportedNotificationType(Pageable pageable, String tenantId, NotificationTargetType notificationTargetType);
+	PageData<NotificationTarget> findByTenantIdAndSupportedNotificationType(String tenantId, NotificationTargetType notificationTargetType, PageLink pageLink);
 
 	void removeByTenantId(String tenantId);
 
-	Page<NotificationTarget> findNotificationTargetsByTenantId(Pageable pageable, String tenantId, NotificationType notificationType, String textSearch);
+	PageData<NotificationTarget> findNotificationTargetsByTenantId(String tenantId, NotificationType notificationType, PageLink pageLink);
 }

@@ -15,15 +15,26 @@
  */
 package org.thingsboard.common;
 
-public class CacheConstants {
-	public static final String SESSIONS_CACHE = "session";
-	public static final String SECURITY_SETTINGS_CACHE = "securitySetting";
-	public static final String USER_SETTINGS_CACHE = "userSetting";
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
-	public static final String TENANT_PROFILE_CACHE = "tenantProfile";
-	public static final String TENANT_CACHE = "tenant";
-	public static final String TENANT_EXIST_CACHE = "tenantsExist";
-	public static final String NOTIFICATION_SETTING_CACHE = "notificationSetting";
+public interface CacheConstants {
+	String SESSION_CACHE = "session";
+	String JWT_TOKEN_CACHE = "jwtToken";
+	String SECURITY_SETTING_CACHE = "securitySetting";
+	String USER_SETTING_CACHE = "userSetting";
+	String TENANT_PROFILE_CACHE = "tenantProfile";
+	String TENANT_CACHE = "tenant";
+	String NOTIFICATION_SETTING_CACHE = "notificationSetting";
+	String TWO_FA_VERIFICATION_CODE_CACHE = "twoFaVerificationCode";
 
-	public static final String TWO_FA_VERIFICATION_CODE_CACHE = "twoFaVerificationCode";
+	List<String> ALL_CACHES = Collections.unmodifiableList(Arrays.asList(SESSION_CACHE,
+		JWT_TOKEN_CACHE,
+		SECURITY_SETTING_CACHE,
+		USER_SETTING_CACHE,
+		TENANT_PROFILE_CACHE,
+		TENANT_CACHE,
+		NOTIFICATION_SETTING_CACHE,
+		TWO_FA_VERIFICATION_CODE_CACHE));
 }

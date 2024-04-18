@@ -36,6 +36,9 @@ import org.springframework.data.redis.connection.RedisNode;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.format.support.DefaultFormattingConversionService;
+import static org.thingsboard.common.CacheConstants.ALL_CACHES;
+import static org.thingsboard.common.StringConstants.COLON;
+import static org.thingsboard.common.StringConstants.COMMA;
 import redis.clients.jedis.JedisPoolConfig;
 
 @Configuration
@@ -97,9 +100,14 @@ public abstract class TBRedisCacheConfiguration {
 
 		Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
 		if (cacheSpecsMap != null) {
-			for (Map.Entry<String, CacheSpecs> entry : cacheSpecsMap.getSpecs().entrySet()) {
-				cacheConfigurations.put(entry.getKey(), createRedisCacheConfigWithTtl(redisConversionService, entry.getValue().getTimeToLiveInMinutes()));
-			}
+			cacheSpecsMap.getSpecs().forEach((cacheName, cacheSpecs) -> {
+				cacheConfigurations.put(cacheName, createRedisCacheConfigWithTtl(redisConversionService, cacheSpecs.getTimeToLiveInMinutes()));
+			});
+			List<String> copiedCaches = new ArrayList<>(ALL_CACHES);
+			copiedCaches.removeAll(cacheSpecsMap.getSpecs().keySet());
+			copiedCaches.forEach(cacheName -> {
+				cacheConfigurations.put(cacheName, createRedisCacheConfigWithTtl(redisConversionService, cacheSpecsMap.getTimeToLiveInMinutes()));
+			});
 		}
 
 		var redisCacheManagerBuilder = RedisCacheManager.builder(cf).cacheDefaults(configuration).withInitialCacheConfigurations(cacheConfigurations).transactionAware();
@@ -146,9 +154,9 @@ public abstract class TBRedisCacheConfiguration {
 			result = Collections.emptyList();
 		} else {
 			result = new ArrayList<>();
-			for (String hostPort : nodes.split(CacheConstants.COMMA)) {
-				String host = hostPort.split(CacheConstants.COLON)[0];
-				int port = Integer.parseInt(hostPort.split(CacheConstants.COLON)[1]);
+			for (String hostPort : nodes.split(COMMA)) {
+				String host = hostPort.split(COLON)[0];
+				int port = Integer.parseInt(hostPort.split(COLON)[1]);
 				result.add(new RedisNode(host, port));
 			}
 		}

@@ -19,15 +19,20 @@ package org.thingsboard.domain.notification.persistence;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.thingsboard.common.dao.Dao;
+import org.thingsboard.common.dao.jpa.PageData;
+import org.thingsboard.common.dao.jpa.PageLink;
 import org.thingsboard.domain.notification.Notification;
 import org.thingsboard.domain.notification.NotificationStatus;
+import org.thingsboard.domain.notification.template.NotificationDeliveryMethod;
 
-public interface NotificationDao extends Dao<Notification> {
-	Page<Notification> findByRecipientIdAndStatus(Pageable pageable, Long recipientId, NotificationStatus status, Integer limit);
-
-	int updateStatusByRecipientId(Long recipientId, NotificationStatus status);
-
-	int updateStatusByIdAndRecipientId(Long recipientId, Long notificationId, NotificationStatus status);
+public interface NotificationDao extends Dao<Notification, Long> {
+	boolean updateStatusByIdAndRecipientId(Long recipientId, Long notificationId, NotificationStatus status);
 
 	boolean deleteByIdAndRecipientId(Long recipientId, Long notificationId);
+
+	int updateStatusByDeliveryMethodAndRecipientId(NotificationDeliveryMethod deliveryMethod, Long recipientId, NotificationStatus notificationStatus);
+
+	PageData<Notification> findUnreadByDeliveryMethodAndRecipientId(NotificationDeliveryMethod deliveryMethod, Long recipientId, PageLink pageLink);
+
+	PageData<Notification> findByDeliveryMethodAndRecipientId( NotificationDeliveryMethod deliveryMethod, Long recipientId, PageLink pageLink);
 }

@@ -8,7 +8,7 @@ import org.thingsboard.common.dao.Dao;
  * @author <a href="mailto:ichensoul@gmail.com">chensoul</a>
  * @since TODO
  */
-public interface DeviceProfileDao extends Dao<DeviceProfile> {
+public interface DeviceProfileDao extends Dao<DeviceProfile, Long> {
 	DeviceProfileInfo findDeviceProfileInfoById(Long deviceProfileId);
 
 	DeviceProfile findDefaultDeviceProfile(String tenantId);

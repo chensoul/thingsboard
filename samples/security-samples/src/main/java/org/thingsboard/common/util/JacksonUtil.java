@@ -139,9 +139,12 @@ public class JacksonUtil {
 		}
 	}
 
-	public static String toPrettyString(Object o) {
+	public static String toPrettyString(Object value) {
+		if (value == null) {
+			return null;
+		}
 		try {
-			return PRETTY_SORTED_JSON_MAPPER.writeValueAsString(o);
+			return PRETTY_SORTED_JSON_MAPPER.writeValueAsString(value);
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}
@@ -200,16 +203,25 @@ public class JacksonUtil {
 	}
 
 	public static <T> T clone(T value) {
+		if (value == null) {
+			return null;
+		}
 		@SuppressWarnings("unchecked")
 		Class<T> valueClass = (Class<T>) value.getClass();
 		return fromString(toString(value), valueClass);
 	}
 
 	public static <T> JsonNode valueToTree(T value) {
+		if (value == null) {
+			return null;
+		}
 		return OBJECT_MAPPER.valueToTree(value);
 	}
 
 	public static <T> byte[] writeValueAsBytes(T value) {
+		if (value == null) {
+			return null;
+		}
 		try {
 			return OBJECT_MAPPER.writeValueAsBytes(value);
 		} catch (JsonProcessingException e) {

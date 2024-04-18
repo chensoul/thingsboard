@@ -15,7 +15,8 @@
  */
 package org.thingsboard.domain.oauth2.persistence;
 
-import com.baomidou.mybatisplus.annotation.TableName;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -26,7 +27,8 @@ import org.thingsboard.domain.oauth2.model.OAuth2Param;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-@TableName(value = "oauth2_param", autoResultMap = true)
+@Entity
+@Table(name = "oauth2_param")
 public class OAuth2ParamEntity extends LongBaseEntity<OAuth2Param> {
 
 	private Boolean enabled;

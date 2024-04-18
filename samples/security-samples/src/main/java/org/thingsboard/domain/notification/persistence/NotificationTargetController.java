@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.thingsboard.common.dao.jpa.PageData;
+import org.thingsboard.common.dao.jpa.PageLink;
 import org.thingsboard.domain.notification.targets.NotificationTarget;
 import org.thingsboard.domain.notification.template.NotificationType;
 import org.thingsboard.domain.user.model.User;
@@ -51,8 +51,8 @@ public class NotificationTargetController {
 
 	@GetMapping("/target/{id}/recipients")
 	@PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-	public Page<User> getRecipientsForNotificationTargetConfig(Pageable pageable, @PathVariable Long id, @AuthenticationPrincipal SecurityUser user) {
-		return notificationTargetService.findRecipientsForNotificationTargetConfig(pageable, user.getTenantId(), id);
+	public PageData<User> getRecipientsForNotificationTargetConfig(PageLink pageLink, @PathVariable Long id, @AuthenticationPrincipal SecurityUser user) {
+		return notificationTargetService.findRecipientsForNotificationTargetConfig(user.getTenantId(), id, pageLink);
 	}
 
 	@GetMapping(value = "/targets", params = {"ids"})
@@ -64,11 +64,10 @@ public class NotificationTargetController {
 
 	@GetMapping("/targets")
 	@PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-	public Page<NotificationTarget> getNotificationTargets(Pageable pageable,
-														   @RequestParam(required = false) String textSearch,
-														   @RequestParam(required = false) NotificationType notificationType,
-														   @AuthenticationPrincipal SecurityUser user) {
-		return notificationTargetService.findNotificationTargetsByTenantId(pageable, user.getTenantId(), notificationType, textSearch);
+	public PageData<NotificationTarget> getNotificationTargets(PageLink pageLink,
+															   @RequestParam(required = false) NotificationType notificationType,
+															   @AuthenticationPrincipal SecurityUser user) {
+		return notificationTargetService.findNotificationTargetsByTenantId(user.getTenantId(), notificationType, pageLink);
 	}
 
 	@DeleteMapping("/target/{id}")

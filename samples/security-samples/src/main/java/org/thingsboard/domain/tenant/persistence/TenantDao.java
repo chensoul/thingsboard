@@ -20,7 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.thingsboard.common.dao.Dao;
 import org.thingsboard.domain.tenant.model.Tenant;
 
-public interface TenantDao extends Dao<Tenant> {
+public interface TenantDao extends Dao<Tenant, String> {
 	Page<Tenant> findTenants(Pageable pageable, String textSearch);
 
 	Tenant findByName(String name);

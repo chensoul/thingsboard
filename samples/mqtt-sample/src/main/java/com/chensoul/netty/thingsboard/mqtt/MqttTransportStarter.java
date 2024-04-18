@@ -21,17 +21,15 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.util.AttributeKey;
 import io.netty.util.ResourceLeakDetector;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-import java.net.InetSocketAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.thingsboard.common.model.DataConstants;
+import org.thingsboard.common.DataConstants;
 import org.thingsboard.common.model.HasName;
 
 /**

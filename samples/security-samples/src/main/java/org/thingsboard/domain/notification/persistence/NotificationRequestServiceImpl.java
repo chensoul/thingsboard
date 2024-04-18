@@ -1,8 +1,9 @@
 package org.thingsboard.domain.notification.persistence;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.thingsboard.common.dao.jpa.PageData;
+import org.thingsboard.common.dao.jpa.PageLink;
 import org.thingsboard.common.model.EntityType;
 import org.thingsboard.domain.notification.NotificationRequest;
 
@@ -36,7 +37,7 @@ public class NotificationRequestServiceImpl implements NotificationRequestServic
 	}
 
 	@Override
-	public Page<NotificationRequestInfo> findNotificationRequestsInfosByTenantIdAndOriginatorType(String tenantId, EntityType originatorType) {
+	public PageData<NotificationRequestInfo> findNotificationRequestsInfosByTenantIdAndOriginatorType(String tenantId, EntityType originatorType, PageLink pageLink) {
 		return null;
 	}
 

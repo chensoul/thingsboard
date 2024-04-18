@@ -15,12 +15,16 @@
  */
 package org.thingsboard.domain.audit;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.thingsboard.common.dao.jpa.JsonConverter;
 import org.thingsboard.common.dao.mybatis.LongBaseEntity;
 import org.thingsboard.common.model.EntityType;
 import org.thingsboard.common.util.JacksonUtil;
@@ -28,7 +32,8 @@ import org.thingsboard.common.util.JacksonUtil;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "audit_log", autoResultMap = true)
+@Entity
+@Table(name = "audit_log")
 public class AuditLogEntity extends LongBaseEntity<AuditLog> {
 	private String tenantId;
 
@@ -38,15 +43,19 @@ public class AuditLogEntity extends LongBaseEntity<AuditLog> {
 
 	private String userName;
 
+	@Enumerated(EnumType.STRING)
 	private EntityType entityType;
 
 	private String entityId;
 
+	@Enumerated(EnumType.STRING)
 	private ActionType actionType;
 
-	@TableField(typeHandler = JacksonTypeHandler.class)
+	@Convert(converter = JsonConverter.class)
+	@Column(columnDefinition = "jsonb")
 	private JsonNode actionData;
 
+	@Enumerated(EnumType.STRING)
 	private ActionStatus actionStatus;
 
 	private String failureDetail;

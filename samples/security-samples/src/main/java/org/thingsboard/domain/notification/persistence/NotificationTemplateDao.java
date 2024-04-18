@@ -22,7 +22,7 @@ import org.thingsboard.common.dao.Dao;
 import org.thingsboard.domain.notification.template.NotificationTemplate;
 import org.thingsboard.domain.notification.template.NotificationType;
 
-public interface NotificationTemplateDao extends Dao<NotificationTemplate> {
+public interface NotificationTemplateDao extends Dao<NotificationTemplate, Long> {
 
 	Page<NotificationTemplate> findByTenantIdAndTemplateTypes(Pageable pageable, String tenantId, List<NotificationType> templateTypes);
 

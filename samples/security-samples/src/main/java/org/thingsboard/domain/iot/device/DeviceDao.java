@@ -8,6 +8,6 @@ import org.thingsboard.common.dao.Dao;
  * @author <a href="mailto:ichensoul@gmail.com">chensoul</a>
  * @since TODO
  */
-public interface DeviceDao extends Dao<Device> {
+public interface DeviceDao extends Dao<Device, String> {
 
 }

@@ -20,7 +20,7 @@ import java.io.Serializable;
 import lombok.Data;
 
 @Data
-public abstract class BaseData<I extends Serializable> extends IdBased<I> implements Serializable {
+public abstract class BaseData<I> extends IdBased<I> implements Serializable {
 	private static final long serialVersionUID = 5422817607129962637L;
 
 	public static final ObjectMapper mapper = new ObjectMapper();

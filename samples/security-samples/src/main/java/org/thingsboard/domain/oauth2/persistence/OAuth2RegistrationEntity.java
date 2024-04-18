@@ -15,17 +15,21 @@
  */
 package org.thingsboard.domain.oauth2.persistence;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.stream.Collectors;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.StringUtils;
-import org.thingsboard.common.dao.mybatis.LongBaseEntity;
+import org.thingsboard.common.dao.jpa.JsonConverter;
+import org.thingsboard.common.dao.mybatis.StringBaseEntity;
 import org.thingsboard.domain.oauth2.model.MapperType;
 import org.thingsboard.domain.oauth2.model.OAuth2BasicMapperConfig;
 import org.thingsboard.domain.oauth2.model.OAuth2CustomMapperConfig;
@@ -36,10 +40,12 @@ import org.thingsboard.domain.oauth2.model.TenantNameStrategyType;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "oauth2_registration", autoResultMap = true)
-public class OAuth2RegistrationEntity extends LongBaseEntity<OAuth2Registration> {
-
+@Entity
+@Table(name = "oauth2_registration")
+public class OAuth2RegistrationEntity extends StringBaseEntity<OAuth2Registration> {
+	@Column(name = "oauth2_param_id", nullable = false)
 	private Long oauth2ParamId;
+
 	private String clientId;
 	private String clientSecret;
 	private String authorizationUri;
@@ -54,10 +60,12 @@ public class OAuth2RegistrationEntity extends LongBaseEntity<OAuth2Registration>
 	private String loginButtonIcon;
 	private Boolean allowUserCreation;
 	private Boolean activateUser;
+	@Enumerated(EnumType.STRING)
 	private MapperType type;
 	private String emailAttributeKey;
 	private String firstNameAttributeKey;
 	private String lastNameAttributeKey;
+	@Enumerated(EnumType.STRING)
 	private TenantNameStrategyType tenantNameStrategy;
 	private String tenantNamePattern;
 	private String merchantNamePattern;
@@ -66,7 +74,8 @@ public class OAuth2RegistrationEntity extends LongBaseEntity<OAuth2Registration>
 	private String customPassword;
 	private Boolean customSendToken;
 
-	@TableField(typeHandler = JacksonTypeHandler.class)
+	@Convert(converter = JsonConverter.class)
+	@Column(columnDefinition = "jsonb")
 	private JsonNode extra;
 
 	@Override

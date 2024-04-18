@@ -42,7 +42,7 @@ public class TenantProfile extends BaseDataWithExtra<Long> implements HasName {
 	@Length
 	private String description;
 
-	private Boolean isDefault;
+	private boolean defaulted;
 
 	@JsonIgnore
 	public Optional<DefaultTenantProfileConfiguration> getProfileConfiguration() {

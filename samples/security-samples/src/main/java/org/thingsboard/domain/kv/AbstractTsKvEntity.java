@@ -15,13 +15,14 @@
  */
 package org.thingsboard.domain.kv;
 
-import java.util.UUID;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.thingsboard.common.model.ToData;
 
 @Data
+@MappedSuperclass
 public abstract class AbstractTsKvEntity implements ToData<TsKvEntry> {
 
 	protected static final String SUM = "SUM";
@@ -30,7 +31,7 @@ public abstract class AbstractTsKvEntity implements ToData<TsKvEntry> {
 	protected static final String MAX = "MAX";
 
 	@Id
-	protected UUID entityId;
+	protected String entityId;
 
 	@Id
 	protected int key;
@@ -49,7 +50,6 @@ public abstract class AbstractTsKvEntity implements ToData<TsKvEntry> {
 
 	@Transient
 	protected String strKey;
-
 	@Transient
 	protected Long aggValuesLastTs;
 	@Transient

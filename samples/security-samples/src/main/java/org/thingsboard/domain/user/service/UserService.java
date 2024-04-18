@@ -15,19 +15,20 @@
  */
 package org.thingsboard.domain.user.service;
 
-import java.io.Serializable;
 import java.util.Set;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.thingsboard.common.dao.EntityDaoService;
+import org.thingsboard.common.dao.jpa.PageData;
+import org.thingsboard.common.dao.jpa.PageLink;
 import org.thingsboard.common.exception.ThingsboardException;
+import org.thingsboard.domain.user.model.Authority;
 import org.thingsboard.domain.user.model.User;
 import org.thingsboard.domain.user.model.UserCredential;
 import org.thingsboard.server.security.SecurityUser;
 
-public interface UserService extends EntityDaoService {
+public interface UserService extends EntityDaoService<Long> {
 
-	User findUserById(Serializable id);
+	User findUserById(Long id);
 
 	User findUserByEmail(String email);
 
@@ -37,11 +38,11 @@ public interface UserService extends EntityDaoService {
 
 	void deleteUser(User user);
 
-	UserCredential findUserCredentialByUserId(Serializable id);
+	UserCredential findUserCredentialByUserId(Long id);
 
 	UserCredential saveUserCredential(UserCredential userCredential);
 
-	UserCredential requestExpiredPasswordReset(Serializable id);
+	UserCredential requestExpiredPasswordReset(Long id);
 
 	UserCredential replaceUserCredential(UserCredential userCredential);
 
@@ -53,25 +54,25 @@ public interface UserService extends EntityDaoService {
 
 	UserCredential activateUserCredential(String activateToken, String encodedPassword);
 
-	void setUserCredentialsEnabled(Serializable userId, boolean userCredentialsEnabled);
+	void setUserCredentialsEnabled(Long userId, boolean userCredentialsEnabled);
 
-	Page<User> findUsers(Pageable pageable, Set<Long> ids, String textSearch);
+	PageData<User> findUsers(PageLink pageLink);
 
-	Page<User> findTenantAdminsByTenantsIds(Pageable pageable, Set<String> tenantIds);
+	PageData<User> findUsersByIds(Set<Long> ids, PageLink pageLink);
 
-	Page<User> findTenantUsers(Pageable pageable, String tenantId, String textSearch);
+	PageData<User> findUsersByTenantIdsAndAuthority(Set<String> tenantIds, Authority authority, PageLink pageLink);
 
-	Page<User> findMerchantUsers(Pageable pageable, Set<Long> merchantIds, String textSearch);
+	PageData<User> findUsersByAuthority(Authority authority, PageLink pageLink);
 
-	Page<User> findAllTenantAdmins(Pageable pageable);
+	PageData<User> findUsersByTenantId(String tenantId, PageLink pageLink);
 
-	Page<User> findAllSysAdmins(Pageable pageable);
+	PageData<User> findUsersByMerchantIds(Set<Long> merchantIds, PageLink pageLink);
 
-	void resetFailedLoginAttempt(Serializable userId);
+	void resetFailedLoginAttempt(Long userId);
 
-	int increaseFailedLoginAttempt(Serializable userId);
+	int increaseFailedLoginAttempt(Long userId);
 
-	void setLastLoginTs(Serializable id);
+	void setLastLoginTs(Long id);
 
 	SecurityUser changePassword(String currentPassword, String newPassword) throws ThingsboardException;
 }

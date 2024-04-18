@@ -24,7 +24,8 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "cache")
 @Data
 public class CacheSpecsMap {
+	private int timeToLiveInMinutes;
 
-    private Map<String, CacheSpecs> specs;
+	private Map<String, CacheSpecs> specs;
 
 }

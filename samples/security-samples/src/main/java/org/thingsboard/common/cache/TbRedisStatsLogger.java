@@ -85,7 +85,7 @@ public class TbRedisStatsLogger {
 	@Nonnegative
 	public double hitRate(CacheStatistics stats) {
 		long requestCount = stats.getGets();
-		return (requestCount == 0) ? 1.0 : (double) stats.getHits() / requestCount;
+		return (requestCount == 0) ? 0.0 : (double) stats.getHits() / requestCount;
 	}
 
 }

@@ -20,7 +20,7 @@ import java.util.List;
 import org.thingsboard.common.dao.Dao;
 import org.thingsboard.domain.oauth2.model.OAuth2Param;
 
-public interface OAuth2ParamDao extends Dao<OAuth2Param> {
+public interface OAuth2ParamDao extends Dao<OAuth2Param, Long> {
 	void deleteAll();
 
 	List<OAuth2Param> findByTenantId(String tenantId);

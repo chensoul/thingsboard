@@ -15,7 +15,6 @@
  */
 package org.thingsboard.common.dao.aspect;
 
-import com.baomidou.mybatisplus.core.exceptions.MybatisPlusException;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -38,6 +37,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.hibernate.exception.JDBCConnectionException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -180,7 +180,7 @@ public class SqlDaoCallsAspect {
 
 	private void reportFailedMethodExecution(String tenantId, String method, long startTime, Throwable t, ProceedingJoinPoint joinPoint) {
 		if (t != null) {
-			if (ExceptionUtils.indexOfThrowable(t, MybatisPlusException.class) >= 0) {
+			if (ExceptionUtils.indexOfThrowable(t, JDBCConnectionException.class) >= 0) {
 				return;
 			}
 			if (StringUtils.containsAny(DEADLOCK_DETECTED_ERROR, ExceptionUtils.getRootCauseMessage(t), ExceptionUtils.getMessage(t))) {

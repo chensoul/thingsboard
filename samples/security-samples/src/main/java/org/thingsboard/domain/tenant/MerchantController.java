@@ -1,18 +1,17 @@
 package org.thingsboard.domain.tenant;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import static org.thingsboard.common.ControllerConstants.MERCHANT_ID;
+import org.thingsboard.common.dao.jpa.PageData;
+import org.thingsboard.common.dao.jpa.PageLink;
 import org.thingsboard.common.model.EntityType;
 import org.thingsboard.common.service.BaseController;
 import org.thingsboard.domain.tenant.model.Merchant;
@@ -53,7 +52,7 @@ public class MerchantController extends BaseController {
 
 	@PreAuthorize("hasAuthority('SYS_ADMIN')")
 	@RequestMapping(value = "/merchants", method = RequestMethod.GET)
-	public Page<Merchant> getTenants(Pageable pageable, @RequestParam(required = false) String textSearch) {
-		return merchantService.findTenant(pageable, getTenantId(), textSearch);
+	public PageData<Merchant> getTenants(PageLink pageLink) {
+		return merchantService.findTenant(getTenantId(), pageLink);
 	}
 }

@@ -25,6 +25,8 @@ import static org.thingsboard.common.ControllerConstants.MERCHANT_ID;
 import static org.thingsboard.common.ControllerConstants.PATH;
 import static org.thingsboard.common.ControllerConstants.TENANT_ID;
 import static org.thingsboard.common.ControllerConstants.USER_ID;
+import org.thingsboard.common.dao.jpa.PageData;
+import org.thingsboard.common.dao.jpa.PageLink;
 import org.thingsboard.common.exception.ThingsboardErrorCode;
 import org.thingsboard.common.exception.ThingsboardException;
 import org.thingsboard.common.model.EntityType;
@@ -157,32 +159,32 @@ public class UserController extends BaseController {
 
 	@PreAuthorize("hasAnyAuthority('SYS_ADMIN','TENANT_ADMIN', 'MERCHANT_USER')")
 	@GetMapping(value = "/users")
-	public Page<User> getUsers(Pageable pageable, @RequestParam(required = false) String textSearch) {
+	public PageData<User> getUsers(PageLink pageLink) {
 		SecurityUser currentUser = getCurrentUser();
 		if (Authority.SYS_ADMIN.equals(currentUser.getAuthority())) {
-			return userService.findUsers(pageable, null, textSearch);
+			return userService.findUsers(pageLink);
 		} else if (Authority.TENANT_ADMIN.equals(currentUser.getAuthority())) {
-			return userService.findTenantUsers(pageable, currentUser.getTenantId(), textSearch);
+			return userService.findUsersByTenantId(currentUser.getTenantId(), pageLink);
 		} else {
 			if (currentUser.getMerchantId() == null) {
 				throw new ThingsboardException("merchantId is null", ThingsboardErrorCode.BAD_REQUEST_PARAMS);
 			}
-			return userService.findMerchantUsers(pageable, Set.of(currentUser.getMerchantId()), textSearch);
+			return userService.findUsersByMerchantIds(Set.of(currentUser.getMerchantId()), pageLink);
 		}
 	}
 
 	@PreAuthorize("hasAuthority('SYS_ADMIN')")
 	@GetMapping(value = "/tenant/{tenantId}/users")
-	public Page<User> getTenantAdmins(Pageable pageable, @PathVariable(TENANT_ID) String tenantId) {
-		return userService.findTenantAdminsByTenantsIds(pageable, Set.of(tenantId));
+	public PageData<User> findUsersByTenantId(PageLink pageLink, @PathVariable(TENANT_ID) String tenantId) {
+		return userService.findUsersByTenantId(tenantId, pageLink);
 	}
 
 	@PreAuthorize("hasAuthority('TENANT_ADMIN')")
 	@GetMapping(value = "/merchant/{merchantId}/users")
-	public Page<User> getMerchantUsers(Pageable pageable, @PathVariable(MERCHANT_ID) Long merchantId,
-									   @RequestParam(required = false) String textSearch) {
+	public PageData<User> findUsersByMerchantId(PageLink pageLink, @PathVariable(MERCHANT_ID) Long merchantId,
+											@RequestParam(required = false, defaultValue = "") String textSearch) {
 		checkMerchantId(merchantId, Operation.READ);
-		return userService.findMerchantUsers(pageable, Set.of(merchantId), textSearch);
+		return userService.findUsersByMerchantIds(Set.of(merchantId), pageLink);
 	}
 
 	@PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
@@ -195,7 +197,7 @@ public class UserController extends BaseController {
 
 	@PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'MERCHANT_USER')")
 	@PostMapping(value = "/user/setting")
-	public JsonNode saveUserSettings(@RequestBody JsonNode settings) {
+	public JsonNode saveUserSetting(@RequestBody JsonNode settings) {
 		UserSetting userSetting = new UserSetting();
 		userSetting.setType(UserSettingType.GENERAL);
 		userSetting.setExtra(settings);
@@ -205,39 +207,39 @@ public class UserController extends BaseController {
 
 	@PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'MERCHANT_USER')")
 	@PutMapping(value = "/user/setting")
-	public void putUserSettings(@RequestBody JsonNode settings) {
+	public void putUserSetting(@RequestBody JsonNode settings) {
 		userSettingService.updateUserSetting(SecurityUtils.getUserId(), UserSettingType.GENERAL, settings);
 	}
 
 	@PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'MERCHANT_USER')")
 	@GetMapping(value = "/user/setting")
-	public JsonNode getUserSettings() {
+	public JsonNode getUserSetting() {
 		UserSetting userSetting = userSettingService.findUserSetting(SecurityUtils.getUserId(), UserSettingType.GENERAL);
 		return userSetting == null ? JacksonUtil.newObjectNode() : userSetting.getExtra();
 	}
 
 	@PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'MERCHANT_USER')")
 	@DeleteMapping(value = "/user/setting/{path}")
-	public void deleteUserSettings(@PathVariable(PATH) String path) {
+	public void deleteUserSetting(@PathVariable(PATH) String path) {
 		userSettingService.deleteUserSetting(SecurityUtils.getUserId(), UserSettingType.GENERAL, Arrays.asList(path.split(",")));
 	}
 
 	@PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'MERCHANT_USER')")
 	@PutMapping(value = "/user/setting/{type}")
-	public void putUserSettings(@PathVariable("type") UserSettingType type, @RequestBody JsonNode settings) {
+	public void putUserSetting(@PathVariable("type") UserSettingType type, @RequestBody JsonNode settings) {
 		userSettingService.updateUserSetting(SecurityUtils.getUserId(), type, settings);
 	}
 
 	@PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'MERCHANT_USER')")
 	@GetMapping(value = "/user/setting/{type}")
-	public JsonNode getUserSettings(@PathVariable("type") UserSettingType type) {
+	public JsonNode getUserSetting(@PathVariable("type") UserSettingType type) {
 		UserSetting userSetting = userSettingService.findUserSetting(SecurityUtils.getUserId(), type);
 		return userSetting == null ? JacksonUtil.newObjectNode() : userSetting.getExtra();
 	}
 
 	@PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'MERCHANT_USER')")
 	@DeleteMapping(value = "/user/setting/{type}/{path}")
-	public void deleteUserSettings(@PathVariable(PATH) String path, @PathVariable("type") UserSettingType type) {
+	public void deleteUserSetting(@PathVariable(PATH) String path, @PathVariable("type") UserSettingType type) {
 		userSettingService.deleteUserSetting(SecurityUtils.getUserId(), type, Arrays.asList(path.split(",")));
 	}
 

@@ -18,11 +18,13 @@ package org.thingsboard.domain.tenant.persistence;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.thingsboard.common.dao.Dao;
+import org.thingsboard.common.dao.jpa.PageData;
+import org.thingsboard.common.dao.jpa.PageLink;
 import org.thingsboard.domain.tenant.model.TenantProfile;
 
-public interface TenantProfileDao extends Dao<TenantProfile> {
+public interface TenantProfileDao extends Dao<TenantProfile, Long> {
 	TenantProfile findDefaultTenantProfile();
 
-	Page<TenantProfile> findTenantProfiles(Pageable pageable,String tenantId,  String textSearch);
+	PageData<TenantProfile> findTenantProfiles(PageLink pageLink);
 
 }

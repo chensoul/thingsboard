@@ -15,19 +15,22 @@
  */
 package org.thingsboard.domain.tenant.persistence;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.thingsboard.common.dao.jpa.JsonConverter;
 import org.thingsboard.common.dao.mybatis.LongBaseEntity;
 import org.thingsboard.common.util.JacksonUtil;
 import org.thingsboard.domain.tenant.model.Merchant;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "merchant", autoResultMap = true)
+@Entity
+@Table(name = "merchant")
 public final class MerchantEntity extends LongBaseEntity<Merchant> {
 
 	private String tenantId;
@@ -50,10 +53,9 @@ public final class MerchantEntity extends LongBaseEntity<Merchant> {
 
 	private String email;
 
-	@TableField(typeHandler = JacksonTypeHandler.class)
+	@Convert(converter = JsonConverter.class)
+	@Column(columnDefinition = "jsonb")
 	private JsonNode extra;
-
-	private String externalId;
 
 	@Override
 	public Merchant toData() {

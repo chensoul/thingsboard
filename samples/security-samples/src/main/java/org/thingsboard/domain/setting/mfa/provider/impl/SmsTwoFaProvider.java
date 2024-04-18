@@ -16,24 +16,24 @@
 package org.thingsboard.domain.setting.mfa.provider.impl;
 
 import java.util.Map;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 import org.thingsboard.common.exception.ThingsboardErrorCode;
 import org.thingsboard.common.exception.ThingsboardException;
 import org.thingsboard.common.util.FormatUtils;
+import org.thingsboard.domain.notification.channel.sms.SmsService;
 import org.thingsboard.domain.setting.mfa.config.SmsTwoFaConfig;
 import org.thingsboard.domain.setting.mfa.provider.SmsTwoFaProviderConfig;
 import org.thingsboard.domain.setting.mfa.provider.TwoFaProviderType;
 import org.thingsboard.domain.user.model.User;
 import org.thingsboard.server.security.SecurityUser;
-import org.thingsboard.domain.notification.channel.sms.SmsService;
 
 @Service
 public class SmsTwoFaProvider extends OtpBasedTwoFaProvider<SmsTwoFaProviderConfig, SmsTwoFaConfig> {
 	private final SmsService smsService;
 
-	public SmsTwoFaProvider(StringRedisTemplate redisTemplate, SmsService smsService) {
-		super(redisTemplate);
+	public SmsTwoFaProvider(CacheManager cacheManager, SmsService smsService) {
+		super(cacheManager);
 		this.smsService = smsService;
 	}
 

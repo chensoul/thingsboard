@@ -15,10 +15,15 @@
  */
 package org.thingsboard.common.dao;
 
-import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.thingsboard.common.model.ToData;
 
-public interface BaseEntity<I extends Serializable, D> extends ToData<D> {
+public interface BaseEntity<D, I> extends ToData<D> {
 
 	I getId();
 
@@ -31,4 +36,22 @@ public interface BaseEntity<I extends Serializable, D> extends ToData<D> {
 	Long getUpdatedTime();
 
 	void setUpdatedTime(Long createdTime);
+
+	default String listToString(List<?> list) {
+		if (list != null) {
+			return StringUtils.join(list, ',');
+		} else {
+			return "";
+		}
+	}
+
+	default <E> List<E> listFromString(String string, Function<String, E> mappingFunction) {
+		if (string != null) {
+			return Arrays.stream(StringUtils.split(string, ','))
+				.filter(StringUtils::isNotBlank)
+				.map(mappingFunction).collect(Collectors.toList());
+		} else {
+			return Collections.emptyList();
+		}
+	}
 }

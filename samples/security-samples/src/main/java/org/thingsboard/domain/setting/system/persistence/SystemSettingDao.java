@@ -19,10 +19,10 @@ import org.thingsboard.common.dao.Dao;
 import org.thingsboard.domain.setting.system.SystemSetting;
 import org.thingsboard.domain.setting.system.SystemSettingType;
 
-public interface SystemSettingDao extends Dao<SystemSetting> {
+public interface SystemSettingDao extends Dao<SystemSetting, Long> {
 	SystemSetting findByType(String tenantId, SystemSettingType type);
 
-	boolean removeByTenantIdAndKey(String tenantId, SystemSettingType type);
+	void removeByTenantIdAndType(String tenantId, SystemSettingType type);
 
 	void removeByTenantId(String tenantId);
 }

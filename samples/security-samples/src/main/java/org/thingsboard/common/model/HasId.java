@@ -17,6 +17,6 @@ package org.thingsboard.common.model;
 
 import java.io.Serializable;
 
-public interface HasId<I extends Serializable> extends Serializable {
+public interface HasId<I> extends Serializable {
     I getId();
 }

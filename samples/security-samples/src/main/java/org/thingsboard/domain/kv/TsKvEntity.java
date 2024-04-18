@@ -15,11 +15,17 @@
  */
 package org.thingsboard.domain.kv;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
+@Entity
+@Table(name = "ts_kv")
+@IdClass(TsKvCompositeKey.class)
 public final class TsKvEntity extends AbstractTsKvEntity {
 
 	public TsKvEntity() {

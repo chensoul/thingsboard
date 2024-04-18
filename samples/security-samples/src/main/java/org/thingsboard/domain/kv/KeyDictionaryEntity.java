@@ -15,13 +15,23 @@
  */
 package org.thingsboard.domain.kv;
 
-import com.baomidou.mybatisplus.annotation.TableName;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Data;
 
 @Data
-@TableName(value = "key_dictionary")
+@Entity
+@Table(name = "key_dictionary")
 public final class KeyDictionaryEntity {
+
 	private String key;
 
-	private int keyId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id", columnDefinition = "bigint")
+	private Long id;
 }

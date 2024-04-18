@@ -21,7 +21,7 @@ import org.thingsboard.domain.user.model.UserCredential;
 /**
  * The Interface UserCredentialsDao.
  */
-public interface UserCredentialDao extends Dao<UserCredential> {
+public interface UserCredentialDao extends Dao<UserCredential, Long> {
 
 	/**
 	 * Save or update user credentials object

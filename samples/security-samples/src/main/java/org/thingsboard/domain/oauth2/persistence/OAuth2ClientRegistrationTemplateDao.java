@@ -19,7 +19,7 @@ import java.util.List;
 import org.thingsboard.common.dao.Dao;
 import org.thingsboard.domain.oauth2.model.OAuth2ClientRegistrationTemplate;
 
-public interface OAuth2ClientRegistrationTemplateDao extends Dao<OAuth2ClientRegistrationTemplate> {
+public interface OAuth2ClientRegistrationTemplateDao extends Dao<OAuth2ClientRegistrationTemplate, Long> {
 
 	OAuth2ClientRegistrationTemplate findByProviderId(String providerId);
 

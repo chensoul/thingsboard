@@ -21,7 +21,7 @@ import lombok.Data;
 import org.thingsboard.common.validation.Create;
 
 @Data
-public abstract class IdBased<I extends Serializable> implements HasId<I> {
+public abstract class IdBased<I> implements HasId<I> {
 	@NotNull(message = "Id should be specified", groups = Create.class)
 	protected I id;
 }

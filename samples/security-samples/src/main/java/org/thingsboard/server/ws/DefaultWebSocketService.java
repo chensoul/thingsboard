@@ -1,6 +1,5 @@
 package org.thingsboard.server.ws;
 
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -20,6 +19,7 @@ import java.util.function.BiConsumer;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,8 +35,8 @@ import org.thingsboard.common.util.JacksonUtil;
 import org.thingsboard.common.util.ThingsBoardExecutors;
 import org.thingsboard.domain.limit.LimitedApi;
 import org.thingsboard.domain.limit.RateLimitService;
-import org.thingsboard.server.security.jwt.JwtAuthenticationProvider;
 import org.thingsboard.server.security.SecurityUser;
+import org.thingsboard.server.security.jwt.JwtAuthenticationProvider;
 import org.thingsboard.server.ws.cmd.WsCmd;
 import org.thingsboard.server.ws.cmd.WsCmdType;
 import org.thingsboard.server.ws.cmd.WsCommandsWrapper;

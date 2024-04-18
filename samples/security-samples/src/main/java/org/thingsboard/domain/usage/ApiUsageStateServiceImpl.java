@@ -50,7 +50,7 @@ public class ApiUsageStateServiceImpl implements ApiUsageStateService {
 	}
 
 	@Override
-	public Optional<HasId<? extends Serializable>> findEntity(Serializable id) {
+	public Optional<HasId<Long>> findEntity(Long id) {
 		return Optional.empty();
 	}
 

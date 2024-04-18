@@ -13,7 +13,7 @@ import org.thingsboard.domain.tenant.persistence.MerchantDao;
 import org.thingsboard.domain.tenant.persistence.TenantDao;
 import org.thingsboard.domain.user.model.Authority;
 import org.thingsboard.domain.user.model.User;
-import org.thingsboard.domain.user.persistence.MybatisUserDao;
+import org.thingsboard.domain.user.persistence.UserDao;
 import static org.thingsboard.server.security.SecurityUser.SYS_TENANT_ID;
 import static org.thingsboard.server.security.SecurityUtils.getCurrentUser;
 
@@ -26,7 +26,7 @@ import static org.thingsboard.server.security.SecurityUtils.getCurrentUser;
 @RequiredArgsConstructor
 @Component
 public class UserValidator extends DataValidator<User> {
-	private final MybatisUserDao userDao;
+	private final UserDao userDao;
 	private final MerchantDao merchantDao;
 	private final TenantDao tenantDao;
 

@@ -17,8 +17,8 @@ package org.thingsboard.domain.tenant.service;
 
 
 import java.util.Optional;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.thingsboard.common.dao.jpa.PageData;
+import org.thingsboard.common.dao.jpa.PageLink;
 import org.thingsboard.domain.tenant.model.Merchant;
 
 public interface MerchantService {
@@ -28,7 +28,7 @@ public interface MerchantService {
 
 	Merchant saveMerchant(Merchant merchant);
 
-	Page<Merchant> findTenant(Pageable pageable, String tenantId, String textSearch);
+	PageData<Merchant> findTenant(String tenantId, PageLink pageLink);
 
 	void deleteMerchant(Merchant merchant);
 

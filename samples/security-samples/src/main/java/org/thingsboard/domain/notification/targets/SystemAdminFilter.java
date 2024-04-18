@@ -22,7 +22,7 @@ public class SystemAdminFilter implements UserFilter {
 
     @Override
     public UserFilterType getType() {
-        return UserFilterType.SYSTEM_ADMIN;
+        return UserFilterType.SYS_ADMIN;
     }
 
 }

@@ -86,7 +86,7 @@ public class SystemSettingController extends BaseController {
 		accessControlService.checkPermission(getCurrentUser(), Resource.SYSTEM_SETTING, Operation.WRITE);
 
 		SystemSetting systemSetting = systemSettingService.findSystemSettingByType(SYS_TENANT_ID, SystemSettingType.valueOf(type.toUpperCase()));
-		if (systemSetting != null && systemSetting.getType().equals(SystemSettingType.MAIL)) {
+		if (systemSetting != null && systemSetting.getType().equals(SystemSettingType.EMAIL)) {
 			((ObjectNode) systemSetting.getExtra()).remove("password");
 			((ObjectNode) systemSetting.getExtra()).remove("refreshToken");
 		}
@@ -137,7 +137,7 @@ public class SystemSettingController extends BaseController {
 	public void sendTestMail(@RequestBody SystemSetting systemSetting) {
 		accessControlService.checkPermission(getCurrentUser(), Resource.SYSTEM_SETTING, Operation.READ);
 
-		if (systemSetting.getType().equals(SystemSettingType.MAIL)) {
+		if (systemSetting.getType().equals(SystemSettingType.EMAIL)) {
 			mailService.sendTestMail(systemSetting, getCurrentUser().getEmail());
 		}
 	}
@@ -178,7 +178,7 @@ public class SystemSettingController extends BaseController {
 		CookieUtils.addCookie(response, STATE_COOKIE_NAME, state, 180);
 
 		accessControlService.checkPermission(getCurrentUser(), Resource.SYSTEM_SETTING, Operation.READ);
-		SystemSetting systemSetting = checkNotNull(systemSettingService.findSystemSettingByType(SYS_TENANT_ID, SystemSettingType.MAIL), "No Administration mail settings found");
+		SystemSetting systemSetting = checkNotNull(systemSettingService.findSystemSettingByType(SYS_TENANT_ID, SystemSettingType.EMAIL), "No Administration mail settings found");
 		JsonNode jsonValue = systemSetting.getExtra();
 
 		String clientId = checkNotNull(jsonValue.get("clientId"), "No clientId was configured").asText();
@@ -207,7 +207,7 @@ public class SystemSettingController extends BaseController {
 		CookieUtils.deleteCookie(request, response, STATE_COOKIE_NAME);
 		CookieUtils.deleteCookie(request, response, PREV_URI_COOKIE_NAME);
 
-		SystemSetting systemSetting = checkNotNull(systemSettingService.findSystemSettingByType(SYS_TENANT_ID, SystemSettingType.MAIL), "No Administration mail settings found");
+		SystemSetting systemSetting = checkNotNull(systemSettingService.findSystemSettingByType(SYS_TENANT_ID, SystemSettingType.EMAIL), "No Administration mail settings found");
 		JsonNode jsonValue = systemSetting.getExtra();
 
 		String clientId = checkNotNull(jsonValue.get("clientId"), "No clientId was configured").asText();

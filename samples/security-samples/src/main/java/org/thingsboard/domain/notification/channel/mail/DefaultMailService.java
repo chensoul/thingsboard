@@ -77,7 +77,7 @@ public class DefaultMailService implements MailService {
 
 	@Override
 	public void updateMailConfiguration() {
-		SystemSetting systemSetting = systemSettingDao.findByType(SYS_TENANT_ID, SystemSettingType.MAIL);
+		SystemSetting systemSetting = systemSettingDao.findByType(SYS_TENANT_ID, SystemSettingType.EMAIL);
 		if (systemSetting != null && systemSetting.getExtra() != null) {
 			JsonNode jsonConfig = systemSetting.getExtra();
 			mailConfiguration = JacksonUtil.convertValue(jsonConfig, MailConfiguration.class);
@@ -97,7 +97,7 @@ public class DefaultMailService implements MailService {
 	@Override
 	public void sendTestMail(SystemSetting systemSetting, String email) {
 		if (systemSetting.getExtra().has("enableOauth2") && systemSetting.getExtra().get("enableOauth2").asBoolean()) {
-			SystemSetting mailSettings = systemSettingDao.findByType(SYS_TENANT_ID, SystemSettingType.MAIL);
+			SystemSetting mailSettings = systemSettingDao.findByType(SYS_TENANT_ID, SystemSettingType.EMAIL);
 			JsonNode refreshToken = mailSettings.getExtra().get("refreshToken");
 			if (refreshToken == null) {
 				throw new ThingsboardException("Refresh token was not generated. Please, generate refresh token.", ThingsboardErrorCode.GENERAL);
@@ -106,7 +106,7 @@ public class DefaultMailService implements MailService {
 			settings.put("refreshToken", refreshToken.asText());
 		} else {
 			if (!systemSetting.getExtra().has("password")) {
-				SystemSetting mailSettings = systemSettingDao.findByType(SYS_TENANT_ID, SystemSettingType.MAIL);
+				SystemSetting mailSettings = systemSettingDao.findByType(SYS_TENANT_ID, SystemSettingType.EMAIL);
 				((ObjectNode) systemSetting.getExtra()).put("password", mailSettings.getExtra().get("password").asText());
 			}
 		}

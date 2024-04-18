@@ -33,7 +33,7 @@ import org.thingsboard.server.security.permission.Operation;
 public class TenantController extends BaseController {
 	@PreAuthorize("hasAuthority('SYS_ADMIN')")
 	@GetMapping(value = "/tenants")
-	public Page<Tenant> getTenants(Pageable pageable, @RequestParam(required = false) String textSearch) {
+	public Page<Tenant> getTenants(Pageable pageable, @RequestParam(required = false, defaultValue = "") String textSearch) {
 		return tenantService.findTenants(pageable, textSearch);
 	}
 

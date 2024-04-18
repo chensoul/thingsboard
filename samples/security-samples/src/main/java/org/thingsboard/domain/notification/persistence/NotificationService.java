@@ -16,10 +16,10 @@
 package org.thingsboard.domain.notification.persistence;
 
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.thingsboard.common.dao.jpa.PageData;
+import org.thingsboard.common.dao.jpa.PageLink;
 import org.thingsboard.domain.notification.Notification;
-import org.thingsboard.domain.notification.NotificationStatus;
+import org.thingsboard.domain.notification.template.NotificationDeliveryMethod;
 
 public interface NotificationService {
 
@@ -27,11 +27,11 @@ public interface NotificationService {
 
 	Notification findNotificationById(Long notificationId);
 
-	int markNotificationAsRead(Long recipientId, Long notificationId);
+	boolean markNotificationAsRead(Long recipientId, Long notificationId);
 
-	int markAllNotificationsAsRead(Long recipientId);
+	int markAllNotificationsAsRead(NotificationDeliveryMethod deliveryMethod, Long recipientId);
 
-	Page<Notification> findNotificationsByRecipientIdAndReadStatus(Pageable pageable, Long recipientId, NotificationStatus status, Integer limit);
+	PageData<Notification> findNotificationsByRecipientIdAndReadStatus(NotificationDeliveryMethod deliveryMethod, Long recipientId, boolean unreadOnly, PageLink pageLink);
 
 	int countUnreadNotificationsByRecipientId(Long recipientId);
 

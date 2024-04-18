@@ -24,7 +24,7 @@ public interface SystemSettingService {
 
 	SystemSetting saveSystemSetting(String tenantId, SystemSetting systemSetting);
 
-	boolean deleteSystemSettingByTenantIdAndType(String tenantId, SystemSettingType type);
+	void deleteSystemSettingByTenantIdAndType(String tenantId, SystemSettingType type);
 
 	void deleteSystemSettingByTenantId(String tenantId);
 

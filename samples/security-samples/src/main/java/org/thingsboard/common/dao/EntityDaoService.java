@@ -5,9 +5,9 @@ import java.util.Optional;
 import org.thingsboard.common.model.EntityType;
 import org.thingsboard.common.model.HasId;
 
-public interface EntityDaoService {
+public interface EntityDaoService<I> {
 
-	Optional<HasId<? extends Serializable>> findEntity(Serializable id);
+	Optional<HasId<I>> findEntity(I id);
 
 	default long countByTenantId(String tenantId) {
 		throw new IllegalArgumentException("Not implemented for " + getEntityType());

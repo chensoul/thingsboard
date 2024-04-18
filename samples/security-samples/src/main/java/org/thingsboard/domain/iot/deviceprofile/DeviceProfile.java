@@ -51,7 +51,7 @@ public class DeviceProfile extends BaseDataWithExtra<Long> implements HasName, H
 
 	private String image;
 
-	private boolean isDefault;
+	private boolean defaulted;
 
 	@NotNull(message = "Device profile type should be specified")
 	private DeviceProfileType type;

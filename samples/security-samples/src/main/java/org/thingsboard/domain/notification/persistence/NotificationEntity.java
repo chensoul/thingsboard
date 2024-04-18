@@ -15,13 +15,19 @@
  */
 package org.thingsboard.domain.notification.persistence;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.Formula;
+import org.thingsboard.common.dao.jpa.JsonConverter;
 import org.thingsboard.common.dao.mybatis.LongBaseEntity;
+import org.thingsboard.common.util.JacksonUtil;
 import org.thingsboard.domain.notification.Notification;
 import org.thingsboard.domain.notification.NotificationStatus;
 import org.thingsboard.domain.notification.info.NotificationInfo;
@@ -30,27 +36,39 @@ import org.thingsboard.domain.notification.template.NotificationType;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "notification", autoResultMap = true)
+@Entity
+@Table(name = "notification")
 public class NotificationEntity extends LongBaseEntity<Notification> {
 
+	@Column(nullable = false)
 	private Long requestId;
 
+	@Column(nullable = false)
 	private Long recipientId;
 
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
 	private NotificationType type;
 
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
 	private NotificationDeliveryMethod deliveryMethod;
 
 	private String subject;
 
+	@Column(nullable = false)
 	private String text;
 
-	@TableField(typeHandler = JacksonTypeHandler.class)
+	@Convert(converter = JsonConverter.class)
+	@Column(columnDefinition = "jsonb")
 	private JsonNode config;
 
-	@TableField(typeHandler = JacksonTypeHandler.class)
+	@Convert(converter = JsonConverter.class)
+	@Column(columnDefinition = "jsonb")
+	@Formula("(SELECT r.info FROM notification_request r WHERE r.id = request_id)")
 	private JsonNode info;
 
+	@Enumerated(EnumType.STRING)
 	private NotificationStatus status;
 
 	@Override
@@ -65,7 +83,7 @@ public class NotificationEntity extends LongBaseEntity<Notification> {
 		notification.setSubject(subject);
 		notification.setText(text);
 		notification.setConfig(config);
-		notification.setInfo(fromJson(info, NotificationInfo.class));
+		notification.setInfo(JacksonUtil.convertValue(info, NotificationInfo.class));
 		notification.setStatus(status);
 		return notification;
 	}

@@ -15,6 +15,7 @@
  */
 package org.thingsboard.domain.setting.mfa.provider.impl;
 
+import org.springframework.cache.CacheManager;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.thingsboard.common.exception.ThingsboardErrorCode;
@@ -30,8 +31,8 @@ import org.thingsboard.server.security.SecurityUser;
 public class EmailTwoFaProvider extends OtpBasedTwoFaProvider<EmailTwoFaProviderConfig, EmailTwoFaConfig> {
 	private final MailService mailService;
 
-	protected EmailTwoFaProvider(StringRedisTemplate redisTemplate, MailService mailService) {
-		super(redisTemplate);
+	protected EmailTwoFaProvider(CacheManager cacheManager, MailService mailService) {
+		super(cacheManager);
 		this.mailService = mailService;
 	}
 

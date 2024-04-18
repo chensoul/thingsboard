@@ -19,7 +19,7 @@ import java.util.List;
 import org.thingsboard.common.dao.Dao;
 import org.thingsboard.domain.oauth2.model.OAuth2Mobile;
 
-public interface OAuth2MobileDao extends Dao<OAuth2Mobile> {
+public interface OAuth2MobileDao extends Dao<OAuth2Mobile, Long> {
 
 	List<OAuth2Mobile> findByOAuth2ParamId(Long oauth2ParamId);
 

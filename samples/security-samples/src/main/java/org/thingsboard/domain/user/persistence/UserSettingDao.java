@@ -19,7 +19,7 @@ import org.thingsboard.common.dao.Dao;
 import org.thingsboard.domain.user.model.UserSetting;
 import org.thingsboard.domain.user.model.UserSettingType;
 
-public interface UserSettingDao extends Dao<UserSetting> {
+public interface UserSettingDao extends Dao<UserSetting, Long> {
 
 	UserSetting findByUserIdAndType(Long userId, UserSettingType type);
 

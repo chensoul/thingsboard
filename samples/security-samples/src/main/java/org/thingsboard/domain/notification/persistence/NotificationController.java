@@ -26,8 +26,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -39,16 +37,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.thingsboard.common.dao.jpa.PageData;
+import org.thingsboard.common.dao.jpa.PageLink;
 import org.thingsboard.common.model.EntityType;
 import org.thingsboard.domain.notification.Notification;
 import org.thingsboard.domain.notification.NotificationContext;
 import org.thingsboard.domain.notification.NotificationRecipient;
 import org.thingsboard.domain.notification.NotificationRequest;
-import org.thingsboard.domain.notification.NotificationStatus;
 import org.thingsboard.domain.notification.targets.NotificationTarget;
 import org.thingsboard.domain.notification.targets.NotificationTargetType;
-import org.thingsboard.domain.notification.template.NotificationDeliveryTemplate;
 import org.thingsboard.domain.notification.template.NotificationDeliveryMethod;
+import org.thingsboard.domain.notification.template.NotificationDeliveryTemplate;
 import org.thingsboard.domain.notification.template.NotificationTemplate;
 import org.thingsboard.domain.user.model.User;
 import org.thingsboard.server.security.SecurityUser;
@@ -67,10 +66,11 @@ public class NotificationController {
 
 	@GetMapping("/notifications")
 	@PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'MERCHANT_USER')")
-	public Page<Notification> getNotifications(Pageable pageable,
+	public PageData<Notification> getNotifications(PageLink pageLink,
+												   @RequestParam(defaultValue = "WEB") NotificationDeliveryMethod deliveryMethod,
 											   @RequestParam(defaultValue = "false") boolean unreadOnly,
 											   @AuthenticationPrincipal SecurityUser user) {
-		return notificationService.findNotificationsByRecipientIdAndReadStatus(pageable, user.getId(), unreadOnly ? NotificationStatus.SENT : null, null);
+		return notificationService.findNotificationsByRecipientIdAndReadStatus(deliveryMethod, user.getId(), unreadOnly, pageLink);
 	}
 
 	@PutMapping("/notification/{id}/read")
@@ -82,8 +82,9 @@ public class NotificationController {
 
 	@PutMapping("/notifications/read")
 	@PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'MERCHANT_USER')")
-	public void markAllNotificationsAsRead(@AuthenticationPrincipal SecurityUser user) {
-		notificationService.markAllNotificationsAsRead(user.getId());
+	public void markAllNotificationsAsRead(@RequestParam(defaultValue = "WEB") NotificationDeliveryMethod deliveryMethod,
+										   @AuthenticationPrincipal SecurityUser user) {
+		notificationService.markAllNotificationsAsRead(deliveryMethod, user.getId());
 	}
 
 	@DeleteMapping("/notification/{id}")
@@ -113,9 +114,9 @@ public class NotificationController {
 
 	@PostMapping("/notification/request/preview")
 	@PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-	public NotificationRequestPreview getNotificationRequestPreview(Pageable pageable, @RequestBody @Valid NotificationRequest request,
+	public NotificationRequestPreview getNotificationRequestPreview(@RequestBody @Valid NotificationRequest request,
 																	@RequestParam(defaultValue = "20") int recipientsPreviewSize,
-																	@AuthenticationPrincipal SecurityUser user) {
+																	@AuthenticationPrincipal SecurityUser user, PageLink pageLink) {
 		// PE: generic permission
 		NotificationTemplate template;
 		if (request.getTemplateId() != null) {
@@ -143,7 +144,7 @@ public class NotificationController {
 			NotificationTargetType targetType = target.getConfig().getType();
 			switch (targetType) {
 				case PLATFORM_USER: {
-					Page<User> recipients = notificationTargetService.findRecipientsForNotificationTargetConfig(pageable, user.getTenantId(), target.getId());
+					PageData<User> recipients = notificationTargetService.findRecipientsForNotificationTargetConfig(user.getTenantId(), target.getId(), pageLink);
 					recipientsCount = (int) recipients.getTotalElements();
 					recipientsPart = recipients.getContent().stream().map(r -> (NotificationRecipient) r).collect(Collectors.toList());
 					break;
@@ -206,9 +207,9 @@ public class NotificationController {
 
 	@GetMapping("/notification/requests")
 	@PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
-	public Page<NotificationRequestInfo> getNotificationRequests(Pageable pageable,
+	public PageData<NotificationRequestInfo> getNotificationRequests(PageLink pageLink,
 																 @AuthenticationPrincipal SecurityUser user) {
-		return notificationRequestService.findNotificationRequestsInfosByTenantIdAndOriginatorType(user.getTenantId(), EntityType.USER);
+		return notificationRequestService.findNotificationRequestsInfosByTenantIdAndOriginatorType(user.getTenantId(), EntityType.USER, pageLink);
 	}
 
 	@DeleteMapping("/notification/request/{id}")

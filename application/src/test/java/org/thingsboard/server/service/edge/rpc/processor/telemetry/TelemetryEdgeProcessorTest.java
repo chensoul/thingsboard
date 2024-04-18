@@ -57,7 +57,7 @@ public class TelemetryEdgeProcessorTest extends BaseEdgeProcessorTest {
         body.put("value", StringUtils.randomAlphanumeric(1000));
         edgeEvent.setBody(body);
 
-        DownlinkMsg downlinkMsg = telemetryEdgeProcessor.convertTelemetryEventToDownlink(edge, edgeEvent);
+        DownlinkMsg downlinkMsg = telemetryEdgeProcessor.convertTelemetryEventToDownlink(edgeEvent);
         Assert.assertNull(downlinkMsg);
 
         verify(notificationRuleProcessor, Mockito.times(1)).process(any());

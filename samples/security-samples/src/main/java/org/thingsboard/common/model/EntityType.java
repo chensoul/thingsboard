@@ -25,6 +25,7 @@ public enum EntityType {
 	USER,
 	ROLE,
 
+	ALARM,
 	DEVICE,
 	DEVICE_PROFILE,
 	NOTIFICATION_TARGET,

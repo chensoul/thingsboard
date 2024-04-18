@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 import static org.thingsboard.common.CacheConstants.TWO_FA_VERIFICATION_CODE_CACHE;
 import org.thingsboard.common.exception.ThingsboardException;
@@ -33,29 +33,29 @@ import org.thingsboard.server.security.SecurityUser;
 @Component
 @RequiredArgsConstructor
 public abstract class OtpBasedTwoFaProvider<C extends OtpBasedTwoFaProviderConfig, A extends OtpBasedTwoFaConfig> implements TwoFaProvider<C, A> {
-	private final StringRedisTemplate redisTemplate;
+	private final CacheManager cacheManager;
 
 	@Override
 	public final void prepareVerificationCode(SecurityUser user, C providerConfig, A accountConfig) {
 		String verificationCode = RandomStringUtils.randomNumeric(6);
 		sendVerificationCode(user, verificationCode, providerConfig, accountConfig);
-		redisTemplate.opsForValue().set(TWO_FA_VERIFICATION_CODE_CACHE + ":" + user.getId(), JacksonUtil.toString(new Otp(System.currentTimeMillis(), verificationCode, accountConfig)));
+		cacheManager.getCache(TWO_FA_VERIFICATION_CODE_CACHE).put(TWO_FA_VERIFICATION_CODE_CACHE + ":" + user.getId(), JacksonUtil.toString(new Otp(System.currentTimeMillis(), verificationCode, accountConfig)));
 	}
 
 	protected abstract void sendVerificationCode(SecurityUser user, String verificationCode, C providerConfig, A accountConfig) throws ThingsboardException;
 
 	@Override
 	public final boolean checkVerificationCode(SecurityUser user, String code, C providerConfig, A accountConfig) {
-		String correctVerificationCode = redisTemplate.opsForValue().get(TWO_FA_VERIFICATION_CODE_CACHE + ":" + user.getId());
+		String correctVerificationCode = cacheManager.getCache(TWO_FA_VERIFICATION_CODE_CACHE).get(TWO_FA_VERIFICATION_CODE_CACHE + ":" + user.getId()).toString();
 		Otp otp = JacksonUtil.fromString(correctVerificationCode, Otp.class);
 		if (correctVerificationCode != null) {
 			if (System.currentTimeMillis() - otp.getTimestamp()
 				> TimeUnit.SECONDS.toMillis(providerConfig.getVerificationCodeLifetime())) {
-				redisTemplate.delete(TWO_FA_VERIFICATION_CODE_CACHE + ":" + user.getId());
+				cacheManager.getCache(TWO_FA_VERIFICATION_CODE_CACHE).evict(TWO_FA_VERIFICATION_CODE_CACHE + ":" + user.getId());
 				return false;
 			}
 			if (code.equals(otp.getValue()) && accountConfig.equals(otp.getAccountConfig())) {
-				redisTemplate.delete(TWO_FA_VERIFICATION_CODE_CACHE + ":" + user.getId());
+				cacheManager.getCache(TWO_FA_VERIFICATION_CODE_CACHE).evict(TWO_FA_VERIFICATION_CODE_CACHE + ":" + user.getId());
 				return true;
 			}
 		}

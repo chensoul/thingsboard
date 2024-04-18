@@ -6,6 +6,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.thingsboard.common.dao.jpa.PageData;
+import org.thingsboard.common.dao.jpa.PageLink;
 import org.thingsboard.common.model.event.DeleteEntityEvent;
 import org.thingsboard.common.model.event.SaveEntityEvent;
 import org.thingsboard.domain.tenant.model.Merchant;
@@ -49,7 +51,7 @@ public class MerchantServiceImpl implements MerchantService {
 	@Override
 	public void deleteMerchant(Merchant merchant) {
 		if (merchant != null) {
-			merchantDao.removeById(merchant);
+			merchantDao.removeById(merchant.getId());
 			eventPublisher.publishEvent(DeleteEntityEvent.builder().tenantId(merchant.getTenantId())
 				.entity(merchant).entityId(merchant.getId()).build());
 		}
@@ -61,7 +63,7 @@ public class MerchantServiceImpl implements MerchantService {
 	}
 
 	@Override
-	public Page<Merchant> findTenant(Pageable pageable, String tenantId, String search) {
-		return merchantDao.findTenants(pageable, tenantId, search);
+	public PageData<Merchant> findTenant(String tenantId, PageLink pageLink) {
+		return merchantDao.findTenants( tenantId, pageLink);
 	}
 }

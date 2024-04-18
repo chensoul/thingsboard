@@ -16,28 +16,27 @@
 package org.thingsboard.common.dao;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import org.thingsboard.common.model.EntityType;
 
-public interface Dao<D> {
+public interface Dao<D, I> {
 
-	D findById(Serializable id);
+	D findById(I id);
 
 	List<D> find();
 
-	ListenableFuture<D> findByIdAsync(Serializable id);
+	ListenableFuture<D> findByIdAsync(I id);
 
-	boolean existsById(Serializable id);
+	boolean existsById(I id);
 
-	ListenableFuture<Boolean> existsByIdAsync(Serializable id);
+	ListenableFuture<Boolean> existsByIdAsync(I id);
 
 	D save(D t);
 
-	boolean removeById(Serializable id);
+	boolean removeById(I id);
 
-	void removeByIds(Collection<Serializable> ids);
+	void removeByIds(Collection<I> ids);
 
 	default EntityType getEntityType() {
 		return null;

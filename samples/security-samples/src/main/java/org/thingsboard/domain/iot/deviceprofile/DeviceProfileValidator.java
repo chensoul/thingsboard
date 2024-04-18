@@ -76,7 +76,7 @@ public class DeviceProfileValidator extends DataValidator<DeviceProfile> {
 			throw new DataValidationException("Device profile is referencing to non-existent tenant!");
 		}
 
-		if (deviceProfile.isDefault()) {
+		if (deviceProfile.isDefaulted()) {
 			DeviceProfile defaultDeviceProfile = deviceProfileService.findDefaultDeviceProfile(deviceProfile.getTenantId());
 			if (defaultDeviceProfile != null && !defaultDeviceProfile.getId().equals(deviceProfile.getId())) {
 				throw new DataValidationException("Another default device profile is present in scope of current tenant!");

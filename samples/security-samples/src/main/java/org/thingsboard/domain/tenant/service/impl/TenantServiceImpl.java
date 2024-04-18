@@ -83,7 +83,7 @@ public class TenantServiceImpl implements TenantService {
 	@Override
 	public void deleteTenant(Tenant tenant) {
 		if (tenant != null) {
-			tenantDao.removeById(tenant);
+			tenantDao.removeById(tenant.getTenantId());
 			eventPublisher.publishEvent(DeleteEntityEvent.builder().tenantId(tenant.getId())
 				.entity(tenant).entityId(tenant.getId()).build());
 		}

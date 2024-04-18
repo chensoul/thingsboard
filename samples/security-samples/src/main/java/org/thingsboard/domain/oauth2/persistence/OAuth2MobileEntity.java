@@ -15,7 +15,9 @@
  */
 package org.thingsboard.domain.oauth2.persistence;
 
-import com.baomidou.mybatisplus.annotation.TableName;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.thingsboard.common.dao.mybatis.LongBaseEntity;
@@ -24,9 +26,11 @@ import org.thingsboard.domain.oauth2.model.OAuth2Mobile;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "oauth2_mobile", autoResultMap = true)
+@Entity
+@Table(name = "oauth2_mobile")
 public class OAuth2MobileEntity extends LongBaseEntity<OAuth2Mobile> {
 
+	@Column(name = "oauth2_param_id", nullable = false)
 	private Long oauth2ParamId;
 
 	private String pkgName;

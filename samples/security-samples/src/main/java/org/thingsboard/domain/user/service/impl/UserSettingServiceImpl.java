@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import static org.thingsboard.common.CacheConstants.USER_SETTINGS_CACHE;
+import static org.thingsboard.common.CacheConstants.USER_SETTING_CACHE;
 import org.thingsboard.common.dao.exception.DataValidationException;
 import org.thingsboard.common.util.JacksonUtil;
 import org.thingsboard.common.validation.ConstraintValidator;
@@ -31,7 +31,7 @@ public class UserSettingServiceImpl implements UserSettingService {
 	private final UserSettingDao userSettingDao;
 
 	@Override
-	@CacheEvict(cacheNames = USER_SETTINGS_CACHE, key = "'userSetting'")
+	@CacheEvict(cacheNames = USER_SETTING_CACHE, key = "'userSetting'")
 	public UserSetting updateUserSetting(Long userId, UserSettingType type, JsonNode settings) {
 		UserSetting oldSettings = userSettingDao.findByUserIdAndType(userId, type);
 		JsonNode oldSettingsJson = oldSettings != null ? oldSettings.getExtra() : JacksonUtil.newObjectNode();
@@ -45,19 +45,19 @@ public class UserSettingServiceImpl implements UserSettingService {
 	}
 
 	@Override
-	@CacheEvict(cacheNames = USER_SETTINGS_CACHE, key = "'userSetting'")
+	@CacheEvict(cacheNames = USER_SETTING_CACHE, key = "'userSetting'")
 	public UserSetting saveUserSetting(UserSetting userSetting) {
 		return doSaveUserSetting(userSetting);
 	}
 
 	@Override
-	@Cacheable(cacheNames = USER_SETTINGS_CACHE, key = "'userSetting'")
+	@Cacheable(cacheNames = USER_SETTING_CACHE, key = "'userSetting'")
 	public UserSetting findUserSetting(Long userId, UserSettingType type) {
 		return userSettingDao.findByUserIdAndType(userId, type);
 	}
 
 	@Override
-	@CacheEvict(cacheNames = USER_SETTINGS_CACHE, key = "'userSetting'")
+	@CacheEvict(cacheNames = USER_SETTING_CACHE, key = "'userSetting'")
 	public UserSetting deleteUserSetting(Long userId, UserSettingType type, List<String> jsonPaths) {
 		UserSetting userSetting = findUserSetting(userId, type);
 		if (userSetting == null) {

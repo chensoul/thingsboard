@@ -5,8 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.thingsboard.common.dao.jpa.PageData;
+import org.thingsboard.common.dao.jpa.PageLink;
 import org.thingsboard.domain.notification.Notification;
 import org.thingsboard.domain.notification.NotificationStatus;
+import org.thingsboard.domain.notification.template.NotificationDeliveryMethod;
 
 /**
  * TODO Comment
@@ -31,10 +34,10 @@ public class NotificationServiceImpl implements NotificationService {
 	}
 
 	@Override
-	public int markNotificationAsRead(Long recipientId, Long notificationId) {
-		int updatedCount = notificationDao.updateStatusByIdAndRecipientId(recipientId, notificationId, NotificationStatus.READ);
+	public boolean markNotificationAsRead(Long recipientId, Long notificationId) {
+		boolean updated = notificationDao.updateStatusByIdAndRecipientId(recipientId, notificationId, NotificationStatus.READ);
 
-		if (updatedCount > 0) {
+		if (updated) {
 //			log.trace("Marked all notifications as read (recipient id: {}, tenant id: {})", recipientId, tenantId);
 //			NotificationUpdate update = NotificationUpdate.builder()
 //				.updated(true)
@@ -43,28 +46,21 @@ public class NotificationServiceImpl implements NotificationService {
 //				.build();
 //			onNotificationUpdate(tenantId, recipientId, update);
 		}
-		return updatedCount;
+		return updated;
 	}
 
 	@Override
-	public int markAllNotificationsAsRead(Long recipientId) {
-		int updatedCount = notificationDao.updateStatusByRecipientId(recipientId, NotificationStatus.READ);
+	public int markAllNotificationsAsRead(NotificationDeliveryMethod deliveryMethod, Long recipientId) {
+		return notificationDao.updateStatusByDeliveryMethodAndRecipientId(deliveryMethod, recipientId, NotificationStatus.READ);
+	}
 
-		if (updatedCount > 0) {
-//			log.trace("Marked all notifications as read (recipient id: {}, tenant id: {})", recipientId, tenantId);
-//			NotificationUpdate update = NotificationUpdate.builder()
-//				.updated(true)
-//				.allNotifications(true)
-//				.newStatus(NotificationStatus.READ)
-//				.build();
-//			onNotificationUpdate(tenantId, recipientId, update);
+	@Override
+	public PageData<Notification> findNotificationsByRecipientIdAndReadStatus( NotificationDeliveryMethod deliveryMethod, Long recipientId, boolean unreadOnly, PageLink pageLink) {
+		if (unreadOnly) {
+			return notificationDao.findUnreadByDeliveryMethodAndRecipientId(deliveryMethod, recipientId,pageLink);
+		} else {
+			return notificationDao.findByDeliveryMethodAndRecipientId( deliveryMethod, recipientId,pageLink);
 		}
-		return updatedCount;
-	}
-
-	@Override
-	public Page<Notification> findNotificationsByRecipientIdAndReadStatus(Pageable pageable, Long recipientId, NotificationStatus status, Integer limit) {
-		return notificationDao.findByRecipientIdAndStatus(pageable, recipientId, status, limit);
 	}
 
 	@Override

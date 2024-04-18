@@ -15,14 +15,19 @@
  */
 package org.thingsboard.domain.notification.persistence;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.thingsboard.common.dao.jpa.JsonConverter;
 import org.thingsboard.common.dao.mybatis.LongBaseEntity;
 import org.thingsboard.common.model.EntityType;
+import org.thingsboard.common.util.JacksonUtil;
 import org.thingsboard.domain.notification.NotificationRequest;
 import org.thingsboard.domain.notification.NotificationRequestConfig;
 import org.thingsboard.domain.notification.NotificationRequestStats;
@@ -32,33 +37,40 @@ import org.thingsboard.domain.notification.template.NotificationTemplate;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "notification_request", autoResultMap = true)
+@Entity
+@Table(name = "notification_request")
 public class NotificationRequestEntity extends LongBaseEntity<NotificationRequest> {
 
 	private String tenantId;
 
 	private String targets;
 
+	@Column(nullable = false)
 	private Long templateId;
 
-	@TableField(typeHandler = JacksonTypeHandler.class)
+	@Convert(converter = JsonConverter.class)
+	@Column(columnDefinition = "jsonb")
 	private JsonNode template;
 
-	@TableField(typeHandler = JacksonTypeHandler.class)
+	@Convert(converter = JsonConverter.class)
+	@Column(columnDefinition = "jsonb")
 	private JsonNode info;
 
-	@TableField(typeHandler = JacksonTypeHandler.class)
+	@Convert(converter = JsonConverter.class)
+	@Column(columnDefinition = "jsonb")
 	private JsonNode config;
 
 	private String entityId;
 
+	@Enumerated(EnumType.STRING)
 	private EntityType entityType;
 
 	private Long ruleId;
 
+	@Column(nullable = false)
 	private NotificationRequestStatus status;
 
-	@TableField(typeHandler = JacksonTypeHandler.class)
+	@Convert(converter = JsonConverter.class)
 	private JsonNode stats;
 
 	@Override
@@ -69,15 +81,15 @@ public class NotificationRequestEntity extends LongBaseEntity<NotificationReques
 		notificationRequest.setTenantId(tenantId);
 		notificationRequest.setTargets(listFromString(targets, Long::valueOf));
 		notificationRequest.setTemplateId(templateId);
-		notificationRequest.setTemplate(fromJson(template, NotificationTemplate.class));
-		notificationRequest.setInfo(fromJson(info, NotificationInfo.class));
-		notificationRequest.setConfig(fromJson(config, NotificationRequestConfig.class));
+		notificationRequest.setTemplate(JacksonUtil.convertValue(template, NotificationTemplate.class));
+		notificationRequest.setInfo(JacksonUtil.convertValue(info, NotificationInfo.class));
+		notificationRequest.setConfig(JacksonUtil.convertValue(config, NotificationRequestConfig.class));
 		if (entityId != null) {
 			notificationRequest.setEntityId(entityId);
 		}
 		notificationRequest.setRuleId(ruleId);
 		notificationRequest.setStatus(status);
-		notificationRequest.setStats(fromJson(stats, NotificationRequestStats.class));
+		notificationRequest.setStats(JacksonUtil.convertValue(stats, NotificationRequestStats.class));
 		return notificationRequest;
 	}
 }

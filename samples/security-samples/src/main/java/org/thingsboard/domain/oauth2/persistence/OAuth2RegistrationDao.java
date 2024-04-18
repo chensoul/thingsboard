@@ -21,7 +21,7 @@ import org.thingsboard.domain.oauth2.model.OAuth2Registration;
 import org.thingsboard.domain.oauth2.model.PlatformType;
 import org.thingsboard.domain.oauth2.model.SchemeType;
 
-public interface OAuth2RegistrationDao extends Dao<OAuth2Registration> {
+public interface OAuth2RegistrationDao extends Dao<OAuth2Registration, String> {
 
 	List<OAuth2Registration> findEnabledByDomainSchemesDomainNameAndPkgNameAndPlatformType(List<SchemeType> domainSchemes, String domainName, String pkgName, PlatformType platformType);
 
