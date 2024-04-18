@@ -20,16 +20,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 
 @Configuration
-@ConditionalOnMissingBean(TbCaffeineCacheConfiguration.class)
+@ConditionalOnMissingBean(CaffeineCacheConfiguration.class)
 @ConditionalOnProperty(prefix = "redis.connection", value = "type", havingValue = "standalone")
-public class TBRedisStandaloneConfiguration extends TBRedisCacheConfiguration {
+public class RedisStandaloneConfiguration extends RedisCacheConfiguration {
 
-    public TBRedisStandaloneConfiguration(CacheSpecsMap cacheSpecsMap) {
+	public RedisStandaloneConfiguration(CacheSpecsMap cacheSpecsMap) {
         super(cacheSpecsMap);
     }
 
@@ -60,8 +59,11 @@ public class TBRedisStandaloneConfiguration extends TBRedisCacheConfiguration {
     @Value("${redis.password:}")
     private String password;
 
+	@Value("${redis.ssl.enabled:false}")
+	private boolean useSsl;
+
     public JedisConnectionFactory loadFactory() {
-        RedisStandaloneConfiguration standaloneConfiguration = new RedisStandaloneConfiguration();
+		org.springframework.data.redis.connection.RedisStandaloneConfiguration standaloneConfiguration = new org.springframework.data.redis.connection.RedisStandaloneConfiguration();
         standaloneConfiguration.setHostName(host);
         standaloneConfiguration.setPort(port);
         standaloneConfiguration.setDatabase(db);
@@ -73,19 +75,24 @@ public class TBRedisStandaloneConfiguration extends TBRedisCacheConfiguration {
         }
     }
 
-    private JedisClientConfiguration buildClientConfig() {
-        if (usePoolConfig) {
-            return JedisClientConfiguration.builder()
-                    .clientName(clientName)
-                    .connectTimeout(Duration.ofMillis(connectTimeout))
-                    .readTimeout(Duration.ofMillis(readTimeout))
-                    .usePooling().poolConfig(buildPoolConfig())
-                    .build();
-        } else {
-            return JedisClientConfiguration.builder()
-                    .clientName(clientName)
-                    .connectTimeout(Duration.ofMillis(connectTimeout))
-                    .readTimeout(Duration.ofMillis(readTimeout)).build();
-        }
-    }
+	private JedisClientConfiguration buildClientConfig() {
+		JedisClientConfiguration.JedisClientConfigurationBuilder jedisClientConfigurationBuilder = JedisClientConfiguration.builder();
+		if (!useDefaultClientConfig) {
+			jedisClientConfigurationBuilder
+				.clientName(clientName)
+				.connectTimeout(Duration.ofMillis(connectTimeout))
+				.readTimeout(Duration.ofMillis(readTimeout));
+		}
+		if (useSsl) {
+			jedisClientConfigurationBuilder
+				.useSsl()
+				.sslSocketFactory(createSslSocketFactory());
+		}
+		if (usePoolConfig) {
+			jedisClientConfigurationBuilder
+				.usePooling()
+				.poolConfig(buildPoolConfig());
+		}
+		return jedisClientConfigurationBuilder.build();
+	}
 }

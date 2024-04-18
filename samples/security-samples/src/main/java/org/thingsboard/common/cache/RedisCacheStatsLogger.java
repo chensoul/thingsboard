@@ -37,7 +37,7 @@ import org.thingsboard.common.util.ThingsBoardThreadFactory;
 @ConditionalOnProperty(prefix = "cache", value = "type", havingValue = "redis")
 @Slf4j
 @RequiredArgsConstructor
-public class TbRedisStatsLogger {
+public class RedisCacheStatsLogger {
 
 	private final CacheManager cacheManager;
 
@@ -52,9 +52,7 @@ public class TbRedisStatsLogger {
 	@PostConstruct
 	public void init() {
 		if (cacheStatsEnabled) {
-			if (log.isDebugEnabled()) {
-				log.debug("initializing redis cache stats scheduled job");
-			}
+			log.info("Initializing redis cache stats scheduled job");
 			scheduler = Executors.newSingleThreadScheduledExecutor(ThingsBoardThreadFactory.forName("redis-cache-stats"));
 			scheduler.scheduleAtFixedRate(this::printCacheStats, cacheStatsInterval, cacheStatsInterval, TimeUnit.SECONDS);
 		}
@@ -73,11 +71,12 @@ public class TbRedisStatsLogger {
 			if (cache instanceof TransactionAwareCacheDecorator transactionAwareCacheDecorator) {
 				RedisCache redisCache = (RedisCache) transactionAwareCacheDecorator.getTargetCache();
 				CacheStatistics stats = redisCache.getStatistics();
-
-				log.info("Redis [{}]: hit rate [{}] hits [{}] misses [{}] puts [{}] deletes [{}]",
-					cache.getName(), hitRate(stats), stats.getHits(), stats.getMisses(),
-					stats.getPuts(), stats.getDeletes());
-				redisCache.clearStatistics();
+				if (stats.getHits() != 0 && stats.getMisses() != 0) {
+					log.info("Redis [{}]: hit rate [{}] hits [{}] misses [{}] puts [{}] deletes [{}]",
+						cache.getName(), hitRate(stats), stats.getHits(), stats.getMisses(),
+						stats.getPuts(), stats.getDeletes());
+				}
+//				redisCache.clearStatistics();
 			}
 		}
 	}
@@ -85,7 +84,7 @@ public class TbRedisStatsLogger {
 	@Nonnegative
 	public double hitRate(CacheStatistics stats) {
 		long requestCount = stats.getGets();
-		return (requestCount == 0) ? 0.0 : (double) stats.getHits() / requestCount;
+		return (requestCount == 0) ? 1.0 : (double) stats.getHits() / requestCount;
 	}
 
 }

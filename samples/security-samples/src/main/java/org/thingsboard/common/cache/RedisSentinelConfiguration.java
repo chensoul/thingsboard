@@ -19,15 +19,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisSentinelConfiguration;
+import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 
 @Configuration
-@ConditionalOnMissingBean(TbCaffeineCacheConfiguration.class)
+@ConditionalOnMissingBean(CaffeineCacheConfiguration.class)
 @ConditionalOnProperty(prefix = "redis.connection", value = "type", havingValue = "sentinel")
-public class TBRedisSentinelConfiguration extends TBRedisCacheConfiguration {
+public class RedisSentinelConfiguration extends RedisCacheConfiguration {
 
-    public TBRedisSentinelConfiguration(CacheSpecsMap cacheSpecsMap) {
+	public RedisSentinelConfiguration(CacheSpecsMap cacheSpecsMap) {
         super(cacheSpecsMap);
     }
 
@@ -49,18 +49,32 @@ public class TBRedisSentinelConfiguration extends TBRedisCacheConfiguration {
     @Value("${redis.password:}")
     private String password;
 
-    public JedisConnectionFactory loadFactory() {
-        RedisSentinelConfiguration redisSentinelConfiguration = new RedisSentinelConfiguration();
-        redisSentinelConfiguration.setMaster(master);
-        redisSentinelConfiguration.setSentinels(getNodes(sentinels));
-        redisSentinelConfiguration.setSentinelPassword(sentinelPassword);
-        redisSentinelConfiguration.setPassword(password);
-        redisSentinelConfiguration.setDatabase(database);
-        if (useDefaultPoolConfig) {
-            return new JedisConnectionFactory(redisSentinelConfiguration);
-        } else {
-            return new JedisConnectionFactory(redisSentinelConfiguration, buildPoolConfig());
-        }
-    }
+	@Value("${redis.ssl.enabled:false}")
+	private boolean useSsl;
+
+	public JedisConnectionFactory loadFactory() {
+		org.springframework.data.redis.connection.RedisSentinelConfiguration redisSentinelConfiguration = new org.springframework.data.redis.connection.RedisSentinelConfiguration();
+		redisSentinelConfiguration.setMaster(master);
+		redisSentinelConfiguration.setSentinels(getNodes(sentinels));
+		redisSentinelConfiguration.setSentinelPassword(sentinelPassword);
+		redisSentinelConfiguration.setPassword(password);
+		redisSentinelConfiguration.setDatabase(database);
+		return new JedisConnectionFactory(redisSentinelConfiguration, buildClientConfig());
+	}
+
+	private JedisClientConfiguration buildClientConfig() {
+		JedisClientConfiguration.JedisClientConfigurationBuilder jedisClientConfigurationBuilder = JedisClientConfiguration.builder();
+		if (!useDefaultPoolConfig) {
+			jedisClientConfigurationBuilder
+				.usePooling()
+				.poolConfig(buildPoolConfig());
+		}
+		if (useSsl) {
+			jedisClientConfigurationBuilder
+				.useSsl()
+				.sslSocketFactory(createSslSocketFactory());
+		}
+		return jedisClientConfigurationBuilder.build();
+	}
 
 }

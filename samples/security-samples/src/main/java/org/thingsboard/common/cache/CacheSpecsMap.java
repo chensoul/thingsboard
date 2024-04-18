@@ -15,17 +15,45 @@
  */
 package org.thingsboard.common.cache;
 
+import jakarta.annotation.PostConstruct;
+import java.util.HashMap;
 import java.util.Map;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.thingsboard.common.CacheConstants;
+import static org.thingsboard.common.CacheConstants.ALL_CACHES;
 
 @Configuration
 @ConfigurationProperties(prefix = "cache")
 @Data
 public class CacheSpecsMap {
-	private int timeToLiveInMinutes;
+	private static final int defaultTimeToLiveInMinutes = 1440;
+	private static final int defaultMaxSize = 10000;
+
+	@Value("${security.jwt.refreshTokenExpTime:604800}")
+	private int refreshTokenExpTime;
 
 	private Map<String, CacheSpecs> specs;
+
+	@PostConstruct
+	public void init() {
+		if (specs == null) {
+			specs = new HashMap<>();
+		}
+
+		// Add default config for all caches if not specified
+		ALL_CACHES.forEach(cacheName -> {
+			if (!specs.containsKey(cacheName)) {
+				specs.put(cacheName, new CacheSpecs(defaultTimeToLiveInMinutes, defaultMaxSize));
+			}
+		});
+
+		var cacheSpecs = specs.get(CacheConstants.USERS_SESSION_INVALIDATION_CACHE);
+		if (cacheSpecs != null) {
+			cacheSpecs.setTimeToLiveInMinutes((refreshTokenExpTime / 60) + 1);
+		}
+	}
 
 }

@@ -15,19 +15,41 @@
  */
 package org.thingsboard.common.util;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.security.PrivateKey;
+import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateFactory;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.PEMDecryptorProvider;
+import org.bouncycastle.openssl.PEMEncryptedKeyPair;
+import org.bouncycastle.openssl.PEMKeyPair;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+import org.bouncycastle.openssl.jcajce.JcePEMDecryptorProviderBuilder;
+import org.bouncycastle.operator.InputDecryptorProvider;
+import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
+import org.bouncycastle.pkcs.PKCSException;
+import org.bouncycastle.pkcs.jcajce.JcePKCSPBEInputDecryptorProviderBuilder;
 
 
 /**
@@ -36,7 +58,91 @@ import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 @Slf4j
 public class SslUtil {
 
+	public static final char[] EMPTY_PASS = {};
+
+	public static final BouncyCastleProvider DEFAULT_PROVIDER = new BouncyCastleProvider();
+
+	static {
+		if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
+			Security.addProvider(DEFAULT_PROVIDER);
+		}
+	}
+
 	private SslUtil() {
+	}
+
+	@SneakyThrows
+	public static List<X509Certificate> readCertFile(String fileContent) {
+		return readCertFile(new StringReader(fileContent));
+	}
+
+	@SneakyThrows
+	public static List<X509Certificate> readCertFileByPath(String filePath) {
+		return readCertFile(new FileReader(filePath));
+	}
+
+	private static List<X509Certificate> readCertFile(Reader reader) throws IOException, CertificateException {
+		List<X509Certificate> certificates = new ArrayList<>();
+		JcaX509CertificateConverter certConverter = new JcaX509CertificateConverter();
+		try (PEMParser pemParser = new PEMParser(reader)) {
+			Object object;
+			while ((object = pemParser.readObject()) != null) {
+				if (object instanceof X509CertificateHolder) {
+					X509Certificate x509Cert = certConverter.getCertificate((X509CertificateHolder) object);
+					certificates.add(x509Cert);
+				}
+			}
+		}
+		return certificates;
+	}
+
+	@SneakyThrows
+	public static PrivateKey readPrivateKey(String fileContent, String passStr) {
+		if (StringUtils.isNotEmpty(fileContent)) {
+			StringReader reader = new StringReader(fileContent);
+			return readPrivateKey(reader, passStr);
+		}
+		return null;
+	}
+
+	@SneakyThrows
+	public static PrivateKey readPrivateKeyByFilePath(String filePath, String passStr) {
+		if (StringUtils.isNotEmpty(filePath)) {
+			FileReader fileReader = new FileReader(filePath);
+			return readPrivateKey(fileReader, passStr);
+		}
+		return null;
+	}
+
+	private static PrivateKey readPrivateKey(Reader reader, String passStr) throws IOException, PKCSException {
+		char[] password = getPassword(passStr);
+		PrivateKey privateKey = null;
+		JcaPEMKeyConverter keyConverter = new JcaPEMKeyConverter();
+		try (PEMParser pemParser = new PEMParser(reader)) {
+			Object object;
+			while ((object = pemParser.readObject()) != null) {
+				if (object instanceof PEMEncryptedKeyPair) {
+					PEMDecryptorProvider decProv = new JcePEMDecryptorProviderBuilder().build(password);
+					privateKey = keyConverter.getKeyPair(((PEMEncryptedKeyPair) object).decryptKeyPair(decProv)).getPrivate();
+					break;
+				} else if (object instanceof PKCS8EncryptedPrivateKeyInfo) {
+					InputDecryptorProvider decProv =
+						new JcePKCSPBEInputDecryptorProviderBuilder().setProvider(DEFAULT_PROVIDER).build(password);
+					privateKey = keyConverter.getPrivateKey(((PKCS8EncryptedPrivateKeyInfo) object).decryptPrivateKeyInfo(decProv));
+					break;
+				} else if (object instanceof PEMKeyPair) {
+					privateKey = keyConverter.getKeyPair((PEMKeyPair) object).getPrivate();
+					break;
+				} else if (object instanceof PrivateKeyInfo) {
+					privateKey = keyConverter.getPrivateKey((PrivateKeyInfo) object);
+				}
+			}
+		}
+		return privateKey;
+	}
+
+	public static char[] getPassword(String passStr) {
+		return StringUtils.isEmpty(passStr) ? EMPTY_PASS : passStr.toCharArray();
 	}
 
 	public static String getCertificateString(Certificate cert)
@@ -53,24 +159,6 @@ public class SslUtil {
 			stringBuilder.append(begin).append(EncryptionUtil.certTrimNewLines(Base64.getEncoder().encodeToString(cert.getEncoded()))).append(end).append("\n");
 		}
 		return stringBuilder.toString();
-	}
-
-	public static X509Certificate readCertFile(String fileContent) {
-		X509Certificate certificate = null;
-		try {
-			if (fileContent != null && !fileContent.trim().isEmpty()) {
-				fileContent = fileContent.replace("-----BEGIN CERTIFICATE-----", "")
-					.replace("-----END CERTIFICATE-----", "")
-					.replaceAll("\\s", "");
-				byte[] decoded = Base64.getDecoder().decode(fileContent);
-				CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
-				try (InputStream inStream = new ByteArrayInputStream(decoded)) {
-					certificate = (X509Certificate) certFactory.generateCertificate(inStream);
-				}
-			}
-		} catch (Exception ignored) {
-		}
-		return certificate;
 	}
 
 	public static String parseCommonName(X509Certificate certificate) {

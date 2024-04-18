@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import static org.thingsboard.common.CacheConstants.JWT_TOKEN_CACHE;
+import static org.thingsboard.common.CacheConstants.USERS_SESSION_INVALIDATION_CACHE;
 import org.thingsboard.domain.user.event.UserAuthDataChangedEvent;
 
 @Slf4j
@@ -34,9 +34,9 @@ public class DefaultTokenCacheService implements TokenCacheService {
 	@EventListener(classes = UserAuthDataChangedEvent.class)
 	public void onUserAuthDataChanged(UserAuthDataChangedEvent event) {
 		if (event.getId() != null) {
-			log.info("User [{}] auth data changed ad {}, update token redis cache", event.getId(), event.getTs());
+			log.info("User [{}] auth data has changed, set jwt token expired time to {}", event.getId(), event.getTs());
 
-			cacheManager.getCache(JWT_TOKEN_CACHE).put(event.getId().toString(), event.getTs());
+			cacheManager.getCache(USERS_SESSION_INVALIDATION_CACHE).put(event.getId().toString(), event.getTs());
 		}
 	}
 
@@ -50,7 +50,7 @@ public class DefaultTokenCacheService implements TokenCacheService {
 	}
 
 	private Boolean isTokenExpired(String sessionId, long issueTime) {
-		return Optional.ofNullable(cacheManager.getCache(JWT_TOKEN_CACHE).get(sessionId)).map(op -> isTokenExpired(issueTime, (Long) op.get())).orElse(false);
+		return Optional.ofNullable(cacheManager.getCache(USERS_SESSION_INVALIDATION_CACHE).get(sessionId)).map(op -> isTokenExpired(issueTime, (Long) op.get())).orElse(false);
 	}
 
 	private boolean isTokenExpired(long issueTime, Long expiredTime) {

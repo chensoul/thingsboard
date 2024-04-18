@@ -22,6 +22,7 @@ import com.github.benmanes.caffeine.cache.Weigher;
 import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -43,14 +44,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.thingsboard.common.util.ThingsBoardThreadFactory;
 
-@Configuration
-@ConditionalOnProperty(prefix = "cache", value = "type", havingValue = "caffeine", matchIfMissing = true)
 @EnableCaching
 @Data
 @Slf4j
-public class TbCaffeineCacheConfiguration {
+@Configuration
+@ConditionalOnProperty(prefix = "cache", value = "type", havingValue = "caffeine", matchIfMissing = true)
+public class CaffeineCacheConfiguration {
 
-	private final CacheSpecsMap configuration;
+	private final CacheSpecsMap cacheSpecsMap;
 
 	@Value("${cache.stats.enabled:true}")
 	private boolean cacheStatsEnabled;
@@ -62,15 +63,30 @@ public class TbCaffeineCacheConfiguration {
 
 	List<CaffeineCache> caches = Collections.emptyList();
 
+	@PostConstruct
+	public void init() {
+		if (cacheStatsEnabled) {
+			log.info("Initializing caffeine cache stats scheduled job");
+			scheduler = Executors.newSingleThreadScheduledExecutor(ThingsBoardThreadFactory.forName("caffeine-cache-stats"));
+			scheduler.scheduleAtFixedRate(this::printCacheStats, cacheStatsInterval, cacheStatsInterval, TimeUnit.SECONDS);
+		}
+	}
+
+	@PreDestroy
+	public void destroy() {
+		if (scheduler != null) {
+			scheduler.shutdown();
+		}
+	}
+
 	@Bean
 	public CacheManager cacheManager() {
-		if (log.isTraceEnabled()) {
-			log.trace("Initializing cache: {} specs {}", Arrays.toString(RemovalCause.values()), configuration.getSpecs());
-		}
+		log.info("Initializing caffeine cache: {}, specs {}", Arrays.toString(RemovalCause.values()), cacheSpecsMap.getSpecs());
+
 		SimpleCacheManager manager = new SimpleCacheManager();
-		if (configuration.getSpecs() != null) {
+		if (cacheSpecsMap.getSpecs() != null) {
 			caches =
-				configuration.getSpecs().entrySet().stream()
+				cacheSpecsMap.getSpecs().entrySet().stream()
 					.map(entry -> buildCache(entry.getKey(),
 						entry.getValue()))
 					.collect(Collectors.toList());
@@ -83,29 +99,12 @@ public class TbCaffeineCacheConfiguration {
 		return new TransactionAwareCacheManagerProxy(manager);
 	}
 
-	@PostConstruct
-	public void init() {
-		if (cacheStatsEnabled) {
-			if (log.isDebugEnabled()) {
-				log.debug("initializing cache stats scheduled job");
-			}
-			scheduler = Executors.newSingleThreadScheduledExecutor(ThingsBoardThreadFactory.forName("cache-stats"));
-			scheduler.scheduleAtFixedRate(this::printCacheStats, cacheStatsInterval, cacheStatsInterval, TimeUnit.SECONDS);
-		}
-	}
-
-	@PreDestroy
-	public void destroy() {
-		if (scheduler != null) {
-			scheduler.shutdown();
-		}
-	}
-
 	void printCacheStats() {
 		caches.forEach((cache) -> {
 			CacheStats stats = cache.getNativeCache().stats();
-			if (stats.hitCount() != 0 || stats.missCount() != 0) {
-				log.info("Caffeine [{}] hit [{}] [{}]", cache.getName(), stats.hitRate(), stats);
+			if (stats.hitCount() != 0 && stats.missCount() != 0) {
+				log.info("Caffeine [{}]: hit rate [{}] hits [{}] misses [{}] puts [{}] deletes [{}]",
+					cache.getName(), BigDecimal.valueOf(stats.hitRate()).setScale(2), stats.hitCount(), stats.missCount(), stats.requestCount(), stats.evictionCount());
 			}
 		});
 	}

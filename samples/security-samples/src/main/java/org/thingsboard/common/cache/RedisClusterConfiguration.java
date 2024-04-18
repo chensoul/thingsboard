@@ -19,15 +19,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisClusterConfiguration;
+import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 
 @Configuration
-@ConditionalOnMissingBean(TbCaffeineCacheConfiguration.class)
+@ConditionalOnMissingBean(CaffeineCacheConfiguration.class)
 @ConditionalOnProperty(prefix = "redis.connection", value = "type", havingValue = "cluster")
-public class TBRedisClusterConfiguration extends TBRedisCacheConfiguration {
+public class RedisClusterConfiguration extends RedisCacheConfiguration {
 
-    public TBRedisClusterConfiguration(CacheSpecsMap cacheSpecsMap) {
+	public RedisClusterConfiguration(CacheSpecsMap cacheSpecsMap) {
         super(cacheSpecsMap);
     }
 
@@ -43,15 +43,29 @@ public class TBRedisClusterConfiguration extends TBRedisCacheConfiguration {
     @Value("${redis.password:}")
     private String password;
 
-    public JedisConnectionFactory loadFactory() {
-        RedisClusterConfiguration clusterConfiguration = new RedisClusterConfiguration();
-        clusterConfiguration.setClusterNodes(getNodes(clusterNodes));
-        clusterConfiguration.setMaxRedirects(maxRedirects);
-        clusterConfiguration.setPassword(password);
-        if (useDefaultPoolConfig) {
-            return new JedisConnectionFactory(clusterConfiguration);
-        } else {
-            return new JedisConnectionFactory(clusterConfiguration, buildPoolConfig());
-        }
-    }
+	@Value("${redis.ssl.enabled:false}")
+	private boolean useSsl;
+
+	public JedisConnectionFactory loadFactory() {
+		org.springframework.data.redis.connection.RedisClusterConfiguration clusterConfiguration = new org.springframework.data.redis.connection.RedisClusterConfiguration();
+		clusterConfiguration.setClusterNodes(getNodes(clusterNodes));
+		clusterConfiguration.setMaxRedirects(maxRedirects);
+		clusterConfiguration.setPassword(password);
+		return new JedisConnectionFactory(clusterConfiguration, buildClientConfig());
+	}
+
+	private JedisClientConfiguration buildClientConfig() {
+		JedisClientConfiguration.JedisClientConfigurationBuilder jedisClientConfigurationBuilder = JedisClientConfiguration.builder();
+		if (!useDefaultPoolConfig) {
+			jedisClientConfigurationBuilder
+				.usePooling()
+				.poolConfig(buildPoolConfig());
+		}
+		if (useSsl) {
+			jedisClientConfigurationBuilder
+				.useSsl()
+				.sslSocketFactory(createSslSocketFactory());
+		}
+		return jedisClientConfigurationBuilder.build();
+	}
 }
