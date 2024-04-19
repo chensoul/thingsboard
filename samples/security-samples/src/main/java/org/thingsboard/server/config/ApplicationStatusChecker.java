@@ -13,23 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.thingsboard.transport.auth;
+package org.thingsboard.server.config;
 
-import java.io.Serializable;
-import lombok.Data;
-import org.thingsboard.domain.iot.device.model.PowerMode;
+import com.zaxxer.hikari.HikariDataSource;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Configuration;
 
-@Data
-public class TransportDeviceInfo implements Serializable {
+@RequiredArgsConstructor
+@Configuration
+public class ApplicationStatusChecker {
+	private final HikariDataSource hikariDataSource;
 
-	private String tenantId;
-	private Long merchantId;
-	private Long deviceProfileId;
-	private String deviceId;
-	private String deviceName;
-	private String deviceType;
-	private PowerMode powerMode;
-	private String extra;
-	private Long psmActivityTimer;
-	private Long pagingTransmissionWindow;
+	@PostConstruct
+	public void init() {
+		if (!hikariDataSource.isRunning()) {
+			throw new RuntimeException("Couldn't start database connection.");
+		}
+	}
 }

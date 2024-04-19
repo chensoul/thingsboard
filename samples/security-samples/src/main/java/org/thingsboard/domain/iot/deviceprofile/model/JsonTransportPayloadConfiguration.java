@@ -16,7 +16,7 @@
 package org.thingsboard.domain.iot.deviceprofile.model;
 
 import lombok.Data;
-import org.thingsboard.transport.TransportPayloadType;
+import org.thingsboard.common.model.TransportPayloadType;
 
 @Data
 public class JsonTransportPayloadConfiguration implements TransportPayloadTypeConfiguration {

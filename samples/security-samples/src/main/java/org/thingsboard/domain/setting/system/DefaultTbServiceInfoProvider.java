@@ -13,55 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.thingsboard.queue.common;
+package org.thingsboard.domain.setting.system;
 
 import jakarta.annotation.PostConstruct;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Collections;
-import java.util.List;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.thingsboard.domain.queue.ServiceType;
+
 
 @Component
 @Slf4j
-public class DefaultServiceInfoProvider implements ServiceInfoProvider {
+public class DefaultTbServiceInfoProvider implements ServiceInfoProvider {
 
 	@Getter
 	@Value("${service.id:#{null}}")
 	private String serviceId;
 
-	@Getter
-	@Value("${service.type:monolith}")
-	private String serviceType;
-
-	@Getter
-	private List<ServiceType> serviceTypes;
-
 	@PostConstruct
 	public void init() {
 		if (StringUtils.isEmpty(serviceId)) {
-			serviceId = generateServiceId();
+			try {
+				serviceId = InetAddress.getLocalHost().getHostName();
+			} catch (UnknownHostException e) {
+				serviceId = RandomStringUtils.randomAlphabetic(10);
+			}
 		}
 		log.info("Current Service ID: {}", serviceId);
-
-		if (serviceType.equalsIgnoreCase("monolith")) {
-			serviceTypes = List.of(ServiceType.values());
-		} else {
-			serviceTypes = Collections.singletonList(ServiceType.of(serviceType));
-		}
 	}
 
-	private String generateServiceId() {
-		try {
-			return InetAddress.getLocalHost().getHostName();
-		} catch (UnknownHostException e) {
-			return RandomStringUtils.randomAlphabetic(10);
-		}
-	}
+
 }

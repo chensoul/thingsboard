@@ -13,17 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.chensoul.netty.thingsboard.mqtt.topic;
+package org.thingsboard.domain.setting.system;
 
-import lombok.Data;
+public interface ServiceInfoProvider {
 
-@Data
-public class EqualsTopicFilter implements MqttTopicFilter {
+	String getServiceId();
 
-    private final String filter;
-
-    @Override
-    public boolean filter(String topic) {
-        return filter.equals(topic);
-    }
 }

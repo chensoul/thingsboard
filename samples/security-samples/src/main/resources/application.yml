@@ -637,7 +637,6 @@ spring:
     hibernate:
       # You can set a Hibernate feature that controls the DDL behavior in a more fine-grained way. The standard Hibernate property values are none, validate, update, create-drop. Spring Boot chooses a default value for you based on whether it thinks your database is embedded (default create-drop) or not (default none)
       ddl-auto: "none"
-    show-sql: true # Enable/Disable SQL logging
   datasource:
     # Database driver for Spring JPA - org.postgresql.Driver
     driverClassName: "${SPRING_DRIVER_CLASS_NAME:org.postgresql.Driver}"

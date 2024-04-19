@@ -34,11 +34,8 @@ public class ThingsBoardThreadFactory implements ThreadFactory {
 
     private ThingsBoardThreadFactory(String name) {
         SecurityManager s = System.getSecurityManager();
-        group = (s != null) ? s.getThreadGroup() :
-                Thread.currentThread().getThreadGroup();
-        namePrefix = name + "-" +
-                poolNumber.getAndIncrement() +
-                "-thread-";
+		group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
+		namePrefix = name + "-" + poolNumber.getAndIncrement() + "-";
     }
 
     public static void updateCurrentThreadName(String threadSuffix) {
@@ -54,13 +51,13 @@ public class ThingsBoardThreadFactory implements ThreadFactory {
 
     @Override
     public Thread newThread(Runnable r) {
-        Thread t = new Thread(group, r,
-                namePrefix + threadNumber.getAndIncrement(),
-                0);
-        if (t.isDaemon())
-            t.setDaemon(false);
-        if (t.getPriority() != Thread.NORM_PRIORITY)
-            t.setPriority(Thread.NORM_PRIORITY);
+		Thread t = new Thread(group, r, namePrefix + threadNumber.getAndIncrement(), 0);
+		if (t.isDaemon()) {
+			t.setDaemon(false);
+		}
+		if (t.getPriority() != Thread.NORM_PRIORITY) {
+			t.setPriority(Thread.NORM_PRIORITY);
+		}
         return t;
     }
 }

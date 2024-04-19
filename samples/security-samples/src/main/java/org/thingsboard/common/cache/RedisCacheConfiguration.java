@@ -51,8 +51,6 @@ import org.springframework.data.redis.connection.RedisNode;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.format.support.DefaultFormattingConversionService;
-import static org.thingsboard.common.StringConstants.COLON;
-import static org.thingsboard.common.StringConstants.COMMA;
 import org.thingsboard.common.util.SslUtil;
 import redis.clients.jedis.JedisPoolConfig;
 
@@ -62,6 +60,8 @@ import redis.clients.jedis.JedisPoolConfig;
 @Data
 @Slf4j
 public abstract class RedisCacheConfiguration {
+	private static final String COMMA = ",";
+	private static final String COLON = ":";
 
 	private final CacheSpecsMap cacheSpecsMap;
 

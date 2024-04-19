@@ -67,7 +67,7 @@ public class CaffeineCacheConfiguration {
 	public void init() {
 		if (cacheStatsEnabled) {
 			log.info("Initializing caffeine cache stats scheduled job");
-			scheduler = Executors.newSingleThreadScheduledExecutor(ThingsBoardThreadFactory.forName("caffeine-cache-stats"));
+			scheduler = Executors.newSingleThreadScheduledExecutor(ThingsBoardThreadFactory.forName("caffeine-stats"));
 			scheduler.scheduleAtFixedRate(this::printCacheStats, cacheStatsInterval, cacheStatsInterval, TimeUnit.SECONDS);
 		}
 	}
@@ -103,7 +103,7 @@ public class CaffeineCacheConfiguration {
 		caches.forEach((cache) -> {
 			CacheStats stats = cache.getNativeCache().stats();
 			if (stats.hitCount() != 0 && stats.missCount() != 0) {
-				log.info("Caffeine [{}]: hit rate [{}] hits [{}] misses [{}] puts [{}] deletes [{}]",
+				log.info("Caffeine [{}]: hit rate [{}], hits [{}], misses [{}], puts [{}], deletes [{}]",
 					cache.getName(), BigDecimal.valueOf(stats.hitRate()).setScale(2), stats.hitCount(), stats.missCount(), stats.requestCount(), stats.evictionCount());
 			}
 		});

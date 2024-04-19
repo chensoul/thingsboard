@@ -23,6 +23,8 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.Data;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLJsonPGObjectJsonbType;
 import org.thingsboard.common.dao.jpa.JsonConverter;
 import org.thingsboard.common.dao.mybatis.LongBaseEntity;
 import org.thingsboard.common.util.JacksonUtil;
@@ -39,7 +41,8 @@ public class UserSettingEntity extends LongBaseEntity<UserSetting> {
 	private UserSettingType type;
 
 	@Convert(converter = JsonConverter.class)
-	@Column(columnDefinition = "jsonb")
+	@JdbcType(PostgreSQLJsonPGObjectJsonbType.class)
+	@Column(name = "extra", columnDefinition = "jsonb")
 	private JsonNode extra;
 
 	@Override

@@ -53,7 +53,7 @@ public class RedisCacheStatsLogger {
 	public void init() {
 		if (cacheStatsEnabled) {
 			log.info("Initializing redis cache stats scheduled job");
-			scheduler = Executors.newSingleThreadScheduledExecutor(ThingsBoardThreadFactory.forName("redis-cache-stats"));
+			scheduler = Executors.newSingleThreadScheduledExecutor(ThingsBoardThreadFactory.forName("redis-stats"));
 			scheduler.scheduleAtFixedRate(this::printCacheStats, cacheStatsInterval, cacheStatsInterval, TimeUnit.SECONDS);
 		}
 	}
@@ -72,11 +72,10 @@ public class RedisCacheStatsLogger {
 				RedisCache redisCache = (RedisCache) transactionAwareCacheDecorator.getTargetCache();
 				CacheStatistics stats = redisCache.getStatistics();
 				if (stats.getHits() != 0 && stats.getMisses() != 0) {
-					log.info("Redis [{}]: hit rate [{}] hits [{}] misses [{}] puts [{}] deletes [{}]",
+					log.info("Redis [{}]: hit rate [{}], hits [{}], misses [{}], puts [{}], deletes [{}]",
 						cache.getName(), hitRate(stats), stats.getHits(), stats.getMisses(),
 						stats.getPuts(), stats.getDeletes());
 				}
-//				redisCache.clearStatistics();
 			}
 		}
 	}

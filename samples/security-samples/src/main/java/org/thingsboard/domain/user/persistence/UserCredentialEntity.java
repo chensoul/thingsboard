@@ -22,6 +22,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLJsonPGObjectJsonbType;
 import org.thingsboard.common.dao.jpa.JsonConverter;
 import org.thingsboard.common.dao.mybatis.LongBaseEntity;
 import org.thingsboard.common.util.JacksonUtil;
@@ -44,7 +46,8 @@ public final class UserCredentialEntity extends LongBaseEntity<UserCredential> {
 	private String resetToken;
 
 	@Convert(converter = JsonConverter.class)
-	@Column(columnDefinition = "jsonb")
+	@JdbcType(PostgreSQLJsonPGObjectJsonbType.class)
+	@Column(name = "extra", columnDefinition = "jsonb")
 	private JsonNode extra;
 
 	@Override

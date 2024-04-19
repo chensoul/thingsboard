@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.io.Serializable;
-import org.thingsboard.transport.TransportPayloadType;
+import org.thingsboard.common.model.TransportPayloadType;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(

@@ -53,7 +53,8 @@ public class UserEntity extends LongBaseEntity<User> {
 	private String phone;
 
 	@Convert(converter = JsonConverter.class)
-	@Column(columnDefinition = "jsonb")
+	@JdbcType(PostgreSQLJsonPGObjectJsonbType.class)
+	@Column(name = "extra", columnDefinition = "jsonb")
 	private JsonNode extra;
 
 	@Override

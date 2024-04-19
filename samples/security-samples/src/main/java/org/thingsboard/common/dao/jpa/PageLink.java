@@ -55,14 +55,17 @@ public class PageLink {
 	}
 
 	public void checkPageNumber() {
-		if (this.pageNumber <= 0) {
+		if (this.pageNumber < 0) {
 			this.pageNumber = 0;
 		}
 	}
 
 	public void checkPageSize() {
-		if (this.pageSize <= 0) {
+		if (this.pageSize < 1) {
 			this.pageSize = 10;
+		}
+		if (this.pageSize > 1000) {
+			this.pageSize = 1000;
 		}
 	}
 
@@ -88,6 +91,9 @@ public class PageLink {
 		this.textSearch = pageLink.getTextSearch();
 		this.sortProperty = pageLink.getSortProperty();
 		this.sortOrder = pageLink.getSortOrder();
+
+		checkPageNumber();
+		checkPageSize();
 	}
 
 	@JsonIgnore

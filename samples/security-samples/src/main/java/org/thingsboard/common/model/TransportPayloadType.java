@@ -13,16 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.thingsboard.queue.spi;
+package org.thingsboard.common.model;
 
-import com.google.common.util.concurrent.ListenableFuture;
-import org.thingsboard.domain.message.QueueMsg;
-
-/**
- * Created by ashvayka on 05.10.18.
- */
-public interface QueueHandler<Request extends QueueMsg, Response extends QueueMsg> {
-
-    ListenableFuture<Response> handle(Request request);
-
+public enum TransportPayloadType {
+    JSON,
+    PROTOBUF
 }

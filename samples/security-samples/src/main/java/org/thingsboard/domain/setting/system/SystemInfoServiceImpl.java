@@ -14,7 +14,6 @@ import static org.thingsboard.common.util.SystemUtil.getTotalMemory;
 import org.thingsboard.domain.notification.channel.mail.MailService;
 import org.thingsboard.domain.notification.channel.sms.SmsService;
 import org.thingsboard.domain.oauth2.service.OAuth2Service;
-import org.thingsboard.queue.common.ServiceInfoProvider;
 import static org.thingsboard.server.security.SecurityUser.SYS_TENANT_ID;
 
 /**
@@ -57,7 +56,7 @@ public class SystemInfoServiceImpl implements SystemInfoService {
 
 		SystemInfoData systemInfoData = new SystemInfoData();
 		systemInfoData.setServiceId(serviceInfoProvider.getServiceId());
-		systemInfoData.setServiceType(serviceInfoProvider.getServiceType());
+//		systemInfoData.setServiceType(serviceInfoProvider.getServiceType());
 		getCpuUsage().ifPresent(t -> systemInfoData.setCpuUsage(t));
 		getMemoryUsage().ifPresent(t -> systemInfoData.setMemoryUsage(t));
 		getDiscSpaceUsage().ifPresent(t -> systemInfoData.setDiscUsage(t));

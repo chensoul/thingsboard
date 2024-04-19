@@ -51,6 +51,8 @@ import org.thingsboard.domain.audit.AuditLog;
 @ConditionalOnProperty(prefix = "audit-log.sink", value = "type", havingValue = "elasticsearch")
 @Slf4j
 public class ElasticsearchAuditLogSink implements AuditLogSink {
+	private static final String TENANT_PLACEHOLDER = "@{TENANT}";
+	private static final String DATE_PLACEHOLDER = "@{DATE}";
 	private static final String INDEX_TYPE = "audit_log";
 
 	@Value("${audit-log.sink.index_pattern}")
@@ -119,7 +121,7 @@ public class ElasticsearchAuditLogSink implements AuditLogSink {
 
 		restClient.performRequestAsync(
 			HttpMethod.POST.name(),
-			String.format("/%s/%s", auditLog.getTenantId(), INDEX_TYPE),
+			String.format("/%s/%s", getIndexName(auditLog.getTenantId()), INDEX_TYPE),
 			Collections.emptyMap(),
 			entity,
 			responseListener);
@@ -130,7 +132,7 @@ public class ElasticsearchAuditLogSink implements AuditLogSink {
 		auditLogNode.put("id", auditLog.getId());
 		auditLogNode.put("tenantId", auditLog.getTenantId());
 		if (auditLog.getMerchantId() != null) {
-			auditLogNode.put("merchantId", auditLog.getMerchantId().toString());
+			auditLogNode.put("merchantId", auditLog.getMerchantId());
 		}
 		auditLogNode.put("entityId", auditLog.getEntityId());
 		auditLogNode.put("entityType", auditLog.getEntityType().name());
@@ -157,4 +159,17 @@ public class ElasticsearchAuditLogSink implements AuditLogSink {
 			log.warn("Elasticsearch sink log action method failed!", exception);
 		}
 	};
+
+	private String getIndexName(String tenantId) {
+		String indexName = indexPattern;
+		if (indexName.contains(TENANT_PLACEHOLDER) && tenantId != null) {
+			indexName = indexName.replace(TENANT_PLACEHOLDER, tenantId);
+		}
+		if (indexName.contains(DATE_PLACEHOLDER)) {
+			LocalDateTime now = LocalDateTime.now();
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat);
+			indexName = indexName.replace(DATE_PLACEHOLDER, now.format(formatter));
+		}
+		return indexName.toLowerCase();
+	}
 }
