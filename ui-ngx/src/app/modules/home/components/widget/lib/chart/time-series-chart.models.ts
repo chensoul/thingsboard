@@ -752,6 +752,15 @@ export const timeSeriesChartDefaultSettings: TimeSeriesChartSettings = {
     timeSeriesChartNoAggregationBarWidthDefaultSettings),
   showTooltip: true,
   tooltipTrigger: EChartsTooltipTrigger.axis,
+  tooltipLabelFont: {
+    family: 'Roboto',
+    size: 12,
+    sizeUnit: 'px',
+    style: 'normal',
+    weight: '400',
+    lineHeight: '16px'
+  },
+  tooltipLabelColor: 'rgba(0, 0, 0, 0.76)',
   tooltipValueFont: {
     family: 'Roboto',
     size: 12,
@@ -965,18 +974,19 @@ export const createTimeSeriesYAxis = (units: string,
       ticksFormatter = parseFunction(settings.ticksFormatter, ['value']);
     }
   }
+  let configuredTicksGenerator: TimeSeriesChartTicksGenerator;
   let ticksGenerator: TimeSeriesChartTicksGenerator;
   let minInterval: number;
   let interval: number;
   let splitNumber: number;
   if (settings.ticksGenerator) {
     if (isFunction(settings.ticksGenerator)) {
-      ticksGenerator = settings.ticksGenerator as TimeSeriesChartTicksGenerator;
+      configuredTicksGenerator = settings.ticksGenerator as TimeSeriesChartTicksGenerator;
     } else if (settings.ticksGenerator.length) {
-      ticksGenerator = parseFunction(settings.ticksGenerator, ['extent', 'interval', 'niceTickExtent', 'intervalPrecision']);
+      configuredTicksGenerator = parseFunction(settings.ticksGenerator, ['extent', 'interval', 'niceTickExtent', 'intervalPrecision']);
     }
   }
-  if (!ticksGenerator) {
+  if (!configuredTicksGenerator) {
     interval = settings.interval;
     if (isUndefinedOrNull(interval)) {
       if (isDefinedAndNotNull(settings.splitNumber)) {
@@ -985,6 +995,11 @@ export const createTimeSeriesYAxis = (units: string,
         minInterval = (1 / Math.pow(10, decimals));
       }
     }
+  } else {
+    ticksGenerator = (extent, ticksInterval, niceTickExtent, intervalPrecision) => {
+      const ticks = configuredTicksGenerator(extent, ticksInterval, niceTickExtent, intervalPrecision);
+      return ticks?.filter(tick => tick.value >= extent[0] && tick.value <= extent[1]);
+    };
   }
   return {
     id: settings.id,
