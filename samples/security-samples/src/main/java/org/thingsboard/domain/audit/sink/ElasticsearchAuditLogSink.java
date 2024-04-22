@@ -45,7 +45,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.thingsboard.common.util.JacksonUtil;
 import org.thingsboard.common.util.ThingsBoardThreadFactory;
-import org.thingsboard.domain.audit.AuditLog;
+import org.thingsboard.domain.audit.model.AuditLog;
 
 @Component
 @ConditionalOnProperty(prefix = "audit-log.sink", value = "type", havingValue = "elasticsearch")

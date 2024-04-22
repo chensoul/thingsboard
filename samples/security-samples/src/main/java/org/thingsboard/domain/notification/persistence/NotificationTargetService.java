@@ -17,8 +17,8 @@ package org.thingsboard.domain.notification.persistence;
 
 import java.util.List;
 import java.util.Set;
-import org.thingsboard.common.dao.jpa.PageData;
-import org.thingsboard.common.dao.jpa.PageLink;
+import org.thingsboard.common.dao.page.PageData;
+import org.thingsboard.common.dao.page.PageLink;
 import org.thingsboard.common.exception.ThingsboardException;
 import org.thingsboard.domain.notification.targets.NotificationTarget;
 import org.thingsboard.domain.notification.targets.UserFilterType;

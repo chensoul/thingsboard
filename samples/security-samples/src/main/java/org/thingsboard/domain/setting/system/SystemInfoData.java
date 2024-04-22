@@ -21,7 +21,8 @@ import lombok.Data;
 @Data
 public class SystemInfoData {
     private String serviceId;
-    private String serviceType;
+	private String serviceName;
+	private String serviceType;
     private long cpuUsage;
     private long cpuCount;
     private long memoryUsage;

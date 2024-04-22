@@ -22,7 +22,7 @@ import org.thingsboard.common.dao.exception.DataValidationException;
 import org.thingsboard.common.model.BaseData;
 import org.thingsboard.common.model.EntityType;
 import org.thingsboard.common.validation.ConstraintValidator;
-import org.thingsboard.domain.limit.EntitiesLimitException;
+import org.thingsboard.domain.usage.limit.EntitiesLimitException;
 import org.thingsboard.domain.usage.ApiLimitService;
 import org.thingsboard.server.security.permission.AccessControlService;
 

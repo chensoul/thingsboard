@@ -25,9 +25,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.thingsboard.common.dao.jpa.PageData;
-import org.thingsboard.common.dao.jpa.PageLink;
-import org.thingsboard.common.dao.jpa.SortOrder;
+import org.thingsboard.common.dao.page.PageData;
+import org.thingsboard.common.dao.page.PageLink;
+import org.thingsboard.common.dao.page.SortOrder;
 import org.thingsboard.common.model.ToData;
 
 public abstract class DaoUtil {

@@ -14,19 +14,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import static org.thingsboard.common.ControllerConstants.USER_ID;
 import org.thingsboard.common.exception.ThingsboardErrorCode;
 import org.thingsboard.common.exception.ThingsboardException;
-import org.thingsboard.domain.audit.ActionType;
-import org.thingsboard.domain.limit.LimitedApi;
-import org.thingsboard.domain.limit.RateLimitService;
+import org.thingsboard.common.service.BaseController;
+import static org.thingsboard.common.validation.Validator.checkNotNull;
+import org.thingsboard.domain.audit.model.ActionType;
+import org.thingsboard.domain.usage.limit.LimitedApi;
 import org.thingsboard.domain.notification.channel.mail.MailService;
 import org.thingsboard.domain.setting.security.PasswordPolicy;
-import org.thingsboard.domain.setting.security.SecuritySettingService;
 import org.thingsboard.domain.user.event.UserCredentialInvalidationEvent;
 import org.thingsboard.domain.user.event.UserSessionInvalidationEvent;
 import org.thingsboard.domain.user.model.PasswordChangeRequest;
@@ -35,13 +37,15 @@ import org.thingsboard.domain.user.model.PasswordResetRequest;
 import org.thingsboard.domain.user.model.User;
 import org.thingsboard.domain.user.model.UserActivateRequest;
 import org.thingsboard.domain.user.model.UserCredential;
-import org.thingsboard.domain.user.service.UserService;
+import org.thingsboard.domain.user.service.AuthService;
 import org.thingsboard.server.security.SecurityUser;
 import org.thingsboard.server.security.SecurityUtils;
 import static org.thingsboard.server.security.SecurityUtils.getCurrentUser;
 import org.thingsboard.server.security.UserPrincipal;
 import org.thingsboard.server.security.jwt.JwtTokenFactory;
 import org.thingsboard.server.security.jwt.token.JwtPair;
+import org.thingsboard.server.security.permission.Operation;
+import org.thingsboard.server.security.permission.Resource;
 import org.thingsboard.server.security.rest.RestAuthenticationDetail;
 
 /**
@@ -55,16 +59,15 @@ import org.thingsboard.server.security.rest.RestAuthenticationDetail;
 @RequestMapping("/api")
 @Slf4j
 @RequiredArgsConstructor
-public class AuthController {
+public class AuthController extends BaseController {
+
 	@Value("${server.rest.rate_limits.reset_password_per_user:5:3600}")
 	private String defaultLimitsConfiguration;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtTokenFactory tokenFactory;
 	private final MailService mailService;
-	private final UserService userService;
-	private final SecuritySettingService securitySettingService;
-	private final RateLimitService rateLimitService;
 	private final ApplicationEventPublisher eventPublisher;
+	private final AuthService authService;
 
 	@PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'MERCHANT_USER')")
 	@GetMapping(value = "/auth/user")
@@ -76,6 +79,24 @@ public class AuthController {
 	@PostMapping(value = "/auth/logout")
 	public void logout(HttpServletRequest request) {
 		logLogoutAction(request);
+	}
+
+	@PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
+	@PostMapping(value = "/auth/sendActivationMail")
+	public void sendActivationEmail(@RequestParam(value = "email") String email,
+									HttpServletRequest request) {
+		User user = checkNotNull(userService.findUserByEmail(email));
+		accessControlService.checkPermission(getCurrentUser(), Resource.USER, Operation.READ, user.getId(), user);
+
+		authService.sendActivationEmail(email, request);
+	}
+
+	@PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
+	@GetMapping(value = "/auth/{userId}/activationLink", produces = "text/plain")
+	public String getActivationLink(@PathVariable(USER_ID) Long userId,
+									HttpServletRequest request) {
+		User user = checkUserId(userId, Operation.READ);
+		return authService.getActivationLink(user.getId(), request);
 	}
 
 	@PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'MERCHANT_USER')")

@@ -17,8 +17,8 @@ package org.thingsboard.domain.tenant.service;
 
 
 import java.util.Optional;
-import org.thingsboard.common.dao.jpa.PageData;
-import org.thingsboard.common.dao.jpa.PageLink;
+import org.thingsboard.common.dao.page.PageData;
+import org.thingsboard.common.dao.page.PageLink;
 import org.thingsboard.domain.tenant.model.Merchant;
 
 public interface MerchantService {

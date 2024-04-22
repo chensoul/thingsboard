@@ -15,10 +15,8 @@
  */
 package org.thingsboard.domain.tenant.service;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.thingsboard.common.dao.jpa.PageData;
-import org.thingsboard.common.dao.jpa.PageLink;
+import org.thingsboard.common.dao.page.PageData;
+import org.thingsboard.common.dao.page.PageLink;
 import org.thingsboard.domain.tenant.model.TenantProfile;
 
 public interface TenantProfileService {

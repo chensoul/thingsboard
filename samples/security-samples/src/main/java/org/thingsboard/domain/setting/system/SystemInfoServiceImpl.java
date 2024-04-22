@@ -2,8 +2,6 @@ package org.thingsboard.domain.setting.system;
 
 import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.info.BuildProperties;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Service;
 import static org.thingsboard.common.util.SystemUtil.getCpuCount;
 import static org.thingsboard.common.util.SystemUtil.getCpuUsage;
@@ -24,12 +22,6 @@ import static org.thingsboard.server.security.SecurityUser.SYS_TENANT_ID;
  */
 @Service
 public class SystemInfoServiceImpl implements SystemInfoService {
-	@Autowired(required = false)
-	private BuildProperties buildProperties;
-
-	@Autowired
-	private ConfigurableApplicationContext context;
-
 	@Autowired
 	private OAuth2Service oAuth2Service;
 
@@ -44,18 +36,17 @@ public class SystemInfoServiceImpl implements SystemInfoService {
 
 	@Autowired
 	private ServiceInfoProvider serviceInfoProvider;
+	@Autowired
+	private SystemSettingServiceImpl systemSettingServiceImpl;
 
 	@Override
 	public SystemInfo getSystemInfo() {
 		SystemInfo systemInfo = new SystemInfo();
-		if (buildProperties != null) {
-			systemInfo.setApplicationName(buildProperties.getName());
-		} else {
-			systemInfo.setApplicationName(context.getApplicationName());
-		}
+
 
 		SystemInfoData systemInfoData = new SystemInfoData();
 		systemInfoData.setServiceId(serviceInfoProvider.getServiceId());
+		systemInfoData.setServiceName(serviceInfoProvider.getServiceName());
 //		systemInfoData.setServiceType(serviceInfoProvider.getServiceType());
 		getCpuUsage().ifPresent(t -> systemInfoData.setCpuUsage(t));
 		getMemoryUsage().ifPresent(t -> systemInfoData.setMemoryUsage(t));

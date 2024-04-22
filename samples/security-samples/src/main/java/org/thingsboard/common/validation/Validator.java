@@ -17,6 +17,7 @@ package org.thingsboard.common.validation;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.thingsboard.common.dao.exception.DataValidationException;
@@ -99,11 +100,27 @@ public class Validator {
 		}
 	}
 
-	public static Object checkNotNull(Object reference, String errorMessage) {
+	public static <T> T checkNotNull(T reference) throws ThingsboardException {
+		return checkNotNull(reference, "Requested item wasn't found!");
+	}
+
+	public static <T> T checkNotNull(T reference, String notFoundMessage) throws ThingsboardException {
 		if (reference == null) {
-			throw new DataValidationException(errorMessage);
+			throw new ThingsboardException(notFoundMessage, ThingsboardErrorCode.NOT_FOUND);
 		}
 		return reference;
+	}
+
+	public static <T> T checkNotNull(Optional<T> reference) throws ThingsboardException {
+		return checkNotNull(reference, "Requested item wasn't found!");
+	}
+
+	public static <T> T checkNotNull(Optional<T> reference, String notFoundMessage) throws ThingsboardException {
+		if (reference.isPresent()) {
+			return reference.get();
+		} else {
+			throw new ThingsboardException(notFoundMessage, ThingsboardErrorCode.NOT_FOUND);
+		}
 	}
 
 	public static void checkParameter(String name, String param) {

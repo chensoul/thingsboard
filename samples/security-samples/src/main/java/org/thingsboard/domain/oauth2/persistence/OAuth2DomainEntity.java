@@ -22,7 +22,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.thingsboard.common.dao.mybatis.LongBaseEntity;
+import org.thingsboard.common.dao.jpa.LongBaseEntity;
 import org.thingsboard.common.util.JacksonUtil;
 import org.thingsboard.domain.oauth2.model.OAuth2Domain;
 import org.thingsboard.domain.oauth2.model.SchemeType;

@@ -33,6 +33,7 @@ import org.thingsboard.common.exception.ThingsboardErrorCode;
 import org.thingsboard.common.exception.ThingsboardException;
 import org.thingsboard.common.service.BaseController;
 import org.thingsboard.common.util.JacksonUtil;
+import static org.thingsboard.common.validation.Validator.checkNotNull;
 import org.thingsboard.domain.setting.jwt.JwtSetting;
 import org.thingsboard.domain.setting.jwt.JwtSettingService;
 import org.thingsboard.domain.setting.security.SecuritySetting;

@@ -42,7 +42,6 @@ public class RefreshTokenAuthenticationProvider implements AuthenticationProvide
 	private final JwtTokenFactory tokenFactory;
 	private final UserService userService;
 	private final MerchantService merchantService;
-	private final TokenCacheService tokenCacheService;
 
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {

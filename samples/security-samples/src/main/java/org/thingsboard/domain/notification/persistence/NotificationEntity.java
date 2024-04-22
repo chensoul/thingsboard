@@ -26,7 +26,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.Formula;
 import org.thingsboard.common.dao.jpa.JsonConverter;
-import org.thingsboard.common.dao.mybatis.LongBaseEntity;
+import org.thingsboard.common.dao.jpa.LongBaseEntity;
 import org.thingsboard.common.util.JacksonUtil;
 import org.thingsboard.domain.notification.Notification;
 import org.thingsboard.domain.notification.NotificationStatus;

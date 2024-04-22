@@ -25,7 +25,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.thingsboard.common.dao.jpa.JsonConverter;
-import org.thingsboard.common.dao.mybatis.LongBaseEntity;
+import org.thingsboard.common.dao.jpa.LongBaseEntity;
 import org.thingsboard.common.util.JacksonUtil;
 import org.thingsboard.domain.setting.system.SystemSetting;
 import org.thingsboard.domain.setting.system.SystemSettingType;

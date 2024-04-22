@@ -2,11 +2,9 @@ package org.thingsboard.domain.notification.persistence;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.thingsboard.common.dao.jpa.PageData;
-import org.thingsboard.common.dao.jpa.PageLink;
+import org.thingsboard.common.dao.page.PageData;
+import org.thingsboard.common.dao.page.PageLink;
 import org.thingsboard.domain.notification.Notification;
 import org.thingsboard.domain.notification.NotificationStatus;
 import org.thingsboard.domain.notification.template.NotificationDeliveryMethod;

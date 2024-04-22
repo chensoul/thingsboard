@@ -28,7 +28,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.thingsboard.common.dao.exception.DataValidationException;
-import org.thingsboard.domain.audit.ActionType;
+import org.thingsboard.domain.audit.model.ActionType;
 import org.thingsboard.domain.setting.security.PasswordPolicy;
 import org.thingsboard.domain.setting.security.SecuritySetting;
 import org.thingsboard.domain.setting.security.SecuritySettingService;

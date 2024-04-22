@@ -17,7 +17,7 @@ package org.thingsboard.domain.setting.security;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.AuthenticationException;
-import org.thingsboard.domain.audit.ActionType;
+import org.thingsboard.domain.audit.model.ActionType;
 import org.thingsboard.domain.setting.mfa.TwoFaSystemSetting;
 import org.thingsboard.domain.user.model.User;
 import org.thingsboard.domain.user.model.UserCredential;

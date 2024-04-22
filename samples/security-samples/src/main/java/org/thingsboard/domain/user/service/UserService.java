@@ -16,15 +16,14 @@
 package org.thingsboard.domain.user.service;
 
 import java.util.Set;
-import org.springframework.data.domain.Page;
 import org.thingsboard.common.dao.EntityDaoService;
-import org.thingsboard.common.dao.jpa.PageData;
-import org.thingsboard.common.dao.jpa.PageLink;
-import org.thingsboard.common.exception.ThingsboardException;
+import org.thingsboard.common.dao.page.PageData;
+import org.thingsboard.common.dao.page.PageLink;
 import org.thingsboard.domain.user.model.Authority;
 import org.thingsboard.domain.user.model.User;
 import org.thingsboard.domain.user.model.UserCredential;
 import org.thingsboard.server.security.SecurityUser;
+import org.thingsboard.server.security.jwt.token.JwtPair;
 
 public interface UserService extends EntityDaoService<Long> {
 
@@ -32,11 +31,13 @@ public interface UserService extends EntityDaoService<Long> {
 
 	User findUserByEmail(String email);
 
-	User saveUser(User user, boolean sendActivationMail) throws ThingsboardException;
+	User saveUser(User user, boolean sendActivationMail);
 
 	User saveUser(User user);
 
 	void deleteUser(User user);
+
+	JwtPair getUserToken(User user);
 
 	UserCredential findUserCredentialByUserId(Long id);
 
@@ -54,8 +55,6 @@ public interface UserService extends EntityDaoService<Long> {
 
 	UserCredential activateUserCredential(String activateToken, String encodedPassword);
 
-	void setUserCredentialsEnabled(Long userId, boolean userCredentialsEnabled);
-
 	PageData<User> findUsers(PageLink pageLink);
 
 	PageData<User> findUsersByIds(Set<Long> ids, PageLink pageLink);
@@ -72,7 +71,9 @@ public interface UserService extends EntityDaoService<Long> {
 
 	int increaseFailedLoginAttempt(Long userId);
 
+	void setUserCredentialsEnabled(Long userId, boolean userCredentialsEnabled);
+
 	void setLastLoginTs(Long id);
 
-	SecurityUser changePassword(String currentPassword, String newPassword) throws ThingsboardException;
+	SecurityUser changePassword(String currentPassword, String newPassword);
 }

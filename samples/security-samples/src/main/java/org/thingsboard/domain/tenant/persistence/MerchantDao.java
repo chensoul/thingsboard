@@ -17,8 +17,8 @@ package org.thingsboard.domain.tenant.persistence;
 
 import java.util.Optional;
 import org.thingsboard.common.dao.Dao;
-import org.thingsboard.common.dao.jpa.PageData;
-import org.thingsboard.common.dao.jpa.PageLink;
+import org.thingsboard.common.dao.page.PageData;
+import org.thingsboard.common.dao.page.PageLink;
 import org.thingsboard.domain.tenant.model.Merchant;
 
 /**

@@ -15,7 +15,7 @@
  */
 package org.thingsboard.domain.audit.sink;
 
-import org.thingsboard.domain.audit.AuditLog;
+import org.thingsboard.domain.audit.model.AuditLog;
 
 public interface AuditLogSink {
 

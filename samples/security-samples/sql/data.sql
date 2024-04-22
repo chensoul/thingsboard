@@ -8,7 +8,6 @@ INSERT INTO user_credential (id, created_time, activate_token, enabled, password
 
 INSERT INTO "system_setting" ("id", "tenant_id", "type", "extra", "created_time", "updated_time") VALUES
 (1, 'ROOT', 'GENERAL', '{"baseUrl": "http://localhost:8080", "prohibitDifferentUrl": false}', 1713409574230, NULL),
-(2, 'ROOT', 'EMAIL', '{"timeout":"10000","mailFrom":"Wesine <wesine.noreply@dmall.com.cn>","smtpHost":"smtp.feishu.cn","smtpPort":"25","username":"wesine.noreply@dmall.com.cn","enableTls":false,"tlsVersion":"TLSv1.2","enableProxy":false,"smtpProtocol":"smtp","showChangePassword":false,"password":"wQ7ae64vj2mXUBFZ"}', 1713409574236, NULL),
 (3, 'ROOT', 'JWT', '{"tokenIssuer": "thingsboard.io", "tokenSigningKey": "dUljbTYyTHlRSkhwZVk4U0RzTDA2N0RjWW12UmUwV3ZMRzlmMHRZRU1JZTFxN044VHZHZlZYVlhCOWZpNHFrWA==", "refreshTokenExpTime": 604800, "tokenExpirationTime": 9000}', 1713409574249, NULL);
 
 INSERT INTO "tenant" ("id", "tenant_profile_id", "name", "phone", "email", "extra", "address", "address2", "city", "country", "state", "zip", "created_time", "updated_time") VALUES

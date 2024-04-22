@@ -16,14 +16,14 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.domain.Page;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.thingsboard.common.dao.exception.DataValidationException;
-import org.thingsboard.common.dao.jpa.PageData;
-import org.thingsboard.common.dao.jpa.PageLink;
+import org.thingsboard.common.dao.page.PageData;
+import org.thingsboard.common.dao.page.PageLink;
+import static org.thingsboard.common.exception.ErrorResponseExceptionHandler.YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION;
 import org.thingsboard.common.exception.ThingsboardErrorCode;
 import org.thingsboard.common.exception.ThingsboardException;
 import org.thingsboard.common.model.EntityType;
@@ -33,10 +33,9 @@ import org.thingsboard.common.model.event.DeleteEntityEvent;
 import org.thingsboard.common.model.event.SaveEntityEvent;
 import org.thingsboard.common.util.JacksonUtil;
 import static org.thingsboard.common.validation.Validator.validateString;
-import org.thingsboard.domain.audit.ActionType;
+import org.thingsboard.domain.audit.model.ActionType;
 import org.thingsboard.domain.notification.channel.mail.MailService;
 import org.thingsboard.domain.setting.security.SecuritySettingService;
-import static org.thingsboard.domain.user.UserController.ACTIVATE_URL_PATTERN;
 import org.thingsboard.domain.user.event.UserCredentialInvalidationEvent;
 import org.thingsboard.domain.user.model.Authority;
 import org.thingsboard.domain.user.model.User;
@@ -47,8 +46,12 @@ import org.thingsboard.domain.user.persistence.UserSettingDao;
 import org.thingsboard.domain.user.service.UserCredentialValidator;
 import org.thingsboard.domain.user.service.UserService;
 import org.thingsboard.domain.user.service.UserValidator;
+import static org.thingsboard.domain.user.service.impl.AuthServiceImpl.ACTIVATE_URL_PATTERN;
 import org.thingsboard.server.security.SecurityUser;
 import static org.thingsboard.server.security.SecurityUtils.getCurrentUser;
+import org.thingsboard.server.security.UserPrincipal;
+import org.thingsboard.server.security.jwt.JwtTokenFactory;
+import org.thingsboard.server.security.jwt.token.JwtPair;
 
 /**
  * TODO Comment
@@ -68,6 +71,10 @@ public class UserServiceImpl implements UserService {
 	@Value("${security.user_login_case_sensitive:true}")
 	private boolean userLoginCaseSensitive;
 
+	@Value("${security.user_token_access_enabled}")
+	private boolean userTokenAccessEnabled;
+
+	private final JwtTokenFactory tokenFactory;
 	private final ApplicationEventPublisher eventPublisher;
 	private final MailService mailService;
 	private final SecuritySettingService securitySettingService;
@@ -152,6 +159,18 @@ public class UserServiceImpl implements UserService {
 
 		eventPublisher.publishEvent(new UserCredentialInvalidationEvent(user.getId()));
 		eventPublisher.publishEvent(DeleteEntityEvent.builder().tenantId(user.getTenantId()).entity(user).build());
+	}
+
+	@Override
+	public JwtPair getUserToken(User user) {
+		if (!userTokenAccessEnabled) {
+			throw new ThingsboardException(YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION,
+				ThingsboardErrorCode.PERMISSION_DENIED);
+		}
+		UserPrincipal principal = new UserPrincipal(UserPrincipal.Type.USER_NAME, user.getEmail());
+		UserCredential credentials = findUserCredentialByUserId(user.getId());
+		SecurityUser securityUser = new SecurityUser(user, credentials.isEnabled(), principal);
+		return tokenFactory.createTokenPair(securityUser);
 	}
 
 	@Override
@@ -258,7 +277,17 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public PageData<User> findUsers(PageLink pageLink) {
-		return userDao.findUsers(pageLink);
+		SecurityUser currentUser = getCurrentUser();
+		if (Authority.SYS_ADMIN.equals(currentUser.getAuthority())) {
+			return userDao.findUsers(pageLink);
+		} else if (Authority.TENANT_ADMIN.equals(currentUser.getAuthority())) {
+			return findUsersByTenantId(currentUser.getTenantId(), pageLink);
+		} else {
+			if (currentUser.getMerchantId() == null) {
+				throw new ThingsboardException("merchantId is null", ThingsboardErrorCode.BAD_REQUEST_PARAMS);
+			}
+			return findUsersByMerchantIds(Set.of(currentUser.getMerchantId()), pageLink);
+		}
 	}
 
 	@Override

@@ -19,4 +19,8 @@ public interface ServiceInfoProvider {
 
 	String getServiceId();
 
+	String getServiceName();
+
+	String getServiceType();
+
 }

@@ -17,7 +17,7 @@ package org.thingsboard.domain.audit.sink;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
-import org.thingsboard.domain.audit.AuditLog;
+import org.thingsboard.domain.audit.model.AuditLog;
 
 @Component
 @ConditionalOnProperty(prefix = "audit-log.sink", value = "type", havingValue = "none", matchIfMissing = true)

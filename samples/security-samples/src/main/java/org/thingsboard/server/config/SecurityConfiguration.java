@@ -41,7 +41,7 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.thingsboard.common.exception.ErrorResponseExceptionHandler;
-import org.thingsboard.domain.limit.RateLimitProcessingFilter;
+import org.thingsboard.domain.usage.limit.RateLimitProcessingFilter;
 import org.thingsboard.server.security.jwt.JwtAuthenticationProvider;
 import org.thingsboard.server.security.jwt.JwtTokenAuthenticationProcessingFilter;
 import org.thingsboard.server.security.jwt.RefreshTokenAuthenticationProvider;

@@ -15,8 +15,6 @@
  */
 package org.thingsboard.server.config;
 
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +22,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
-@EnableAutoConfiguration(exclude = {RedisAutoConfiguration.class})
 @ComponentScan("org.thingsboard")
 @EnableJpaRepositories("org.thingsboard")
 @EntityScan("org.thingsboard")

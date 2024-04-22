@@ -2,7 +2,6 @@ package org.thingsboard.common.service;
 
 import jakarta.mail.MessagingException;
 import java.io.Serializable;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
@@ -19,13 +18,16 @@ import org.thingsboard.common.model.BaseData;
 import org.thingsboard.common.model.EntityType;
 import org.thingsboard.common.model.HasId;
 import org.thingsboard.common.model.HasTenantId;
+import org.thingsboard.common.validation.Validator;
 import static org.thingsboard.common.validation.Validator.validateId;
-import org.thingsboard.domain.audit.ActionType;
-import org.thingsboard.domain.audit.AuditLogService;
+import org.thingsboard.domain.audit.model.ActionType;
+import org.thingsboard.domain.audit.service.AuditLogService;
 import org.thingsboard.domain.iot.device.Device;
 import org.thingsboard.domain.iot.device.DeviceService;
 import org.thingsboard.domain.iot.deviceprofile.DeviceProfile;
 import org.thingsboard.domain.iot.deviceprofile.DeviceProfileService;
+import org.thingsboard.domain.usage.limit.RateLimitService;
+import org.thingsboard.domain.setting.security.SecuritySettingService;
 import org.thingsboard.domain.tenant.model.Merchant;
 import org.thingsboard.domain.tenant.model.Tenant;
 import org.thingsboard.domain.tenant.model.TenantInfo;
@@ -60,6 +62,12 @@ public class BaseController {
 	protected UserSettingService userSettingService;
 
 	@Autowired
+	protected SecuritySettingService securitySettingService;
+
+	@Autowired
+	protected RateLimitService rateLimitService;
+
+	@Autowired
 	protected MerchantService merchantService;
 
 	@Autowired
@@ -78,7 +86,7 @@ public class BaseController {
 	private AuditLogService auditLogService;
 
 	protected <E extends HasId<I> & HasTenantId, I extends Serializable> E checkEntity(E entity, EntityType entityType, Operation operation) {
-		checkNotNull(entity, "Entity not found");
+		Validator.checkNotNull(entity, "Entity not found");
 		accessControlService.checkPermission(getCurrentUser(), Resource.of(entityType), operation, entity.getId(), entity);
 		return entity;
 	}
@@ -90,7 +98,7 @@ public class BaseController {
 		try {
 			validateId(entityId, "Invalid entity id");
 			E entity = findingFunction.apply(entityId);
-			checkNotNull(entity, "Item [" + entityId + "] is not found");
+			Validator.checkNotNull(entity, "Item [" + entityId + "] is not found");
 
 			return checkEntity(entity, entityType, operation);
 		} catch (Exception e) {
@@ -153,7 +161,7 @@ public class BaseController {
 		try {
 			validateId(tenantProfileId, id -> "Incorrect tenantProfileId " + id);
 			TenantProfile tenantProfile = tenantProfileService.findTenantProfileById(tenantProfileId);
-			checkNotNull(tenantProfile, "Tenant profile with id [" + tenantProfileId + "] is not found");
+			Validator.checkNotNull(tenantProfile, "Tenant profile with id [" + tenantProfileId + "] is not found");
 			accessControlService.checkPermission(getCurrentUser(), Resource.TENANT_PROFILE, operation);
 			return tenantProfile;
 		} catch (Exception e) {
@@ -227,29 +235,6 @@ public class BaseController {
 		} catch (Exception e) {
 			logEntityAction(user, oldEntity, oldEntity, null, entityType, ActionType.DELETE, e);
 			throw e;
-		}
-	}
-
-	protected <T> T checkNotNull(T reference) throws ThingsboardException {
-		return checkNotNull(reference, "Requested item wasn't found!");
-	}
-
-	protected <T> T checkNotNull(T reference, String notFoundMessage) throws ThingsboardException {
-		if (reference == null) {
-			throw new ThingsboardException(notFoundMessage, ThingsboardErrorCode.NOT_FOUND);
-		}
-		return reference;
-	}
-
-	protected <T> T checkNotNull(Optional<T> reference) throws ThingsboardException {
-		return checkNotNull(reference, "Requested item wasn't found!");
-	}
-
-	protected <T> T checkNotNull(Optional<T> reference, String notFoundMessage) throws ThingsboardException {
-		if (reference.isPresent()) {
-			return reference.get();
-		} else {
-			throw new ThingsboardException(notFoundMessage, ThingsboardErrorCode.NOT_FOUND);
 		}
 	}
 

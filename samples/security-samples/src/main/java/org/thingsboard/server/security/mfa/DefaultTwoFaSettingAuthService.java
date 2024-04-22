@@ -10,7 +10,7 @@ import static org.apache.commons.lang3.StringUtils.repeat;
 import org.springframework.stereotype.Service;
 import org.thingsboard.common.exception.ThingsboardErrorCode;
 import org.thingsboard.common.exception.ThingsboardException;
-import org.thingsboard.domain.audit.ActionType;
+import org.thingsboard.domain.audit.model.ActionType;
 import org.thingsboard.domain.setting.mfa.TwoFaSettingService;
 import org.thingsboard.domain.setting.mfa.TwoFaSystemSetting;
 import org.thingsboard.domain.setting.mfa.config.EmailTwoFaConfig;

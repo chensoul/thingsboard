@@ -21,6 +21,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.awaitility.Awaitility.await;
 import org.awaitility.pollinterval.FixedPollInterval;
 import org.junit.jupiter.api.Test;
+import org.thingsboard.domain.usage.limit.RateLimits;
 
 @Slf4j
 public class RateLimitsTest {

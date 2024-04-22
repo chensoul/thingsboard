@@ -23,7 +23,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.thingsboard.common.dao.jpa.JsonConverter;
-import org.thingsboard.common.dao.mybatis.StringBaseEntity;
+import org.thingsboard.common.dao.jpa.StringBaseEntity;
 import org.thingsboard.common.util.JacksonUtil;
 import org.thingsboard.domain.tenant.model.Tenant;
 
