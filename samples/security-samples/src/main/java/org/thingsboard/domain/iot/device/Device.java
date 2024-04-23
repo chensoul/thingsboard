@@ -26,7 +26,7 @@ import org.thingsboard.common.model.HasName;
 import org.thingsboard.common.model.HasTenantId;
 import org.thingsboard.common.validation.Length;
 import org.thingsboard.common.validation.NoXss;
-import org.thingsboard.domain.iot.HasOtaPackage;
+import org.thingsboard.domain.iot.ota.HasOtaPackage;
 
 
 @Data

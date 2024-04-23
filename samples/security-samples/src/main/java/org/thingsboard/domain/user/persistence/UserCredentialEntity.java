@@ -24,8 +24,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLJsonPGObjectJsonbType;
-import org.thingsboard.common.dao.jpa.JsonConverter;
-import org.thingsboard.common.dao.jpa.LongBaseEntity;
+import org.thingsboard.data.dao.jpa.JsonConverter;
+import org.thingsboard.data.dao.jpa.LongBaseEntity;
 import org.thingsboard.common.util.JacksonUtil;
 import org.thingsboard.domain.user.model.UserCredential;
 

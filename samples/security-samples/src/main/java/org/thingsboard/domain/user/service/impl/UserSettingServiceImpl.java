@@ -11,7 +11,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import static org.thingsboard.common.CacheConstants.USER_SETTING_CACHE;
-import org.thingsboard.common.dao.exception.DataValidationException;
+import org.thingsboard.common.validation.exception.DataValidationException;
 import org.thingsboard.common.util.JacksonUtil;
 import org.thingsboard.common.validation.ConstraintValidator;
 import org.thingsboard.domain.user.model.UserSetting;

@@ -44,7 +44,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.thingsboard.common.util.JacksonUtil;
-import org.thingsboard.common.util.ThingsBoardThreadFactory;
+import org.thingsboard.common.concurrent.ThingsBoardThreadFactory;
 import org.thingsboard.domain.audit.model.AuditLog;
 
 @Component

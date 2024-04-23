@@ -1,4 +1,6 @@
-import org.thingsboard.server.common.data.User;
+//import org.thingsboard.server.common.data.User;
+
+//import org.thingsboard.server.common.data.User;
 
 /**
  * TODO Comment
@@ -8,6 +10,6 @@ import org.thingsboard.server.common.data.User;
  */
 public class Test {
 	public static void main(String[] args) {
-		User user = new User();
+//		User user = new User();
 	}
 }

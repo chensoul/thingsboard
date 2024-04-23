@@ -19,7 +19,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.thingsboard.common.dao.jpa.StringBaseEntity;
+import org.thingsboard.data.dao.jpa.StringBaseEntity;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

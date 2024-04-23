@@ -16,9 +16,9 @@
 package org.thingsboard.domain.user.service;
 
 import java.util.Set;
-import org.thingsboard.common.dao.EntityDaoService;
-import org.thingsboard.common.dao.page.PageData;
-import org.thingsboard.common.dao.page.PageLink;
+import org.thingsboard.data.dao.EntityDaoService;
+import org.thingsboard.data.model.page.PageData;
+import org.thingsboard.data.model.page.PageLink;
 import org.thingsboard.domain.user.model.Authority;
 import org.thingsboard.domain.user.model.User;
 import org.thingsboard.domain.user.model.UserCredential;

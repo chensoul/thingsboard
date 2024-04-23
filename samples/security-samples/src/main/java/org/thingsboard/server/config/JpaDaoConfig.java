@@ -22,9 +22,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
-@ComponentScan("org.thingsboard")
-@EnableJpaRepositories("org.thingsboard")
-@EntityScan("org.thingsboard")
+@ComponentScan("org.thingsboard.domain")
+@EnableJpaRepositories("org.thingsboard.domain")
+@EntityScan("org.thingsboard.domain")
 @EnableTransactionManagement
 public class JpaDaoConfig {
 

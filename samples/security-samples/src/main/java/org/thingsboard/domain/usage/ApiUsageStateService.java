@@ -16,7 +16,7 @@
 package org.thingsboard.domain.usage;
 
 import java.io.Serializable;
-import org.thingsboard.common.dao.EntityDaoService;
+import org.thingsboard.data.dao.EntityDaoService;
 
 public interface ApiUsageStateService extends EntityDaoService<Long> {
 

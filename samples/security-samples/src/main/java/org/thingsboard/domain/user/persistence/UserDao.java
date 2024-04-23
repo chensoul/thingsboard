@@ -1,10 +1,10 @@
 package org.thingsboard.domain.user.persistence;
 
 import java.util.Set;
-import org.thingsboard.common.dao.Dao;
-import org.thingsboard.common.dao.TenantEntityDao;
-import org.thingsboard.common.dao.page.PageData;
-import org.thingsboard.common.dao.page.PageLink;
+import org.thingsboard.data.dao.Dao;
+import org.thingsboard.data.dao.TenantEntityDao;
+import org.thingsboard.data.model.page.PageData;
+import org.thingsboard.data.model.page.PageLink;
 import org.thingsboard.domain.user.model.Authority;
 import org.thingsboard.domain.user.model.User;
 

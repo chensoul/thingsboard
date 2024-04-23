@@ -32,7 +32,7 @@ import org.springframework.web.socket.adapter.NativeWebSocketSession;
 import org.thingsboard.common.exception.ErrorResponse;
 import org.thingsboard.common.exception.ThingsboardErrorCode;
 import org.thingsboard.common.util.JacksonUtil;
-import org.thingsboard.common.util.ThingsBoardExecutors;
+import org.thingsboard.common.concurrent.ThingsBoardExecutors;
 import org.thingsboard.domain.usage.limit.LimitedApi;
 import org.thingsboard.domain.usage.limit.RateLimitService;
 import org.thingsboard.server.security.SecurityUser;

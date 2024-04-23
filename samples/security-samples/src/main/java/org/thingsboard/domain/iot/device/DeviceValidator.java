@@ -17,7 +17,7 @@ package org.thingsboard.domain.iot.device;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.thingsboard.common.service.DataValidator;
+import org.thingsboard.data.service.DataValidator;
 
 @Slf4j
 @Component

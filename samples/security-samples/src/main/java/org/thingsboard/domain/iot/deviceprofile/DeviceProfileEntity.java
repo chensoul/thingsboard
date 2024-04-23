@@ -8,8 +8,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.thingsboard.common.dao.jpa.JsonConverter;
-import org.thingsboard.common.dao.jpa.LongBaseEntity;
+import org.thingsboard.data.dao.jpa.JsonConverter;
+import org.thingsboard.data.dao.jpa.LongBaseEntity;
 import org.thingsboard.domain.iot.device.model.DeviceTransportType;
 
 /**

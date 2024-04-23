@@ -21,8 +21,8 @@ import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Data;
-import org.thingsboard.common.dao.jpa.JsonConverter;
-import org.thingsboard.common.dao.jpa.LongBaseEntity;
+import org.thingsboard.data.dao.jpa.JsonConverter;
+import org.thingsboard.data.dao.jpa.LongBaseEntity;
 import org.thingsboard.common.util.JacksonUtil;
 import org.thingsboard.domain.tenant.model.TenantProfile;
 

@@ -16,9 +16,9 @@
 package org.thingsboard.domain.audit.persistence;
 
 import java.util.List;
-import org.thingsboard.common.dao.Dao;
-import org.thingsboard.common.dao.page.PageData;
-import org.thingsboard.common.dao.page.PageLink;
+import org.thingsboard.data.dao.Dao;
+import org.thingsboard.data.model.page.PageData;
+import org.thingsboard.data.model.page.PageLink;
 import org.thingsboard.domain.audit.model.ActionType;
 import org.thingsboard.domain.audit.model.AuditLog;
 

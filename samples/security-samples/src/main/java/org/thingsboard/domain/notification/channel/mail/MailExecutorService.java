@@ -17,7 +17,7 @@ package org.thingsboard.domain.notification.channel.mail;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.thingsboard.common.util.AbstractListeningExecutor;
+import org.thingsboard.common.concurrent.AbstractListeningExecutor;
 
 @Component
 public class MailExecutorService extends AbstractListeningExecutor {

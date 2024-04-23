@@ -19,7 +19,6 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListeningScheduledExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import jakarta.annotation.PostConstruct;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -30,21 +29,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.thingsboard.common.exception.ThingsboardException;
+import org.thingsboard.common.concurrent.ThingsBoardThreadFactory;
 import org.thingsboard.common.model.EntityType;
 import org.thingsboard.common.util.SchedulerUtils;
-import org.thingsboard.common.util.ThingsBoardThreadFactory;
-import org.thingsboard.domain.kv.BasicTsKvEntry;
-import org.thingsboard.domain.kv.LongDataEntry;
-import org.thingsboard.domain.kv.StringDataEntry;
-import org.thingsboard.domain.kv.TsKvEntry;
 import org.thingsboard.domain.notification.channel.mail.MailExecutorService;
 import org.thingsboard.domain.notification.channel.mail.MailService;
 import org.thingsboard.domain.tenant.model.TenantProfile;
@@ -194,18 +186,7 @@ public class DefaultTbApiUsageStateService implements TbApiUsageStateService {
 
 	private void updateProfileThresholds(String tenantId, Long id,
 										 TenantProfileConfiguration oldData, TenantProfileConfiguration newData) {
-		long ts = System.currentTimeMillis();
-		List<TsKvEntry> profileThresholds = new ArrayList<>();
-		for (ApiUsageRecordKey key : ApiUsageRecordKey.values()) {
-			long newProfileThreshold = newData.getProfileThreshold(key);
-			if (oldData == null || oldData.getProfileThreshold(key) != newProfileThreshold) {
-				log.info("[{}] Updating profile threshold [{}]:[{}]", tenantId, key, newProfileThreshold);
-				profileThresholds.add(new BasicTsKvEntry(ts, new LongDataEntry(key.getApiLimitKey(), newProfileThreshold)));
-			}
-		}
-		if (!profileThresholds.isEmpty()) {
-//			tsWsService.saveAndNotifyInternal(tenantId, id, profileThresholds, VOID_CALLBACK);
-		}
+
 	}
 
 	public void onTenantDelete(String tenantId) {
@@ -227,34 +208,6 @@ public class DefaultTbApiUsageStateService implements TbApiUsageStateService {
 	private void persistAndNotify(BaseApiUsageState state, Map<ApiFeature, ApiUsageStateValue> result) {
 		log.info("[{}] Detected update of the API state for {}: {}", state.getEntityId(), state.getEntityType(), result);
 		apiUsageStateService.update(state.getApiUsageState());
-		long ts = System.currentTimeMillis();
-		List<TsKvEntry> stateTelemetry = new ArrayList<>();
-		result.forEach((apiFeature, aState) -> stateTelemetry.add(new BasicTsKvEntry(ts, new StringDataEntry(apiFeature.getApiStateKey(), aState.name()))));
-//		tsWsService.saveAndNotifyInternal(state.getTenantId(), state.getApiUsageState().getId(), stateTelemetry, VOID_CALLBACK);
-
-		if (state.getEntityType() == EntityType.TENANT && !state.getEntityId().equals(SYS_TENANT_ID)) {
-			String email = tenantService.findTenantById(state.getTenantId()).getEmail();
-			result.forEach((apiFeature, stateValue) -> {
-				ApiUsageRecordState recordState = createApiUsageRecordState((TenantApiUsageState) state, apiFeature, stateValue);
-				if (recordState == null) {
-					return;
-				}
-//				notificationRuleProcessor.process(ApiUsageLimitTrigger.builder()
-//					.tenantId(state.getTenantId())
-//					.state(recordState)
-//					.status(stateValue)
-//					.build());
-				if (StringUtils.isNotEmpty(email)) {
-					mailExecutor.submit(() -> {
-						try {
-//							mailService.sendApiFeatureStateEmail(apiFeature, stateValue, email, recordState);
-						} catch (ThingsboardException e) {
-							log.warn("[{}] Can't send update of the API state to tenant with provided email [{}]", state.getTenantId(), email, e);
-						}
-					});
-				}
-			});
-		}
 	}
 
 	private ApiUsageRecordState createApiUsageRecordState(TenantApiUsageState state, ApiFeature apiFeature, ApiUsageStateValue stateValue) {
@@ -307,9 +260,9 @@ public class DefaultTbApiUsageStateService implements TbApiUsageStateService {
 	}
 
 	private void saveNewCounts(BaseApiUsageState state, List<ApiUsageRecordKey> keys) {
-		List<TsKvEntry> counts = keys.stream()
-			.map(key -> new BasicTsKvEntry(state.getCurrentCycleTs(), new LongDataEntry(key.getApiCountKey(), 0L)))
-			.collect(Collectors.toList());
+//		List<TsKvEntry> counts = keys.stream()
+//			.map(key -> new BasicTsKvEntry(state.getCurrentCycleTs(), new LongDataEntry(key.getApiCountKey(), 0L)))
+//			.collect(Collectors.toList());
 
 //		tsWsService.saveAndNotifyInternal(state.getTenantId(), state.getApiUsageState().getId(), counts, VOID_CALLBACK);
 	}

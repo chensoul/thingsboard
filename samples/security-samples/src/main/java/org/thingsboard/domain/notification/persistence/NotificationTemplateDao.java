@@ -18,7 +18,7 @@ package org.thingsboard.domain.notification.persistence;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.thingsboard.common.dao.Dao;
+import org.thingsboard.data.dao.Dao;
 import org.thingsboard.domain.notification.template.NotificationTemplate;
 import org.thingsboard.domain.notification.template.NotificationType;
 

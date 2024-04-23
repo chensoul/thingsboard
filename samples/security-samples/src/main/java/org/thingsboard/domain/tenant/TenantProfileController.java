@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.thingsboard.common.dao.page.PageData;
-import org.thingsboard.common.dao.page.PageLink;
+import org.thingsboard.data.model.page.PageData;
+import org.thingsboard.data.model.page.PageLink;
 import org.thingsboard.common.model.EntityType;
-import org.thingsboard.common.service.BaseController;
+import org.thingsboard.domain.BaseController;
 import org.thingsboard.domain.tenant.model.TenantProfile;
 import org.thingsboard.server.security.permission.Operation;
 

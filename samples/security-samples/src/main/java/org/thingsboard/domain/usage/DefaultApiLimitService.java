@@ -18,7 +18,7 @@ package org.thingsboard.domain.usage;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.thingsboard.common.dao.EntityServiceRegistry;
+import org.thingsboard.data.service.EntityServiceRegistry;
 import org.thingsboard.common.model.EntityType;
 import org.thingsboard.domain.tenant.model.DefaultTenantProfileConfiguration;
 import org.thingsboard.domain.tenant.model.TenantProfile;

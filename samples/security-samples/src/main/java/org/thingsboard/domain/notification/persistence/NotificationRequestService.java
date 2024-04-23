@@ -15,8 +15,8 @@
  */
 package org.thingsboard.domain.notification.persistence;
 
-import org.thingsboard.common.dao.page.PageData;
-import org.thingsboard.common.dao.page.PageLink;
+import org.thingsboard.data.model.page.PageData;
+import org.thingsboard.data.model.page.PageLink;
 import org.thingsboard.common.model.EntityType;
 import org.thingsboard.domain.notification.NotificationRequest;
 

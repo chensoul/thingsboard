@@ -63,7 +63,7 @@ public class SecurityConfiguration {
 	public static final String FORM_BASED_LOGIN_ENTRY_POINT = "/api/auth/login";
 	public static final String PUBLIC_LOGIN_ENTRY_POINT = "/api/auth/login/public";
 	public static final String TOKEN_REFRESH_ENTRY_POINT = "/api/auth/token";
-	public static final String[] NON_TOKEN_BASED_AUTH_ENTRY_POINTS = new String[]{"/index.html", "/api/noauth/**"};
+	public static final String[] NON_TOKEN_BASED_AUTH_ENTRY_POINTS = new String[]{"/index.html", "/api/noauth/**", "/startup-report", "/actuator/**"};
 	public static final String TOKEN_BASED_AUTH_ENTRY_POINT = "/api/**";
 	public static final String WS_ENTRY_POINT = "/api/ws/**";
 	public static final String MAIL_OAUTH2_PROCESSING_ENTRY_POINT = "/api/system/mail/oauth2/code";

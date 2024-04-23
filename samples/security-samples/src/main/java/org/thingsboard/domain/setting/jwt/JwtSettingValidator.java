@@ -22,7 +22,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import org.thingsboard.common.dao.exception.DataValidationException;
+import org.thingsboard.common.validation.exception.DataValidationException;
 import static org.thingsboard.domain.setting.jwt.DefaultJwtSettingService.TOKEN_SIGNING_KEY_DEFAULT;
 
 @Component

@@ -15,7 +15,7 @@
  */
 package org.thingsboard.domain.user.persistence;
 
-import org.thingsboard.common.dao.Dao;
+import org.thingsboard.data.dao.Dao;
 import org.thingsboard.domain.user.model.UserCredential;
 
 /**

@@ -3,8 +3,8 @@ package org.thingsboard.domain.setting.system.persistence;
 import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
-import org.thingsboard.common.dao.DaoUtil;
-import org.thingsboard.common.dao.jpa.JpaAbstractDao;
+import org.thingsboard.data.dao.DaoUtil;
+import org.thingsboard.data.dao.jpa.JpaAbstractDao;
 import org.thingsboard.domain.setting.system.SystemSetting;
 import org.thingsboard.domain.setting.system.SystemSettingType;
 

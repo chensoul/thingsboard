@@ -15,7 +15,7 @@
  */
 package org.thingsboard.domain.setting.system.persistence;
 
-import org.thingsboard.common.dao.Dao;
+import org.thingsboard.data.dao.Dao;
 import org.thingsboard.domain.setting.system.SystemSetting;
 import org.thingsboard.domain.setting.system.SystemSettingType;
 

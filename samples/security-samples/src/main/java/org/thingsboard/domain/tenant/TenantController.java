@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import static org.thingsboard.common.ControllerConstants.TENANT_ID;
 import org.thingsboard.common.model.EntityType;
-import org.thingsboard.common.service.BaseController;
+import org.thingsboard.domain.BaseController;
 import org.thingsboard.domain.tenant.model.Tenant;
 import org.thingsboard.domain.tenant.model.TenantInfo;
 import org.thingsboard.server.security.permission.Operation;

@@ -4,7 +4,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.thingsboard.common.dao.exception.DataValidationException;
+import org.thingsboard.common.validation.exception.DataValidationException;
 import org.thingsboard.domain.oauth2.model.MapperType;
 import org.thingsboard.domain.oauth2.model.OAuth2BasicMapperConfig;
 import org.thingsboard.domain.oauth2.model.OAuth2CustomMapperConfig;

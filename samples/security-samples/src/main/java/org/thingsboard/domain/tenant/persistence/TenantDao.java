@@ -17,7 +17,7 @@ package org.thingsboard.domain.tenant.persistence;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.thingsboard.common.dao.Dao;
+import org.thingsboard.data.dao.Dao;
 import org.thingsboard.domain.tenant.model.Tenant;
 
 public interface TenantDao extends Dao<Tenant, String> {

@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import org.thingsboard.common.dao.exception.DataValidationException;
+import org.thingsboard.common.validation.exception.DataValidationException;
 import org.thingsboard.common.exception.ThingsboardException;
 import org.thingsboard.common.util.JacksonUtil;
 import org.thingsboard.domain.iot.device.model.CoapDeviceTransportConfiguration;

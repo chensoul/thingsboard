@@ -11,21 +11,21 @@
     <artifactId>thingsboard-pe</artifactId>
 
     <dependencies>
-        <dependency>
-            <groupId>org.thingsboard.common</groupId>
-            <artifactId>data</artifactId>
-            <version>3.6.3PE</version>
-        </dependency>
-        <dependency>
-            <groupId>org.thingsboard.common</groupId>
-            <artifactId>cache</artifactId>
-            <version>3.6.3PE</version>
-        </dependency>
-        <dependency>
-            <groupId>org.thingsboard.common</groupId>
-            <artifactId>util</artifactId>
-            <version>3.6.3PE</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.thingsboard.common</groupId>-->
+<!--            <artifactId>data</artifactId>-->
+<!--            <version>3.6.3PE</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.thingsboard.common</groupId>-->
+<!--            <artifactId>cache</artifactId>-->
+<!--            <version>3.6.3PE</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.thingsboard.common</groupId>-->
+<!--            <artifactId>util</artifactId>-->
+<!--            <version>3.6.3PE</version>-->
+<!--        </dependency>-->
     </dependencies>
 
     <distributionManagement>
@@ -35,36 +35,4 @@
             <url>https://repo.thingsboard.io/artifactory/libs-release-public</url>
         </repository>
     </distributionManagement>
-
-    <repositories>
-        <repository>
-            <id>central</id>
-            <url>https://repo1.maven.org/maven2/</url>
-        </repository>
-        <repository>
-            <id>spring-snapshots</id>
-            <name>Spring Snapshots</name>
-            <url>https://repo.spring.io/snapshot</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>spring-milestones</id>
-            <name>Spring Milestones</name>
-            <url>https://repo.spring.io/milestone</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>typesafe</id>
-            <name>Typesafe Repository</name>
-            <url>https://repo.typesafe.com/typesafe/releases/</url>
-        </repository>
-        <repository>
-            <id>sonatype</id>
-            <url>https://oss.sonatype.org/content/groups/public</url>
-        </repository>
-    </repositories>
 </project>

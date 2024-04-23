@@ -16,8 +16,8 @@
 package org.thingsboard.domain.audit.service;
 
 import org.springframework.stereotype.Component;
-import org.thingsboard.common.dao.exception.DataValidationException;
-import org.thingsboard.common.service.DataValidator;
+import org.thingsboard.common.validation.exception.DataValidationException;
+import org.thingsboard.data.service.DataValidator;
 import org.thingsboard.domain.audit.model.AuditLog;
 
 @Component

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import static org.thingsboard.common.ControllerConstants.DEVICE_PROFILE_ID;
 import org.thingsboard.common.exception.ThingsboardException;
 import org.thingsboard.common.model.EntityType;
-import org.thingsboard.common.service.BaseController;
+import org.thingsboard.domain.BaseController;
 import static org.thingsboard.common.validation.Validator.checkNotNull;
 import static org.thingsboard.server.security.SecurityUtils.getTenantId;
 import org.thingsboard.server.security.permission.Operation;

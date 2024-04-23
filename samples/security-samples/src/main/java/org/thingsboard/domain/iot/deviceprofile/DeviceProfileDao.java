@@ -1,6 +1,6 @@
 package org.thingsboard.domain.iot.deviceprofile;
 
-import org.thingsboard.common.dao.Dao;
+import org.thingsboard.data.dao.Dao;
 
 /**
  * TODO Comment

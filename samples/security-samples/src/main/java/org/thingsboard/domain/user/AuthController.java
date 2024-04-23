@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import static org.thingsboard.common.ControllerConstants.USER_ID;
 import org.thingsboard.common.exception.ThingsboardErrorCode;
 import org.thingsboard.common.exception.ThingsboardException;
-import org.thingsboard.common.service.BaseController;
+import org.thingsboard.domain.BaseController;
 import static org.thingsboard.common.validation.Validator.checkNotNull;
 import org.thingsboard.domain.audit.model.ActionType;
 import org.thingsboard.domain.usage.limit.LimitedApi;
