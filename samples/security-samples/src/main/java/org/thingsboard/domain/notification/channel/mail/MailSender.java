@@ -148,7 +148,7 @@ public class MailSender extends JavaMailSenderImpl {
 				if (MailOauth2Provider.OFFICE_365.name().equals(providerId)) {
 					mailConfiguration.setRefreshToken(tokenResponse.getRefreshToken());
 					mailConfiguration.setRefreshTokenExpires(Instant.now().plus(Duration.ofDays(RefreshTokenExpCheckService.AZURE_DEFAULT_REFRESH_TOKEN_LIFETIME_IN_DAYS)).toEpochMilli());
-					settings.setExtra(JacksonUtil.toJsonNode(mailConfiguration));
+					settings.setExtra(JacksonUtil.readTree(mailConfiguration));
 					systemSettingDao.save(settings);
 				}
 				accessToken = tokenResponse.getAccessToken();

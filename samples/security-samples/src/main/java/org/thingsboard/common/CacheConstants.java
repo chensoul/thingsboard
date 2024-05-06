@@ -28,6 +28,8 @@ public interface CacheConstants {
 	String TENANT_CACHE = "tenant";
 	String NOTIFICATION_SETTING_CACHE = "notificationSetting";
 	String TWO_FA_VERIFICATION_CODE_CACHE = "twoFaVerificationCode";
+	String SENT_NOTIFICATIONS_CACHE = "sentNotifications";
+
 
 	List<String> ALL_CACHES = Collections.unmodifiableList(Arrays.asList(
 		SESSION_CACHE,

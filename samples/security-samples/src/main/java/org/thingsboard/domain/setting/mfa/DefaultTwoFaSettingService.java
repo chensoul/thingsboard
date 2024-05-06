@@ -301,7 +301,7 @@ public class DefaultTwoFaSettingService implements TwoFaSettingService {
 				return newUserAuthSettings;
 			});
 		settings.getConfigs().values().forEach(accountConfig -> accountConfig.setSerializeHiddenFields(true));
-		userAuthSettings.setExtra(JacksonUtil.toJsonNode(JacksonUtil.toString(settings)));
+		userAuthSettings.setExtra(JacksonUtil.readTree(JacksonUtil.toString(settings)));
 		userSettingDao.save(userAuthSettings);
 		settings.getConfigs().values().forEach(accountConfig -> accountConfig.setSerializeHiddenFields(false));
 		return settings;

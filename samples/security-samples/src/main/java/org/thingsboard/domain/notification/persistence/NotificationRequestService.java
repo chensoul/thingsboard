@@ -15,6 +15,9 @@
  */
 package org.thingsboard.domain.notification.persistence;
 
+import java.io.Serializable;
+import java.util.List;
+import org.hibernate.annotations.TenantId;
 import org.thingsboard.data.model.page.PageData;
 import org.thingsboard.data.model.page.PageLink;
 import org.thingsboard.common.model.EntityType;
@@ -35,8 +38,9 @@ public interface NotificationRequestService {
 	//
 //	List<NotificationRequestId> findNotificationRequestsIdsByStatusAndRuleId(TenantId tenantId, NotificationRequestStatus requestStatus, NotificationRuleId ruleId);
 //
-//	List<NotificationRequest> findNotificationRequestsByRuleIdAndOriginatorEntityId(TenantId tenantId, NotificationRuleId ruleId, EntityId originatorEntityId);
-//
+	List<NotificationRequest> findNotificationRequestsByRuleIdAndOriginatorEntityId(Long ruleId, Serializable originatorEntityId);
+
+	//
 	void deleteNotificationRequest(Long id);
 //
 //	PageData<NotificationRequest> findScheduledNotificationRequests(PageLink pageLink);

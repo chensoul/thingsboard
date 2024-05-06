@@ -13,24 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.thingsboard.server.ws.cmd;
+package org.thingsboard.domain.notification.rule;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.hibernate.annotations.TenantId;
+import org.thingsboard.domain.notification.rule.trigger.config.NotificationRuleTriggerType;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class WsCommandsWrapper {
-
-	@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
-	@JsonSubTypes({
-		@JsonSubTypes.Type(name = "ATTRIBUTES", value = AttributesDataCmd.class),
-	})
-	private List<WsCmd> cmds;
-
+public interface NotificationRuleService {
+	List<NotificationRule> findEnabledNotificationRulesByTenantIdAndTriggerType(String tenantId, NotificationRuleTriggerType triggerType);
 }

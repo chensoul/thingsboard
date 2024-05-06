@@ -141,6 +141,25 @@ CREATE TABLE notification_template (
     PRIMARY KEY (id)
 );
 
+CREATE TABLE notification_rule (
+    id int8 NOT NULL,
+    created_time int8 NOT NULL,
+    tenant_id varchar(50) NOT NULL,
+    name varchar(255) NOT NULL,
+    enabled bool NOT NULL DEFAULT true,
+    template_id int8 NOT NULL,
+    trigger_type varchar(50) NOT NULL,
+    trigger_config varchar(1000) NOT NULL,
+    recipients_config varchar(10000) NOT NULL,
+    additional_config varchar(255),
+    PRIMARY KEY (id)
+);
+
+-- Indices
+CREATE UNIQUE INDEX uq_notification_rule_name ON public.notification_rule USING btree (tenant_id, name);
+CREATE UNIQUE INDEX uq_notification_rule_external_id ON public.notification_rule USING btree (tenant_id, external_id);
+CREATE INDEX idx_notification_rule_tenant_id_trigger_type_created_time ON public.notification_rule USING btree (tenant_id, trigger_type, created_time DESC);
+
 DROP TABLE IF EXISTS oauth2_client_registration_template;
 CREATE TABLE oauth2_client_registration_template (
     id int8 NOT NULL ,

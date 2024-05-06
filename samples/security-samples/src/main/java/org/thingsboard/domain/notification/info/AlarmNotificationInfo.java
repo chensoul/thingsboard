@@ -15,24 +15,53 @@
  */
 package org.thingsboard.domain.notification.info;
 
+import java.io.Serializable;
 import java.util.Map;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.thingsboard.domain.iot.alarm.AlarmSeverity;
+import org.thingsboard.domain.iot.alarm.AlarmStatus;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AlarmNotificationInfo implements NotificationInfo {
+public class AlarmNotificationInfo implements RuleOriginatedNotificationInfo {
+
 	private String alarmType;
-	private String alarmId;
+	private String action;
+	private Long alarmId;
+	private Serializable alarmOriginator;
+	private String alarmOriginatorName;
+	private AlarmSeverity alarmSeverity;
+	private AlarmStatus alarmStatus;
+	private boolean acknowledged;
+	private boolean cleared;
+	private Long alarmCustomerId;
 
 	@Override
 	public Map<String, String> getTemplateData() {
 		return Map.of(
 			"alarmType", alarmType,
-			"alarmId", alarmId.toString());
+			"action", action,
+			"alarmId", alarmId.toString(),
+			"alarmSeverity", alarmSeverity.name().toLowerCase(),
+			"alarmStatus", alarmStatus.toString(),
+			"alarmOriginatorId", alarmOriginator.toString()
+		);
 	}
+
+	@Override
+	public Long getAffectedCustomerId() {
+		return alarmCustomerId;
+	}
+
+	@Override
+	public Serializable getStateEntityId() {
+		return alarmOriginator;
+	}
+
 }

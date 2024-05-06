@@ -14,6 +14,7 @@ import org.springframework.web.socket.WebSocketSession;
 import org.thingsboard.domain.tenant.model.DefaultTenantProfileConfiguration;
 import org.thingsboard.domain.tenant.model.TenantProfile;
 import org.thingsboard.domain.tenant.service.TenantProfileService;
+import org.thingsboard.domain.usage.limit.LimitedApi;
 import org.thingsboard.server.security.UserPrincipal;
 
 /**
@@ -117,6 +118,40 @@ public class WebSocketApiLimitService {
 			}
 		}
 		return false;
+	}
+
+	public void cleanupLimits(WebSocketSession session, WebSocketSessionRef sessionRef) {
+		var tenantProfileConfiguration = getTenantProfileConfiguration(sessionRef);
+		if (tenantProfileConfiguration == null) return;
+
+		String sessionId = session.getId();
+//		rateLimitService.cleanUp(LimitedApi.WS_UPDATES_PER_SESSION, sessionRef.getSessionId());
+		if (tenantProfileConfiguration.getMaxWsSessionsPerTenant() > 0) {
+			Set<String> tenantSessions = tenantSessionsMap.computeIfAbsent(sessionRef.getSecurityCtx().getTenantId(), id -> ConcurrentHashMap.newKeySet());
+			synchronized (tenantSessions) {
+				tenantSessions.remove(sessionId);
+			}
+		}
+		if (sessionRef.getSecurityCtx().isMerchantUser()) {
+			if (tenantProfileConfiguration.getMaxWsSessionsPerCustomer() > 0) {
+				Set<String> customerSessions = customerSessionsMap.computeIfAbsent(sessionRef.getSecurityCtx().getMerchantId(), id -> ConcurrentHashMap.newKeySet());
+				synchronized (customerSessions) {
+					customerSessions.remove(sessionId);
+				}
+			}
+			if (tenantProfileConfiguration.getMaxWsSessionsPerRegularUser() > 0 && UserPrincipal.Type.USER_NAME.equals(sessionRef.getSecurityCtx().getUserPrincipal().getType())) {
+				Set<String> regularUserSessions = regularUserSessionsMap.computeIfAbsent(sessionRef.getSecurityCtx().getId(), id -> ConcurrentHashMap.newKeySet());
+				synchronized (regularUserSessions) {
+					regularUserSessions.remove(sessionId);
+				}
+			}
+			if (tenantProfileConfiguration.getMaxWsSessionsPerPublicUser() > 0 && UserPrincipal.Type.PUBLIC_ID.equals(sessionRef.getSecurityCtx().getUserPrincipal().getType())) {
+				Set<String> publicUserSessions = publicUserSessionsMap.computeIfAbsent(sessionRef.getSecurityCtx().getId(), id -> ConcurrentHashMap.newKeySet());
+				synchronized (publicUserSessions) {
+					publicUserSessions.remove(sessionId);
+				}
+			}
+		}
 	}
 
 	public void processSessionClose(WebSocketSessionRef sessionRef) {

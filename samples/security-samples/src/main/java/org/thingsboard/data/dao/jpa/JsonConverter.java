@@ -29,6 +29,6 @@ public class JsonConverter implements AttributeConverter<JsonNode, String> {
 
     @Override
     public JsonNode convertToEntityAttribute(String s) {
-        return JacksonUtil.toJsonNode(s);
+        return JacksonUtil.readTree(s);
     }
 }

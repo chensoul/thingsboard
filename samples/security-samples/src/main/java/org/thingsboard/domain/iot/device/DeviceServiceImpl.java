@@ -111,7 +111,7 @@ public class DeviceServiceImpl implements DeviceService {
 				}
 			}
 			device.setType(deviceProfile.getName());
-			device.setDeviceData(JacksonUtil.toJsonNode(syncDeviceData(deviceProfile, device.getDeviceData())));
+			device.setDeviceData(JacksonUtil.readTree(syncDeviceData(deviceProfile, device.getDeviceData())));
 			Device savedDevice = deviceDao.save(device);
 			return savedDevice;
 		} catch (Exception t) {

@@ -59,6 +59,10 @@ import org.thingsboard.server.security.rest.RestPublicLoginProcessingFilter;
 @EnableMethodSecurity
 @Order(SecurityProperties.BASIC_AUTH_ORDER)
 public class SecurityConfiguration {
+	public static final String JWT_TOKEN_HEADER_PARAM = "X-Authorization";
+	public static final String JWT_TOKEN_HEADER_PARAM_V2 = "Authorization";
+	public static final String JWT_TOKEN_QUERY_PARAM = "token";
+
 	public static final String DEVICE_API_ENTRY_POINT = "/api/v1/**";
 	public static final String FORM_BASED_LOGIN_ENTRY_POINT = "/api/auth/login";
 	public static final String PUBLIC_LOGIN_ENTRY_POINT = "/api/auth/login/public";
@@ -165,25 +169,24 @@ public class SecurityConfiguration {
 
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.headers(headers -> headers.cacheControl(config -> {
-				})
-				.frameOptions(config -> {
-				}).disable())
-			.cors(cors -> {
-			})
+		http.headers(headers -> headers
+				.cacheControl(config -> {})
+				.frameOptions(config -> {}).disable())
+			.cors(cors -> {})
 			.csrf(AbstractHttpConfigurer::disable)
-			.exceptionHandling(config -> {
-			})
+			.exceptionHandling(config -> {})
 			.sessionManagement(config -> config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests(config -> config
-				.requestMatchers(DEVICE_API_ENTRY_POINT).permitAll() // Device HTTP Transport API
-				.requestMatchers(FORM_BASED_LOGIN_ENTRY_POINT).permitAll() // Login end-point
-				.requestMatchers(PUBLIC_LOGIN_ENTRY_POINT).permitAll() // Public login end-point
-				.requestMatchers(TOKEN_REFRESH_ENTRY_POINT).permitAll() // Token refresh end-point
-				.requestMatchers(MAIL_OAUTH2_PROCESSING_ENTRY_POINT).permitAll() // Mail oauth2 code processing url
-				.requestMatchers(NON_TOKEN_BASED_AUTH_ENTRY_POINTS).permitAll()// static resources, user activation and password reset end-points
-				.requestMatchers(WS_ENTRY_POINT).permitAll() // Protected WebSocket API End-points
-				.requestMatchers(TOKEN_BASED_AUTH_ENTRY_POINT).authenticated()) // Protected API End-points
+				.requestMatchers(NON_TOKEN_BASED_AUTH_ENTRY_POINTS).permitAll() // static resources, user activation and password reset end-points (webjars included)
+				.requestMatchers(
+					DEVICE_API_ENTRY_POINT, // Device HTTP Transport API
+					FORM_BASED_LOGIN_ENTRY_POINT, // Login end-point
+					PUBLIC_LOGIN_ENTRY_POINT, // Public login end-point
+					TOKEN_REFRESH_ENTRY_POINT, // Token refresh end-point
+					MAIL_OAUTH2_PROCESSING_ENTRY_POINT, // Mail oauth2 code processing url
+					WS_ENTRY_POINT).permitAll() // Protected WebSocket API End-points
+				.requestMatchers(TOKEN_BASED_AUTH_ENTRY_POINT).authenticated() // Protected API End-points
+				.anyRequest().permitAll())
 			.exceptionHandling(config -> config.accessDeniedHandler(restAccessDeniedHandler))
 			.addFilterBefore(buildRestLoginProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
 			.addFilterBefore(buildRestPublicLoginProcessingFilter(), UsernamePasswordAuthenticationFilter.class)

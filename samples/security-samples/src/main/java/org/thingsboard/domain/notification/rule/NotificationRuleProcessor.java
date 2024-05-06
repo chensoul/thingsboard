@@ -13,22 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.thingsboard.server.ws.cmd;
+package org.thingsboard.domain.notification.rule;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.thingsboard.domain.notification.rule.trigger.NotificationRuleTrigger;
 
-/**
- * @author Andrew Shvayka
- */
-public class AttributesDataCmd extends DataCmd {
-	@JsonCreator
-	public AttributesDataCmd(@JsonProperty("cmdId") int cmdId) {
-		super(cmdId);
-	}
+public interface NotificationRuleProcessor {
 
-	@Override
-	public WsCmdType getType() {
-		return WsCmdType.ATTRIBUTES;
-	}
+	void process(NotificationRuleTrigger trigger);
+
 }

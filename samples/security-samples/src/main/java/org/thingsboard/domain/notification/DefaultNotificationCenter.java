@@ -10,10 +10,15 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.TenantId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.thingsboard.common.exception.RateLimitedException;
+import org.thingsboard.common.model.EntityType;
 import org.thingsboard.domain.notification.channel.NotificationChannel;
+import org.thingsboard.domain.notification.persistence.NotificationRequestService;
 import org.thingsboard.domain.notification.persistence.NotificationTargetService;
+import org.thingsboard.domain.notification.persistence.NotificationTemplateService;
 import org.thingsboard.domain.setting.notification.NotificationSetting;
 import org.thingsboard.domain.notification.targets.NotificationTarget;
 import org.thingsboard.domain.notification.targets.PlatformUserNotificationTargetConfig;
@@ -21,7 +26,13 @@ import org.thingsboard.domain.notification.template.NotificationDeliveryTemplate
 import org.thingsboard.domain.notification.template.NotificationDeliveryMethod;
 import org.thingsboard.domain.notification.template.NotificationTemplate;
 import org.thingsboard.domain.notification.template.WebNotificationDeliveryTemplate;
+import org.thingsboard.domain.setting.notification.NotificationSettingService;
+import org.thingsboard.domain.usage.limit.LimitedApi;
+import org.thingsboard.domain.usage.limit.RateLimitService;
 import org.thingsboard.domain.user.model.User;
+import org.thingsboard.server.security.SecurityUser;
+import static org.thingsboard.server.security.SecurityUser.SYS_TENANT_ID;
+import org.thingsboard.server.security.SecurityUtils;
 
 /**
  * TODO Comment
@@ -38,32 +49,60 @@ public class DefaultNotificationCenter implements NotificationChannel<User, WebN
 	private final NotificationExecutorService notificationExecutor;
 	private final NotificationTargetService notificationTargetService;
 
+	private final RateLimitService rateLimitService;
+	private final NotificationTemplateService notificationTemplateService;
+	private final NotificationRequestService notificationRequestService;
+	private final NotificationSettingService notificationSettingService;
+
+
 	@Autowired
 	public void setChannels(List<NotificationChannel> channels, DefaultNotificationCenter webNotificationChannel) {
 		this.channels = channels.stream().collect(Collectors.toMap(NotificationChannel::getDeliveryMethod, c -> c));
 		this.channels.put(NotificationDeliveryMethod.WEB, (NotificationChannel) webNotificationChannel);
 	}
 
-	public NotificationRequest processNotificationRequest(NotificationRequest request, NotificationSetting settings, FutureCallback<NotificationRequestStats> callback) {
-		NotificationTemplate notificationTemplate = request.getTemplate();
-		Set<NotificationDeliveryMethod> deliveryTypes = new HashSet<>();
+	@Override
+	public NotificationRequest processNotificationRequest(NotificationRequest request, FutureCallback<NotificationRequestStats> callback) {
+		if (request.getRuleId() == null) {
+			if (!rateLimitService.checkRateLimited(LimitedApi.NOTIFICATION_REQUESTS, request.getTenantId())) {
+				throw new RateLimitedException(EntityType.TENANT);
+			}
+		}
+
+		NotificationTemplate notificationTemplate;
+		if (request.getTemplateId() != null) {
+			notificationTemplate = notificationTemplateService.findNotificationTemplateById(request.getTemplateId());
+		} else {
+			notificationTemplate = request.getTemplate();
+		}
+		if (notificationTemplate == null) throw new IllegalArgumentException("Template is missing");
+
+		Set<NotificationDeliveryMethod> deliveryMethods = new HashSet<>();
 		List<NotificationTarget> targets = request.getTargets().stream()
 			.map(id -> notificationTargetService.findNotificationTargetById(id))
 			.collect(Collectors.toList());
 
-		notificationTemplate.getConfig().getDeliveryTemplates().forEach((type, deliveryTemplate) -> {
-			if (!deliveryTemplate.isEnabled()) return;
+		String tenantId = request.getTenantId();
+		Long ruleId = request.getRuleId();
+		notificationTemplate.getConfig().getDeliveryTemplates().forEach((deliveryMethod, template) -> {
+			if (!template.isEnabled()) return;
 			try {
-				channels.get(deliveryTemplate.getDeliveryMethod()).check(request.getTenantId());
+				channels.get(deliveryMethod).check(tenantId);
 			} catch (Exception e) {
-				throw new IllegalArgumentException(e.getMessage());
+				if (ruleId == null) {
+					throw new IllegalArgumentException(e.getMessage());
+				} else {
+					return; // if originated by rule - just ignore delivery method
+				}
 			}
-			if (targets.stream().noneMatch(target -> target.getConfig().getType().getSupportedDeliveryTypes().contains(deliveryTemplate.getDeliveryMethod()))) {
-				throw new IllegalArgumentException("Recipients for " + deliveryTemplate.getDeliveryMethod().getName() + " delivery method not chosen");
+			if (ruleId == null) {
+				if (targets.stream().noneMatch(target -> target.getConfig().getType().getSupportedDeliveryTypes().contains(deliveryMethod))) {
+					throw new IllegalArgumentException("Recipients for " + deliveryMethod.getName() + " delivery method not chosen");
+				}
 			}
-			deliveryTypes.add(deliveryTemplate.getDeliveryMethod());
+			deliveryMethods.add(deliveryMethod);
 		});
-		if (deliveryTypes.isEmpty()) {
+		if (deliveryMethods.isEmpty()) {
 			throw new IllegalArgumentException("No delivery methods to send notification with");
 		}
 
@@ -71,27 +110,44 @@ public class DefaultNotificationCenter implements NotificationChannel<User, WebN
 			NotificationRequestConfig config = request.getConfig();
 			if (config.getSendingDelayInSec() > 0 && request.getId() == null) {
 				request.setStatus(NotificationRequestStatus.SCHEDULED);
-//				request = notificationRequestService.saveNotificationRequest(tenantId, request);
-//				forwardToNotificationSchedulerService(context.getTenantId(), request.getId());
+				request = notificationRequestService.saveNotificationRequest(request);
+				forwardToNotificationSchedulerService(tenantId, request.getId());
 				return request;
 			}
 		}
+		NotificationSetting settings = notificationSettingService.findNotificationSetting(tenantId);
+		NotificationSetting systemSettings = SecurityUtils.isSysTenantId(tenantId) ? settings : notificationSettingService.findNotificationSetting(SYS_TENANT_ID);
 
-		log.debug("Processing notification request (tenantId: {}, targets: {})", request.getTenantId(), request.getTargets());
+		log.debug("Processing notification request (tenantId: {}, targets: {})", tenantId, request.getTargets());
 		request.setStatus(NotificationRequestStatus.PROCESSING);
-//		request = notificationRequestService.saveNotificationRequest(tenantId, request);
+		request = notificationRequestService.saveNotificationRequest(request);
 
-		NotificationContext context = NotificationContext.builder()
-			.tenantId(request.getTenantId())
+		NotificationContext ctx = NotificationContext.builder()
+			.tenantId(tenantId)
 			.request(request)
-			.deliveryTypes(deliveryTypes)
+			.deliveryTypes(deliveryMethods)
 			.template(notificationTemplate)
 			.settings(settings)
+			.systemSettings(systemSettings)
 			.build();
 
-		processNotificationRequestAsync(context, targets, callback);
+		processNotificationRequestAsync(ctx, targets, callback);
 		return request;
 	}
+
+	private void forwardToNotificationSchedulerService(String tenantId, Long notificationRequestId) {
+//		TransportProtos.NotificationSchedulerServiceMsg.Builder msg = TransportProtos.NotificationSchedulerServiceMsg.newBuilder()
+//			.setTenantIdMSB(tenantId.getId().getMostSignificantBits())
+//			.setTenantIdLSB(tenantId.getId().getLeastSignificantBits())
+//			.setRequestIdMSB(notificationRequestId.getId().getMostSignificantBits())
+//			.setRequestIdLSB(notificationRequestId.getId().getLeastSignificantBits())
+//			.setTs(System.currentTimeMillis());
+//		TransportProtos.ToCoreMsg toCoreMsg = TransportProtos.ToCoreMsg.newBuilder()
+//			.setNotificationSchedulerServiceMsg(msg)
+//			.build();
+//		clusterService.pushMsgToCore(tenantId, notificationRequestId, toCoreMsg, null);
+	}
+
 
 	private void processNotificationRequestAsync(NotificationContext ctx, List<NotificationTarget> targets, FutureCallback<NotificationRequestStats> callback) {
 		notificationExecutor.submit(() -> {
@@ -237,6 +293,11 @@ public class DefaultNotificationCenter implements NotificationChannel<User, WebN
 			})
 			.map(NotificationChannel::getDeliveryMethod)
 			.collect(Collectors.toSet());
+	}
+
+	@Override
+	public void deleteNotificationRequest(Long notificationRequestId) {
+
 	}
 
 	@Override

@@ -31,7 +31,7 @@ public class DefaultMailTemplateService implements MailTemplateService {
 
     @PostConstruct
     private void postConstruct() throws IOException {
-        mailConfigTemplates = JacksonUtil.toJsonNode(new ClassPathResource("/templates/mail_config_templates.json").getFile());
+        mailConfigTemplates = JacksonUtil.readTree(new ClassPathResource("/templates/mail_config_templates.json").getFile());
     }
 
     @Override

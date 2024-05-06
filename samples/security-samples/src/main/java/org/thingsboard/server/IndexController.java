@@ -16,8 +16,6 @@ import org.thingsboard.server.ws.WebSocketHandler;
 @RestController
 @RequestMapping("/api")
 public class IndexController {
-	private WebSocketHandler webSocketHandler;
-
 	@GetMapping("/index")
 	public String index(String name) {
 		return "ok";

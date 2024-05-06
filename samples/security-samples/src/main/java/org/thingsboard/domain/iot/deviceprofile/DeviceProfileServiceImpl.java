@@ -72,7 +72,7 @@ public class DeviceProfileServiceImpl implements DeviceProfileService {
 		deviceProfileData.setConfiguration(configuration);
 		deviceProfileData.setTransportConfiguration(transportConfiguration);
 		deviceProfileData.setProvisionConfiguration(provisionConfiguration);
-		deviceProfile.setExtra(JacksonUtil.toJsonNode(deviceProfileData));
+		deviceProfile.setExtra(JacksonUtil.readTree(deviceProfileData));
 		return saveDeviceProfile(deviceProfile);
 	}
 

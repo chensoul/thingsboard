@@ -25,38 +25,61 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.type.CollectionType;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.common.collect.Lists;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.UnaryOperator;
+import java.util.regex.Pattern;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Created by Valerii Sosliuk on 5/12/2017.
  */
+@Slf4j
 public class JacksonUtil {
 
-	public static final ObjectMapper OBJECT_MAPPER = getObjectMapperWithJavaTimeModule();
-	public static final ObjectMapper PRETTY_SORTED_JSON_MAPPER = getObjectMapperWithJavaTimeModule()
+	public static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder()
+		.addModule(new Jdk8Module())
+		.build();
+	public static final ObjectMapper PRETTY_SORTED_JSON_MAPPER = JsonMapper.builder()
+		.addModule(new Jdk8Module())
 		.enable(SerializationFeature.INDENT_OUTPUT)
 		.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true)
-		.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
-
-	public static ObjectMapper ALLOW_UNQUOTED_FIELD_NAMES_MAPPER = getObjectMapperWithJavaTimeModule()
+		.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
+		.build();
+	public static ObjectMapper ALLOW_UNQUOTED_FIELD_NAMES_MAPPER = JsonMapper.builder()
+		.addModule(new Jdk8Module())
 		.configure(JsonWriteFeature.QUOTE_FIELD_NAMES.mappedFeature(), false)
-		.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-
-	public static final ObjectMapper IGNORE_UNKNOWN_PROPERTIES_JSON_MAPPER = getObjectMapperWithJavaTimeModule()
-		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
+		.build();
+	public static final ObjectMapper IGNORE_UNKNOWN_PROPERTIES_JSON_MAPPER = JsonMapper.builder()
+		.addModule(new Jdk8Module())
+		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+		.build();
 
 	public static ObjectMapper getObjectMapperWithJavaTimeModule() {
-		return new ObjectMapper().registerModule(new JavaTimeModule());
+		return JsonMapper.builder()
+			.addModule(new Jdk8Module())
+			.addModule(new JavaTimeModule())
+			.build();
 	}
 
 	public static <T> T convertValue(Object fromValue, Class<T> toValueType) {
@@ -72,6 +95,22 @@ public class JacksonUtil {
 			return fromValue != null ? OBJECT_MAPPER.convertValue(fromValue, toValueTypeRef) : null;
 		} catch (IllegalArgumentException e) {
 			throw new IllegalArgumentException("The given object value cannot be converted to " + toValueTypeRef + ": " + fromValue, e);
+		}
+	}
+
+	public static <T> T fromInputStream(InputStream inputStream, Class<T> clazz) {
+		try {
+			return inputStream != null ? OBJECT_MAPPER.readValue(inputStream, clazz) : null;
+		} catch (IOException e) {
+			throw new IllegalArgumentException("Invalid request payload", e);
+		}
+	}
+
+	public static <T> T fromReader(Reader reader, Class<T> clazz) {
+		try {
+			return reader != null ? OBJECT_MAPPER.readValue(reader, clazz) : null;
+		} catch (IOException e) {
+			throw new IllegalArgumentException("Invalid request payload", e);
 		}
 	}
 
@@ -111,7 +150,7 @@ public class JacksonUtil {
 		try {
 			return bytes != null ? OBJECT_MAPPER.readValue(bytes, clazz) : null;
 		} catch (IOException e) {
-			throw new IllegalArgumentException("The given string value cannot be transformed to Json object: " + Arrays.toString(bytes), e);
+			throw new IllegalArgumentException("The given byte[] value cannot be transformed to Json object:" + Arrays.toString(bytes), e);
 		}
 	}
 
@@ -139,14 +178,43 @@ public class JacksonUtil {
 		}
 	}
 
-	public static String toPrettyString(Object value) {
-		if (value == null) {
-			return null;
-		}
+	public static String toPrettyString(Object o) {
 		try {
-			return PRETTY_SORTED_JSON_MAPPER.writeValueAsString(value);
+			return PRETTY_SORTED_JSON_MAPPER.writeValueAsString(o);
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	public static String toPlainText(String data) {
+		if (data == null) {
+			return null;
+		}
+		if (data.startsWith("\"") && data.endsWith("\"") && data.length() >= 2) {
+			final String dataBefore = data;
+			try {
+				data = JacksonUtil.fromString(data, String.class);
+			} catch (Exception ignored) {
+			}
+			log.trace("Trimming double quotes. Before trim: [{}], after trim: [{}]", dataBefore, data);
+		}
+		return data;
+	}
+
+	public static <T> byte[] toBytes(T value) {
+		try {
+			return OBJECT_MAPPER.writeValueAsBytes(value);
+		} catch (JsonProcessingException e) {
+			throw new IllegalArgumentException("The given Json object value cannot be transformed to a String: " + value, e);
+		}
+	}
+
+	public static <T> void writeValue(Writer writer, T value) {
+		try {
+			OBJECT_MAPPER.writeValue(writer, value);
+		} catch (IOException e) {
+			throw new IllegalArgumentException("The given writer value: "
+											   + writer + "cannot be wrote", e);
 		}
 	}
 
@@ -158,15 +226,32 @@ public class JacksonUtil {
 		}
 	}
 
-	public static JsonNode toJsonNode(Object value) {
-		return toJsonNode(toString(value), OBJECT_MAPPER);
+	public static JsonNode readTree(Object value) {
+		return readTree(toString(value), OBJECT_MAPPER);
 	}
 
-	public static JsonNode toJsonNode(String value) {
-		return toJsonNode(value, OBJECT_MAPPER);
+	public static JsonNode readTree(String value) {
+		return readTree(value, OBJECT_MAPPER);
 	}
 
-	public static JsonNode toJsonNode(String value, ObjectMapper mapper) {
+	public static JsonNode readTree(Path file) {
+		try {
+			return OBJECT_MAPPER.readTree(Files.readAllBytes(file));
+		} catch (IOException e) {
+			throw new IllegalArgumentException("Can't read file: " + file, e);
+		}
+	}
+
+	public static JsonNode readTree(File value) {
+		try {
+			return value != null ? OBJECT_MAPPER.readTree(value) : null;
+		} catch (IOException e) {
+			throw new IllegalArgumentException("The given File object value: "
+											   + value + " cannot be transformed to a JsonNode", e);
+		}
+	}
+
+	public static JsonNode readTree(String value, ObjectMapper mapper) {
 		if (value == null || value.isEmpty()) {
 			return null;
 		}
@@ -177,12 +262,45 @@ public class JacksonUtil {
 		}
 	}
 
-	public static JsonNode toJsonNode(File value) {
+	public static <T> JsonNode valueToTree(T value) {
+		return OBJECT_MAPPER.valueToTree(value);
+	}
+
+	public static JsonNode getSafely(JsonNode node, String... path) {
+		if (node == null) {
+			return null;
+		}
+		for (String p : path) {
+			if (!node.has(p)) {
+				return null;
+			} else {
+				node = node.get(p);
+			}
+		}
+		return node;
+	}
+
+	public static <T> T readValue(String file, CollectionType clazz) {
 		try {
-			return value != null ? OBJECT_MAPPER.readTree(value) : null;
+			return OBJECT_MAPPER.readValue(file, clazz);
 		} catch (IOException e) {
-			throw new IllegalArgumentException("The given File object value: "
-											   + value + " cannot be transformed to a JsonNode", e);
+			throw new IllegalArgumentException("Can't read file: " + file, e);
+		}
+	}
+
+	public static <T> T readValue(File file, TypeReference<T> clazz) {
+		try {
+			return OBJECT_MAPPER.readValue(file, clazz);
+		} catch (IOException e) {
+			throw new IllegalArgumentException("Can't read file: " + file, e);
+		}
+	}
+
+	public static <T> T readValue(File file, Class<T> clazz) {
+		try {
+			return OBJECT_MAPPER.readValue(file, clazz);
+		} catch (IOException e) {
+			throw new IllegalArgumentException("Can't read file: " + file, e);
 		}
 	}
 
@@ -203,72 +321,24 @@ public class JacksonUtil {
 	}
 
 	public static <T> T clone(T value) {
-		if (value == null) {
-			return null;
-		}
 		@SuppressWarnings("unchecked")
 		Class<T> valueClass = (Class<T>) value.getClass();
 		return fromString(toString(value), valueClass);
 	}
 
-	public static <T> JsonNode valueToTree(T value) {
-		if (value == null) {
-			return null;
-		}
-		return OBJECT_MAPPER.valueToTree(value);
+
+	public static ObjectNode asObject(JsonNode node) {
+		return node != null && node.isObject() ? ((ObjectNode) node) : newObjectNode();
 	}
 
-	public static <T> byte[] writeValueAsBytes(T value) {
-		if (value == null) {
-			return null;
-		}
-		try {
-			return OBJECT_MAPPER.writeValueAsBytes(value);
-		} catch (JsonProcessingException e) {
-			throw new IllegalArgumentException("The given Json object value cannot be transformed to a String: " + value, e);
-		}
-	}
-
-
-	public static JsonNode getSafely(JsonNode node, String... path) {
-		if (node == null) {
-			return null;
-		}
-		for (String p : path) {
-			if (!node.has(p)) {
-				return null;
-			} else {
-				node = node.get(p);
-			}
-		}
-		return node;
+	public static JavaType constructCollectionType(Class collectionClass, Class<?> elementClass) {
+		return OBJECT_MAPPER.getTypeFactory().constructCollectionType(collectionClass, elementClass);
 	}
 
 	public static Map<String, String> toFlatMap(JsonNode node) {
 		HashMap<String, String> map = new HashMap<>();
 		toFlatMap(node, "", map);
 		return map;
-	}
-
-	public static <T> T fromReader(Reader reader, Class<T> clazz) {
-		try {
-			return reader != null ? OBJECT_MAPPER.readValue(reader, clazz) : null;
-		} catch (IOException e) {
-			throw new IllegalArgumentException("Invalid request payload", e);
-		}
-	}
-
-	public static <T> void writeValue(Writer writer, T value) {
-		try {
-			OBJECT_MAPPER.writeValue(writer, value);
-		} catch (IOException e) {
-			throw new IllegalArgumentException("The given writer value: "
-											   + writer + "cannot be wrote", e);
-		}
-	}
-
-	public static JavaType constructCollectionType(Class collectionClass, Class<?> elementClass) {
-		return OBJECT_MAPPER.getTypeFactory().constructCollectionType(collectionClass, elementClass);
 	}
 
 	private static void toFlatMap(JsonNode node, String currentPath, Map<String, String> map) {

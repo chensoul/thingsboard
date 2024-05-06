@@ -50,8 +50,6 @@ class DefaultNotificationCenterTest {
 			.config(new NotificationRequestConfig())
 			.build();
 
-		NotificationSetting settings = new NotificationSetting();
-
-		defaultNotificationCenter.processNotificationRequest(request, settings, null);
+		defaultNotificationCenter.processNotificationRequest(request, null);
 	}
 }

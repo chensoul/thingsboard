@@ -5,6 +5,7 @@ import jakarta.websocket.SendHandler;
 import jakarta.websocket.SendResult;
 import jakarta.websocket.Session;
 import java.io.IOException;
+import java.security.InvalidParameterException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -23,9 +24,8 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.adapter.NativeWebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-import org.thingsboard.common.util.JacksonUtil;
+import org.thingsboard.server.security.jwt.JwtExpiredTokenException;
 import static org.thingsboard.server.ws.DefaultWebSocketService.NUMBER_OF_PING_ATTEMPTS;
-import org.thingsboard.server.ws.cmd.WsCommandsWrapper;
 import org.thingsboard.server.ws.message.PingWebSocketMsg;
 import org.thingsboard.server.ws.message.TextWebSocketMsg;
 import org.thingsboard.server.ws.message.WebSocketMsg;
@@ -46,6 +46,12 @@ public class WebSocketHandler extends TextWebSocketHandler {
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 		try {
 			webSocketService.addSession(session);
+		} catch (InvalidParameterException e) {
+			log.warn("[{}] Failed to start session", session.getId(), e);
+			session.close(CloseStatus.BAD_DATA.withReason(e.getMessage()));
+		} catch (JwtExpiredTokenException e) {
+			log.trace("[{}] Failed to start session", session.getId(), e);
+			session.close(CloseStatus.SERVER_ERROR.withReason(e.getMessage()));
 		} catch (Exception e) {
 			log.warn("[{}] Failed to start session", session.getId(), e);
 			session.close(CloseStatus.SERVER_ERROR.withReason(e.getMessage()));
@@ -59,7 +65,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
 	@Override
 	protected void handlePongMessage(WebSocketSession session, PongMessage message) throws Exception {
-		webSocketService.handPong(session);
+		webSocketService.handPong(session, message);
 	}
 
 	@Override
@@ -100,36 +106,6 @@ public class WebSocketHandler extends TextWebSocketHandler {
 			this.sessionRef = sessionRef;
 			this.pingTimeout = pingTimeout;
 			this.lastActivityTime = System.currentTimeMillis();
-		}
-
-		public void handMessage(String msg) throws IOException {
-			inboundMsgQueue.add(msg);
-
-			while (!inboundMsgQueue.isEmpty() && inboundMsgQueueProcessorLock.tryLock()) {
-				try {
-					String todo;
-					while ((todo = inboundMsgQueue.poll()) != null) {
-						processMsg(this, todo);
-					}
-				} finally {
-					inboundMsgQueueProcessorLock.unlock();
-				}
-			}
-		}
-
-		void processMsg(WebSocketHandler.SessionMetaData sessionMd, String msg) throws IOException {
-			WebSocketSessionRef sessionRef = sessionMd.sessionRef;
-			log.trace("{} Processing {}", sessionRef, msg);
-
-			WsCommandsWrapper cmdsWrapper;
-			try {
-				cmdsWrapper = JacksonUtil.fromString(msg, WsCommandsWrapper.class);
-			} catch (Exception e) {
-				log.debug("{} Failed to decode message: {}", sessionRef, e.getMessage(), e);
-				webSocketService.sendError(sessionRef, 1, "Failed to decode message");
-				return;
-			}
-			webSocketService.handleCommands(sessionRef, cmdsWrapper);
 		}
 
 		public void sendPing(long currentTime) {
@@ -214,6 +190,28 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
 			isSending.set(false);
 			processNextMsg();
+		}
+
+		public void onMsg(String msg) throws IOException {
+			inboundMsgQueue.add(msg);
+			tryProcessInboundMsgs();
+		}
+
+		void tryProcessInboundMsgs() throws IOException {
+			while (!inboundMsgQueue.isEmpty()) {
+				if (inboundMsgQueueProcessorLock.tryLock()) {
+					try {
+						String msg;
+						while ((msg = inboundMsgQueue.poll()) != null) {
+							webSocketService.processMsg(this, msg);
+						}
+					} finally {
+						inboundMsgQueueProcessorLock.unlock();
+					}
+				} else {
+					return;
+				}
+			}
 		}
 
 	}

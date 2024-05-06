@@ -69,29 +69,40 @@
         </dependency>
 
         <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>elasticsearch-rest-client</artifactId>
+            <version>8.13.2</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-clients</artifactId>
-            <version>3.6.1</version>
+            <version>3.7.0</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.rabbitmq</groupId>
             <artifactId>amqp-client</artifactId>
-            <version>4.8.0</version>
+            <version>5.21.0</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.google.cloud</groupId>
             <artifactId>google-cloud-pubsub</artifactId>
-            <version>1.105.0</version>
+            <version>1.128.1</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-sns</artifactId>
-            <version>1.11.747</version>
+            <version>1.12.701</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.microsoft.azure</groupId>
             <artifactId>azure-servicebus</artifactId>
             <version>3.6.7</version>
+            <optional>true</optional>
             <exclusions>
                 <exclusion>
                     <groupId>com.nimbusds</groupId>
@@ -111,16 +122,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.elasticsearch.client</groupId>
-            <artifactId>rest</artifactId>
-            <version>5.0.2</version>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>33.0.0-jre</version>
+            <version>33.1.0-jre</version>
         </dependency>
 
         <dependency>
@@ -132,7 +136,7 @@
         <dependency>
             <groupId>org.owasp.antisamy</groupId>
             <artifactId>antisamy</artifactId>
-            <version>1.7.3</version>
+            <version>1.7.5</version>
         </dependency>
 
         <dependency>
@@ -168,18 +172,17 @@
         <dependency>
             <groupId>com.github.ua-parser</groupId>
             <artifactId>uap-java</artifactId>
-            <version>1.5.4</version>
+            <version>1.6.1</version>
         </dependency>
         <dependency>
             <groupId>com.github.oshi</groupId>
             <artifactId>oshi-core</artifactId>
-            <version>6.4.2</version>
+            <version>6.6.0</version>
         </dependency>
-
         <dependency>
-            <groupId>com.github.vladimir-bukhtoyarov</groupId>
+            <groupId>com.bucket4j</groupId>
             <artifactId>bucket4j-core</artifactId>
-            <version>4.1.1</version>
+            <version>8.10.1</version>
         </dependency>
 
         <dependency>
@@ -191,7 +194,7 @@
         <dependency>
             <groupId>com.google.oauth-client</groupId>
             <artifactId>google-oauth-client</artifactId>
-            <version>1.34.1</version>
+            <version>1.35.0</version>
         </dependency>
 
         <dependency>

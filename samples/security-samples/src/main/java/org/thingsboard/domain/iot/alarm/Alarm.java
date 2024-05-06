@@ -16,7 +16,9 @@
 package org.thingsboard.domain.iot.alarm;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -65,4 +67,17 @@ public class Alarm extends BaseData<Long> implements HasName, HasTenantId, HasMe
 	private boolean propagateToOwner;
 	private boolean propagateToTenant;
 	private List<String> propagateRelationTypes;
+
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	public AlarmStatus getStatus() {
+		return toStatus(cleared, acknowledged);
+	}
+
+	public static AlarmStatus toStatus(boolean cleared, boolean acknowledged) {
+		if (cleared) {
+			return acknowledged ? AlarmStatus.CLEARED_ACK : AlarmStatus.CLEARED_UNACK;
+		} else {
+			return acknowledged ? AlarmStatus.ACTIVE_ACK : AlarmStatus.ACTIVE_UNACK;
+		}
+	}
 }

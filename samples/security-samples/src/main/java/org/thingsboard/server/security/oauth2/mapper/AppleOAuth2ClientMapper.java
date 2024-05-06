@@ -42,7 +42,7 @@ public class AppleOAuth2ClientMapper extends AbstractOAuth2ClientMapper implemen
 	private static final String EMAIL = "email";
 
 	@Override
-	protected OAuth2User getOAuth2User(HttpServletRequest request, OAuth2AuthenticationToken token, String providerAccessToken, OAuth2Registration registration)  {
+	protected OAuth2User getOAuth2User(HttpServletRequest request, OAuth2AuthenticationToken token, String providerAccessToken, OAuth2Registration registration) {
 		OAuth2MapperConfig config = registration.getMapperConfig();
 		Map<String, Object> attributes = token.getPrincipal().getAttributes();
 
@@ -57,11 +57,7 @@ public class AppleOAuth2ClientMapper extends AbstractOAuth2ClientMapper implemen
 		MultiValueMap<String, String> params = toMultiMap(request.getParameterMap());
 		String userValue = params.getFirst(USER);
 		if (StringUtils.hasText(userValue)) {
-			JsonNode user = null;
-			try {
-				user = JacksonUtil.toJsonNode(userValue);
-			} catch (Exception e) {
-			}
+			JsonNode user = JacksonUtil.readTree(userValue);
 			if (user != null) {
 				updated = new HashMap<>(attributes);
 				if (user.has(NAME)) {
