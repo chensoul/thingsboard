@@ -15,7 +15,7 @@
  */
 package org.thingsboard.server.ws.message;
 
-public enum TbWebSocketMsgType {
+public enum WebSocketMsgType {
 
     PING, TEXT
 }

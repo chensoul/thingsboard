@@ -24,7 +24,7 @@ import org.thingsboard.server.security.UserPrincipal;
  */
 @Slf4j
 @Component
-public class WsSessionLimitService {
+public class WebSocketSessionChecker {
 	@Value("${server.ws.max_queue_messages_per_session:1000}")
 	private int wsMaxQueueMessagesPerSession;
 

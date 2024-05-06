@@ -15,15 +15,14 @@
  */
 package org.thingsboard.server.ws;
 
-import org.springframework.web.socket.CloseStatus;
 import org.thingsboard.server.ws.cmd.CmdUpdate;
-import org.thingsboard.server.ws.cmd.WsCommandsWrapper;
+import org.thingsboard.server.ws.cmd.WsCommandWrapper;
 
 /**
  * Created by ashvayka on 27.03.18.
  */
 public interface WebSocketService {
-	void handleCommands(WebSocketSessionRef sessionRef, WsCommandsWrapper commandsWrapper);
+	void handleCommands(WebSocketSessionRef sessionRef, WsCommandWrapper commandsWrapper);
 
 	void sendUpdate(WebSocketSessionRef sessionRef, CmdUpdate update);
 

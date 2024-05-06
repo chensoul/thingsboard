@@ -26,12 +26,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.thingsboard.common.util.JacksonUtil;
-import org.thingsboard.server.ws.cmd.AttributeCmd;
 import org.thingsboard.server.ws.cmd.CmdUpdate;
 import org.thingsboard.server.ws.cmd.WsCmd;
 import org.thingsboard.server.ws.cmd.WsCmdType;
-import org.thingsboard.server.ws.cmd.WsCommandsWrapper;
+import org.thingsboard.server.ws.cmd.WsCommandWrapper;
 import org.thingsboard.server.ws.handler.WsCmdHandler;
+import org.thingsboard.server.ws.handler.WsCmdService;
 
 /**
  * Created by ashvayka on 27.03.18.
@@ -50,11 +50,11 @@ public class DefaultWebSocketService implements WebSocketService {
 	@PostConstruct
 	public void init() {
 		cmdsHandlers = new EnumMap<>(WsCmdType.class);
-		cmdsHandlers.put(WsCmdType.ATTRIBUTE, newCmdHandler(this::handleWsAttributesSubscriptionCmd));
+		cmdsHandlers.put(WsCmdType.ATTRIBUTE, WsCmdService.newCmdHandler(WsCmdService::handleWsAttributesSubscriptionCmd));
 	}
 
 	@Override
-	public void handleCommands(WebSocketSessionRef sessionRef, WsCommandsWrapper commandsWrapper) {
+	public void handleCommands(WebSocketSessionRef sessionRef, WsCommandWrapper commandsWrapper) {
 		if (commandsWrapper == null || CollectionUtils.isEmpty(commandsWrapper.getCmds())) {
 			return;
 		}
@@ -94,16 +94,5 @@ public class DefaultWebSocketService implements WebSocketService {
 		} catch (JsonProcessingException e) {
 			log.warn("[{}] Failed to encode reply: {}", sessionRef.getSessionId(), update, e);
 		}
-	}
-
-	private void handleWsAttributesSubscriptionCmd(WebSocketSessionRef sessionRef, AttributeCmd cmd) {
-		String sessionId = sessionRef.getSessionId();
-		log.info("[{}] Processing attribute subscription cmd: {}", sessionId, cmd);
-
-		doSendUpdate(sessionRef, cmd.getCmdId(), "Success");
-	}
-
-	public static <C extends WsCmd> WsCmdHandler<C> newCmdHandler(BiConsumer<WebSocketSessionRef, C> handler) {
-		return new WsCmdHandler<>(handler);
 	}
 }

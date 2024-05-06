@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class WsCommandsWrapper {
+public class WsCommandWrapper {
 	private String token;
 
 	@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")

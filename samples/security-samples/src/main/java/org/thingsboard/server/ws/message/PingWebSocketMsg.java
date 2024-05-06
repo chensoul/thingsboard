@@ -30,7 +30,7 @@ public class PingWebSocketMsg implements WebSocketMsg<ByteBuffer> {
 		return PING_MSG;
 	}
 
-	public TbWebSocketMsgType getType() {
-		return TbWebSocketMsgType.PING;
+	public WebSocketMsgType getType() {
+		return WebSocketMsgType.PING;
 	}
 }

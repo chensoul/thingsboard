@@ -19,11 +19,9 @@ public class WsCmdService {
 
 	/**
 	 * TODO: 改为依赖注入的方式
-	 *
-	 * @param webSocketSessionRef
-	 * @param wsCmd
 	 */
-	public static void handleWsAttributesSubscriptionCmd(WebSocketSessionRef webSocketSessionRef, WsCmd wsCmd) {
-		log.info("wsCmd: {}", wsCmd);
+	public static void handleWsAttributesSubscriptionCmd(WebSocketSessionRef sessionRef, WsCmd wsCmd) {
+		String sessionId = sessionRef.getSessionId();
+		log.info("[{}] Processing attribute subscription cmd: {}", sessionId, wsCmd);
 	}
 }

@@ -16,7 +16,7 @@
 package org.thingsboard.server.ws.message;
 
 public interface WebSocketMsg<T> {
-	TbWebSocketMsgType getType();
+	WebSocketMsgType getType();
 
     T getMsg();
 

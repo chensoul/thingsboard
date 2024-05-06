@@ -27,8 +27,8 @@ public class TextWebSocketMsg implements WebSocketMsg<String> {
 		return value;
 	}
 
-	public TbWebSocketMsgType getType() {
-		return TbWebSocketMsgType.TEXT;
+	public WebSocketMsgType getType() {
+		return WebSocketMsgType.TEXT;
 	}
 
 }

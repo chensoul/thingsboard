@@ -63,9 +63,9 @@ import org.thingsboard.server.security.SecurityUser;
 import org.thingsboard.server.security.jwt.JwtAuthenticationProvider;
 import org.thingsboard.server.security.jwt.JwtExpiredTokenException;
 import static org.thingsboard.server.ws.DefaultWebSocketService.UNKNOWN_SUBSCRIPTION_ID;
-import org.thingsboard.server.ws.cmd.WsCommandsWrapper;
+import org.thingsboard.server.ws.cmd.WsCommandWrapper;
 import org.thingsboard.server.ws.message.PingWebSocketMsg;
-import org.thingsboard.server.ws.message.TbWebSocketMsgType;
+import org.thingsboard.server.ws.message.WebSocketMsgType;
 import org.thingsboard.server.ws.message.TextWebSocketMsg;
 import org.thingsboard.server.ws.message.WebSocketMsg;
 
@@ -83,7 +83,7 @@ public class WebSocketHandler extends TextWebSocketHandler implements WebSocketM
 	private final WebSocketService webSocketService;
 	private final JwtAuthenticationProvider authenticationProvider;
 	private final RateLimitService rateLimitService;
-	private final WsSessionLimitService wsSessionLimitService;
+	private final WebSocketSessionChecker webSocketSessionChecker;
 	private final ApplicationEventPublisher eventPublisher;
 
 	@Value("${server.ws.send_timeout:5000}")
@@ -194,7 +194,7 @@ public class WebSocketHandler extends TextWebSocketHandler implements WebSocketM
 		if (sessionMd != null) {
 			externalSessionMap.remove(sessionMd.sessionRef.getSessionId());
 			if (sessionMd.sessionRef.getSecurityCtx() != null) {
-				wsSessionLimitService.cleanupLimits(session, sessionMd.sessionRef);
+				webSocketSessionChecker.cleanupLimits(session, sessionMd.sessionRef);
 				processInWebSocketService(sessionMd.sessionRef, SessionEvent.onClosed());
 			}
 			log.info("{} Session is closed", sessionMd.sessionRef);
@@ -249,13 +249,13 @@ public class WebSocketHandler extends TextWebSocketHandler implements WebSocketM
 
 	private void establishSession(WebSocketSession session, WebSocketSessionRef sessionRef, SessionMetaData sessionMd) throws IOException {
 		if (sessionRef.getSecurityCtx() != null) {
-			if (wsSessionLimitService.checkLimited(session, sessionRef)) {
+			if (webSocketSessionChecker.checkLimited(session, sessionRef)) {
 				return;
 			}
 			if (sessionMd == null) {
 				sessionMd = new SessionMetaData(session, sessionRef);
 			}
-			sessionMd.setMaxMsgQueueSize(wsSessionLimitService.getMaxMsgQueueSize(sessionRef));
+			sessionMd.setMaxMsgQueueSize(webSocketSessionChecker.getMaxMsgQueueSize(sessionRef));
 
 			internalSessionMap.put(session.getId(), sessionMd);
 			externalSessionMap.put(sessionRef.getSessionId(), session.getId());
@@ -271,9 +271,9 @@ public class WebSocketHandler extends TextWebSocketHandler implements WebSocketM
 
 	void processMsg(SessionMetaData sessionMd, String msg) throws IOException {
 		WebSocketSessionRef sessionRef = sessionMd.sessionRef;
-		WsCommandsWrapper cmdsWrapper;
+		WsCommandWrapper cmdsWrapper;
 		try {
-			cmdsWrapper = JacksonUtil.fromString(msg, WsCommandsWrapper.class);
+			cmdsWrapper = JacksonUtil.fromString(msg, WsCommandWrapper.class);
 		} catch (Exception e) {
 			log.warn("{} Failed to decode cmd: {}", sessionRef, e.getMessage(), e);
 			if (sessionRef.getSecurityCtx() != null) {
@@ -446,7 +446,7 @@ public class WebSocketHandler extends TextWebSocketHandler implements WebSocketM
 
 		private void sendMsgInternal(WebSocketMsg<?> msg) {
 			try {
-				if (TbWebSocketMsgType.TEXT.equals(msg.getType())) {
+				if (WebSocketMsgType.TEXT.equals(msg.getType())) {
 					TextWebSocketMsg textMsg = (TextWebSocketMsg) msg;
 					this.asyncRemote.sendText(textMsg.getMsg(), this);
 					// isSending status will be reset in the onResult method by call back
