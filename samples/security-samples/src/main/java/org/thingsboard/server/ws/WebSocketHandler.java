@@ -83,7 +83,7 @@ public class WebSocketHandler extends TextWebSocketHandler implements WebSocketM
 	private final WebSocketService webSocketService;
 	private final JwtAuthenticationProvider authenticationProvider;
 	private final RateLimitService rateLimitService;
-	private final WebSocketSessionChecker webSocketSessionChecker;
+	private final WebSocketSessionLimitService webSocketSessionLimitService;
 	private final ApplicationEventPublisher eventPublisher;
 
 	@Value("${server.ws.send_timeout:5000}")
@@ -194,7 +194,7 @@ public class WebSocketHandler extends TextWebSocketHandler implements WebSocketM
 		if (sessionMd != null) {
 			externalSessionMap.remove(sessionMd.sessionRef.getSessionId());
 			if (sessionMd.sessionRef.getSecurityCtx() != null) {
-				webSocketSessionChecker.cleanupLimits(session, sessionMd.sessionRef);
+				webSocketSessionLimitService.cleanupLimits(session, sessionMd.sessionRef);
 				processInWebSocketService(sessionMd.sessionRef, SessionEvent.onClosed());
 			}
 			log.info("{} Session is closed", sessionMd.sessionRef);
@@ -249,13 +249,13 @@ public class WebSocketHandler extends TextWebSocketHandler implements WebSocketM
 
 	private void establishSession(WebSocketSession session, WebSocketSessionRef sessionRef, SessionMetaData sessionMd) throws IOException {
 		if (sessionRef.getSecurityCtx() != null) {
-			if (webSocketSessionChecker.checkLimited(session, sessionRef)) {
+			if (webSocketSessionLimitService.checkLimited(session, sessionRef)) {
 				return;
 			}
 			if (sessionMd == null) {
 				sessionMd = new SessionMetaData(session, sessionRef);
 			}
-			sessionMd.setMaxMsgQueueSize(webSocketSessionChecker.getMaxMsgQueueSize(sessionRef));
+			sessionMd.setMaxMsgQueueSize(webSocketSessionLimitService.getMaxMsgQueueSize(sessionRef));
 
 			internalSessionMap.put(session.getId(), sessionMd);
 			externalSessionMap.put(sessionRef.getSessionId(), session.getId());
@@ -286,7 +286,7 @@ public class WebSocketHandler extends TextWebSocketHandler implements WebSocketM
 
 		if (sessionRef.getSecurityCtx() != null) {
 			log.debug("{} Processing {}", sessionRef, msg);
-			webSocketService.handleCommands(sessionRef, cmdsWrapper);
+			webSocketService.handleCommand(sessionRef, cmdsWrapper);
 		} else {
 			String token = cmdsWrapper.getToken();
 			if (token == null) {
@@ -305,7 +305,7 @@ public class WebSocketHandler extends TextWebSocketHandler implements WebSocketM
 			pendingSessions.invalidate(sessionMd.session.getId());
 			establishSession(sessionMd.session, sessionRef, sessionMd);
 
-			webSocketService.handleCommands(sessionRef, cmdsWrapper);
+			webSocketService.handleCommand(sessionRef, cmdsWrapper);
 		}
 	}
 

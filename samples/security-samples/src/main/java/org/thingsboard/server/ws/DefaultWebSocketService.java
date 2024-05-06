@@ -18,9 +18,10 @@ package org.thingsboard.server.ws;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.annotation.PostConstruct;
 import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiConsumer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -31,7 +32,6 @@ import org.thingsboard.server.ws.cmd.WsCmd;
 import org.thingsboard.server.ws.cmd.WsCmdType;
 import org.thingsboard.server.ws.cmd.WsCommandWrapper;
 import org.thingsboard.server.ws.handler.WsCmdHandler;
-import org.thingsboard.server.ws.handler.WsCmdService;
 
 /**
  * Created by ashvayka on 27.03.18.
@@ -41,34 +41,33 @@ import org.thingsboard.server.ws.handler.WsCmdService;
 @RequiredArgsConstructor
 public class DefaultWebSocketService implements WebSocketService {
 	public static final int UNKNOWN_SUBSCRIPTION_ID = 0;
-	private static final String SESSION_META_DATA_NOT_FOUND = "Session meta-data not found!";
 
 	private final WebSocketMsgEndpoint msgEndpoint;
+	private final List<WsCmdHandler<? extends WsCmd>> cmdHandlers;
 
-	private Map<WsCmdType, WsCmdHandler<? extends WsCmd>> cmdsHandlers;
+	private Map<WsCmdType, WsCmdHandler<? extends WsCmd>> cmdHandlerMap = new HashMap<>();
 
 	@PostConstruct
 	public void init() {
-		cmdsHandlers = new EnumMap<>(WsCmdType.class);
-		cmdsHandlers.put(WsCmdType.ATTRIBUTE, WsCmdService.newCmdHandler(WsCmdService::handleWsAttributesSubscriptionCmd));
+		cmdHandlers.forEach(handler -> cmdHandlerMap.put(handler.getType(), handler));
 	}
 
 	@Override
-	public void handleCommands(WebSocketSessionRef sessionRef, WsCommandWrapper commandsWrapper) {
+	public void handleCommand(WebSocketSessionRef sessionRef, WsCommandWrapper commandsWrapper) {
 		if (commandsWrapper == null || CollectionUtils.isEmpty(commandsWrapper.getCmds())) {
 			return;
 		}
 		String sessionId = sessionRef.getSessionId();
 		if (!msgEndpoint.validate(sessionId)) {
-			log.warn("[{}] Session meta data not found. ", sessionId);
-			sendError(sessionRef, UNKNOWN_SUBSCRIPTION_ID, SESSION_META_DATA_NOT_FOUND);
+			log.warn("[{}] Session not found. ", sessionId);
+			sendError(sessionRef, UNKNOWN_SUBSCRIPTION_ID, "Session not found");
 			return;
 		}
 
 		for (WsCmd cmd : commandsWrapper.getCmds()) {
 			log.debug("[{}][{}][{}] Processing cmd: {}", sessionId, cmd.getType(), cmd.getCmdId(), cmd);
 			try {
-				Optional.ofNullable(cmdsHandlers.get(cmd.getType()))
+				Optional.ofNullable(cmdHandlerMap.get(cmd.getType()))
 					.ifPresent(cmdHandler -> cmdHandler.handle(sessionRef, cmd));
 			} catch (Exception e) {
 				log.error("[sessionId: {}, tenantId: {}, userId: {}] Failed to handle WS cmd: {}", sessionId,

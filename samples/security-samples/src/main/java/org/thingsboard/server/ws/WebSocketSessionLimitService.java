@@ -5,15 +5,19 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketSession;
 import org.thingsboard.domain.tenant.model.DefaultTenantProfileConfiguration;
 import org.thingsboard.domain.tenant.model.TenantProfile;
 import org.thingsboard.domain.tenant.service.TenantProfileService;
+import org.thingsboard.domain.usage.limit.LimitedApi;
+import org.thingsboard.domain.usage.limit.RateLimitService;
 import org.thingsboard.server.security.UserPrincipal;
 
 /**
@@ -24,12 +28,13 @@ import org.thingsboard.server.security.UserPrincipal;
  */
 @Slf4j
 @Component
-public class WebSocketSessionChecker {
+@RequiredArgsConstructor
+public class WebSocketSessionLimitService {
 	@Value("${server.ws.max_queue_messages_per_session:1000}")
 	private int wsMaxQueueMessagesPerSession;
 
-	@Autowired
-	private TenantProfileService tenantProfileService;
+	private final TenantProfileService tenantProfileService;
+	private final RateLimitService rateLimitService;
 
 	private final ConcurrentMap<String, Set<String>> tenantSessionsMap = new ConcurrentHashMap<>();
 	private final ConcurrentMap<Long, Set<String>> customerSessionsMap = new ConcurrentHashMap<>();
@@ -124,7 +129,7 @@ public class WebSocketSessionChecker {
 		if (tenantProfileConfiguration == null) return;
 
 		String sessionId = session.getId();
-//		rateLimitService.cleanUp(LimitedApi.WS_UPDATES_PER_SESSION, sessionRef.getSessionId());
+		rateLimitService.cleanUp(LimitedApi.WS_UPDATES_PER_SESSION, sessionRef.getSessionId());
 		if (tenantProfileConfiguration.getMaxWsSessionsPerTenant() > 0) {
 			Set<String> tenantSessions = tenantSessionsMap.computeIfAbsent(sessionRef.getSecurityCtx().getTenantId(), id -> ConcurrentHashMap.newKeySet());
 			synchronized (tenantSessions) {
@@ -150,6 +155,14 @@ public class WebSocketSessionChecker {
 					publicUserSessions.remove(sessionId);
 				}
 			}
+		}
+	}
+
+	@EventListener(WebSocketSessionEvent.class)
+	private void onSessionClose(WebSocketSessionEvent event) {
+		WebSocketSessionEvent.WebSocketSessionEventSource source = (WebSocketSessionEvent.WebSocketSessionEventSource) event.getSource();
+		if (source.getEvent().getEventType().equals(SessionEvent.SessionEventType.CLOSED)) {
+			processSessionClose(source.getSessionRef());
 		}
 	}
 
