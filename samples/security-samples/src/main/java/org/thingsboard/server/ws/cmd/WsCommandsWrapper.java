@@ -13,22 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.thingsboard.server.ws.message;
+package org.thingsboard.server.ws.cmd;
 
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@RequiredArgsConstructor
-public class TextWebSocketMsg implements WebSocketMsg<String> {
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class WsCommandsWrapper {
+	private String token;
 
-	private final String value;
-
-	@Override
-	public String getMsg() {
-		return value;
-	}
-
-	public TbWebSocketMsgType getType() {
-		return TbWebSocketMsgType.TEXT;
-	}
+	@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+	@JsonSubTypes({
+		@JsonSubTypes.Type(name = "ATTRIBUTE", value = AttributeCmd.class),
+	})
+	private List<WsCmd> cmds;
 
 }

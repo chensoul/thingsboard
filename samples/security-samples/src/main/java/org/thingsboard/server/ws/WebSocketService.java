@@ -1,37 +1,31 @@
+/**
+ * Copyright © 2016-2024 The Thingsboard Authors
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.thingsboard.server.ws;
 
-import java.io.IOException;
 import org.springframework.web.socket.CloseStatus;
-import org.springframework.web.socket.PongMessage;
-import org.springframework.web.socket.WebSocketSession;
-import org.thingsboard.server.ws.cmd.WsCmdWrapper;
+import org.thingsboard.server.ws.cmd.CmdUpdate;
+import org.thingsboard.server.ws.cmd.WsCommandsWrapper;
 
 /**
- * TODO Comment
- *
- * @author <a href="mailto:ichensoul@gmail.com">chensoul</a>
- * @since TODO
+ * Created by ashvayka on 27.03.18.
  */
 public interface WebSocketService {
-	void addSession(WebSocketSession session) throws IOException;
+	void handleCommands(WebSocketSessionRef sessionRef, WsCommandsWrapper commandsWrapper);
 
-	void closeSession(WebSocketSessionRef sessionRef, CloseStatus reason) throws IOException;
+	void sendUpdate(WebSocketSessionRef sessionRef, CmdUpdate update);
 
-	void removeSession(WebSocketSession session, CloseStatus status) throws IOException;
-
-	void handleSessionEvent(WebSocketSession session, SessionEvent sessionEvent);
-
-	void handleCommands(WebSocketSessionRef sessionRef, WsCmdWrapper commandsWrapper);
-
-	void handMessage(WebSocketSession session, String message);
-
-	void handPong(WebSocketSession session, PongMessage message);
-
-	void send(WebSocketSessionRef sessionRef, String msg) throws IOException;
-
-	void send(String msg) throws IOException;
-
-	void sendError(WebSocketSessionRef sessionRef, int errorCode, String errorMsg);
-
-	void processMsg(WebSocketHandler.SessionMetaData sessionMetaData, String msg) throws IOException;
+	void sendError(WebSocketSessionRef sessionRef, int cmdId, String errorMsg);
 }

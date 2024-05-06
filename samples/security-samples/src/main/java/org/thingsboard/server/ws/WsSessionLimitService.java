@@ -14,7 +14,6 @@ import org.springframework.web.socket.WebSocketSession;
 import org.thingsboard.domain.tenant.model.DefaultTenantProfileConfiguration;
 import org.thingsboard.domain.tenant.model.TenantProfile;
 import org.thingsboard.domain.tenant.service.TenantProfileService;
-import org.thingsboard.domain.usage.limit.LimitedApi;
 import org.thingsboard.server.security.UserPrincipal;
 
 /**
@@ -25,7 +24,7 @@ import org.thingsboard.server.security.UserPrincipal;
  */
 @Slf4j
 @Component
-public class WebSocketApiLimitService {
+public class WsSessionLimitService {
 	@Value("${server.ws.max_queue_messages_per_session:1000}")
 	private int wsMaxQueueMessagesPerSession;
 

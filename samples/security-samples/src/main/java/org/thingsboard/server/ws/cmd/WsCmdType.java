@@ -16,6 +16,5 @@
 package org.thingsboard.server.ws.cmd;
 
 public enum WsCmdType {
-	AUTH,
 	ATTRIBUTE,
 }

@@ -13,25 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.thingsboard.server.ws.cmd;
+package org.thingsboard.server.ws;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.io.IOException;
+import org.springframework.web.socket.CloseStatus;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class WsCmdWrapper {
-	private String token;
+/**
+ * Created by ashvayka on 27.03.18.
+ */
+public interface WebSocketMsgEndpoint {
+	boolean validate(String sessionId);
 
-	@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
-	@JsonSubTypes({
-		@JsonSubTypes.Type(name = "ATTRIBUTES", value = AttributeCmd.class),
-	})
-	private List<WsCmd> cmds;
+	void send(WebSocketSessionRef sessionRef, int cmdId, String msg);
 
+	void sendPing();
+
+	void close(WebSocketSessionRef sessionRef, CloseStatus withReason) throws IOException;
 }
