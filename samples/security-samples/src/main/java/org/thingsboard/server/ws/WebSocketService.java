@@ -15,13 +15,13 @@
  */
 package org.thingsboard.server.ws;
 
-import org.thingsboard.server.ws.cmd.CmdUpdate;
-import org.thingsboard.server.ws.cmd.WsCommandWrapper;
+import org.thingsboard.server.ws.cmd.DataUpdate;
+import org.thingsboard.server.ws.cmd.WsCmdWrapper;
 
 public interface WebSocketService {
-	void handleCommand(WebSocketSessionRef sessionRef, WsCommandWrapper commandsWrapper);
+	void handleCommand(WebSocketSessionRef sessionRef, WsCmdWrapper commandsWrapper);
 
-	void sendUpdate(WebSocketSessionRef sessionRef, CmdUpdate update);
+	void sendUpdate(WebSocketSessionRef sessionRef, DataUpdate update);
 
 	void sendError(WebSocketSessionRef sessionRef, int cmdId, String errorMsg);
 }

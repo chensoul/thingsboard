@@ -17,7 +17,7 @@ package org.thingsboard.server.security.oauth2.mapper;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.thingsboard.domain.oauth2.model.OAuth2Registration;
+import org.thingsboard.domain.oauth2.OAuth2Registration;
 import org.thingsboard.server.security.SecurityUser;
 
 public interface OAuth2ClientMapper {

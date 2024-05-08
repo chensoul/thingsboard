@@ -34,17 +34,7 @@ import org.thingsboard.common.exception.ThingsboardException;
 import org.thingsboard.domain.BaseController;
 import org.thingsboard.common.util.JacksonUtil;
 import static org.thingsboard.common.validation.Validator.checkNotNull;
-import org.thingsboard.domain.setting.jwt.JwtSetting;
-import org.thingsboard.domain.setting.jwt.JwtSettingService;
-import org.thingsboard.domain.setting.security.SecuritySetting;
-import org.thingsboard.domain.setting.security.SecuritySettingService;
-import org.thingsboard.domain.setting.system.FeatureInfo;
-import org.thingsboard.domain.setting.system.SystemInfo;
-import org.thingsboard.domain.setting.system.SystemInfoService;
-import org.thingsboard.domain.setting.system.SystemSetting;
-import org.thingsboard.domain.setting.system.SystemSettingService;
-import org.thingsboard.domain.setting.system.SystemSettingType;
-import org.thingsboard.domain.notification.channel.mail.MailService;
+import org.thingsboard.domain.notification.internal.channel.mail.MailService;
 import static org.thingsboard.server.config.SecurityConfiguration.MAIL_OAUTH2_PROCESSING_ENTRY_POINT;
 import static org.thingsboard.server.security.SecurityUser.SYS_TENANT_ID;
 import static org.thingsboard.server.security.SecurityUtils.getCurrentUser;
@@ -55,8 +45,8 @@ import static org.thingsboard.server.security.oauth2.HttpCookieOAuth2Authorizati
 import org.thingsboard.server.security.permission.AccessControlService;
 import org.thingsboard.server.security.permission.Operation;
 import org.thingsboard.server.security.permission.Resource;
-import org.thingsboard.domain.notification.channel.sms.SmsService;
-import org.thingsboard.domain.notification.channel.sms.TestSmsRequest;
+import org.thingsboard.domain.notification.internal.channel.sms.SmsService;
+import org.thingsboard.domain.notification.internal.channel.sms.TestSmsRequest;
 
 /**
  * TODO Comment
@@ -79,7 +69,7 @@ public class SystemSettingController extends BaseController {
 	private final JwtSettingService jwtSettingService;
 	private final JwtTokenFactory tokenFactory;
 	private final AccessControlService accessControlService;
-	private final SystemInfoService systemInfoService;
+	private final ServiceInfoService serviceInfoService;
 
 	@PreAuthorize("hasAuthority('SYS_ADMIN')")
 	@GetMapping(value = "/setting/{type}")
@@ -152,14 +142,14 @@ public class SystemSettingController extends BaseController {
 
 	@PreAuthorize("hasAuthority('SYS_ADMIN')")
 	@RequestMapping(value = "/info", method = RequestMethod.GET)
-	public SystemInfo getSystemInfo() throws ThingsboardException {
-		return systemInfoService.getSystemInfo();
+	public ServiceInfo getSystemInfo() throws ThingsboardException {
+		return serviceInfoService.getServiceInfo();
 	}
 
 	@PreAuthorize("hasAuthority('SYS_ADMIN')")
 	@RequestMapping(value = "/feature", method = RequestMethod.GET)
-	public FeatureInfo getFeatureInfo() {
-		return systemInfoService.getFeatureInfo();
+	public ServiceFeature getFeatureInfo() {
+		return serviceInfoService.getFeatureInfo();
 	}
 
 	@PreAuthorize("hasAnyAuthority('SYS_ADMIN')")

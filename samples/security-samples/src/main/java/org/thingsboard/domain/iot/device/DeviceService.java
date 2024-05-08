@@ -1,7 +1,7 @@
 package org.thingsboard.domain.iot.device;
 
 import org.thingsboard.common.exception.ThingsboardException;
-import org.thingsboard.domain.user.model.User;
+import org.thingsboard.domain.user.User;
 
 /**
  * TODO Comment

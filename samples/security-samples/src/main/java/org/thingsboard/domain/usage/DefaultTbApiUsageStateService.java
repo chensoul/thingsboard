@@ -37,13 +37,13 @@ import org.springframework.stereotype.Service;
 import org.thingsboard.common.concurrent.ThingsBoardThreadFactory;
 import org.thingsboard.common.model.EntityType;
 import org.thingsboard.common.util.SchedulerUtils;
-import org.thingsboard.domain.notification.channel.mail.MailExecutorService;
-import org.thingsboard.domain.notification.channel.mail.MailService;
-import org.thingsboard.domain.tenant.model.TenantProfile;
-import org.thingsboard.domain.tenant.model.TenantProfileConfiguration;
-import org.thingsboard.domain.tenant.model.TenantProfileData;
-import org.thingsboard.domain.tenant.service.TenantProfileService;
-import org.thingsboard.domain.tenant.service.TenantService;
+import org.thingsboard.domain.notification.internal.channel.mail.MailExecutorService;
+import org.thingsboard.domain.notification.internal.channel.mail.MailService;
+import org.thingsboard.domain.tenant.TenantProfile;
+import org.thingsboard.domain.tenant.TenantProfileConfiguration;
+import org.thingsboard.domain.tenant.TenantProfileData;
+import org.thingsboard.domain.tenant.TenantProfileService;
+import org.thingsboard.domain.tenant.TenantService;
 import static org.thingsboard.server.security.SecurityUser.SYS_TENANT_ID;
 
 @Slf4j

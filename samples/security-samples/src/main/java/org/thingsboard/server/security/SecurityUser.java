@@ -24,7 +24,7 @@ import lombok.Setter;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.thingsboard.domain.user.model.User;
+import org.thingsboard.domain.user.User;
 
 public class SecurityUser extends User {
 	private static final long serialVersionUID = -797397440703066079L;

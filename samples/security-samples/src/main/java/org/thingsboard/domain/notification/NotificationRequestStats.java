@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.Data;
-import org.thingsboard.domain.notification.template.NotificationDeliveryMethod;
+import org.thingsboard.domain.notification.internal.template.NotificationDeliveryMethod;
 
 @Data
 public class NotificationRequestStats {

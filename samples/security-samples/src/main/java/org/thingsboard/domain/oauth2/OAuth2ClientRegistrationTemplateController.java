@@ -29,8 +29,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import static org.thingsboard.common.ControllerConstants.CLIENT_REGISTRATION_TEMPLATE_ID;
-import org.thingsboard.domain.oauth2.model.OAuth2ClientRegistrationTemplate;
-import org.thingsboard.domain.oauth2.service.OAuth2ClientRegistrationTemplateService;
 
 @RestController
 @RequestMapping("/api/oauth2/config/template")

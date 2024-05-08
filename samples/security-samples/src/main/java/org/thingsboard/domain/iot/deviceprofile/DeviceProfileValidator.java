@@ -51,7 +51,7 @@ import org.thingsboard.domain.iot.deviceprofile.model.DeviceProfileTransportConf
 import org.thingsboard.domain.iot.deviceprofile.model.MqttDeviceProfileTransportConfiguration;
 import org.thingsboard.domain.iot.deviceprofile.model.TransportPayloadTypeConfiguration;
 import org.thingsboard.domain.iot.deviceprofile.model.X509CertificateChainProvisionConfiguration;
-import org.thingsboard.domain.tenant.service.TenantService;
+import org.thingsboard.domain.tenant.TenantService;
 
 @Slf4j
 @Component

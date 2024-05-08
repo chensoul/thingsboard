@@ -27,7 +27,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
-import org.thingsboard.domain.setting.security.SecuritySettingService;
+import org.thingsboard.domain.setting.SecuritySettingService;
 
 @Component(value = "oauth2AuthenticationFailureHandler")
 public class Oauth2AuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {

@@ -22,7 +22,7 @@ import org.springframework.web.socket.CloseStatus;
  * Created by ashvayka on 27.03.18.
  */
 public interface WebSocketMsgEndpoint {
-	boolean validate(String sessionId);
+	boolean contains(WebSocketSessionRef sessionRef);
 
 	void send(WebSocketSessionRef sessionRef, int cmdId, String msg);
 

@@ -20,9 +20,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.thingsboard.data.service.EntityServiceRegistry;
 import org.thingsboard.common.model.EntityType;
-import org.thingsboard.domain.tenant.model.DefaultTenantProfileConfiguration;
-import org.thingsboard.domain.tenant.model.TenantProfile;
-import org.thingsboard.domain.tenant.service.TenantProfileService;
+import org.thingsboard.domain.tenant.DefaultTenantProfileConfiguration;
+import org.thingsboard.domain.tenant.TenantProfile;
+import org.thingsboard.domain.tenant.TenantProfileService;
 import org.thingsboard.server.security.SecurityUtils;
 
 @Service

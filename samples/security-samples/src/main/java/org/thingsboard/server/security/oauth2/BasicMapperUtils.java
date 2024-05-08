@@ -19,7 +19,7 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.springframework.util.StringUtils;
-import org.thingsboard.domain.oauth2.model.OAuth2MapperConfig;
+import org.thingsboard.domain.oauth2.OAuth2MapperConfig;
 
 @Slf4j
 public class BasicMapperUtils {

@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.thingsboard.domain.setting.mfa.provider.TwoFaProviderType;
+import org.thingsboard.domain.setting.internal.mfa.provider.TwoFaProviderType;
 import static org.thingsboard.server.security.SecurityUtils.getCurrentUser;
 import org.thingsboard.server.security.jwt.token.JwtPair;
 import org.thingsboard.server.security.mfa.TwoFaSettingAuthService;

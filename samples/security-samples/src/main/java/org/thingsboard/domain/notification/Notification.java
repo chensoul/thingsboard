@@ -22,9 +22,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.thingsboard.common.model.BaseData;
-import org.thingsboard.domain.notification.info.NotificationInfo;
-import org.thingsboard.domain.notification.template.NotificationDeliveryMethod;
-import org.thingsboard.domain.notification.template.NotificationType;
+import org.thingsboard.domain.notification.internal.template.NotificationDeliveryMethod;
+import org.thingsboard.domain.notification.internal.template.NotificationType;
 
 @Data
 @AllArgsConstructor

@@ -18,7 +18,7 @@ package org.thingsboard.common.model.event;
 import java.io.Serializable;
 import lombok.Builder;
 import lombok.Data;
-import org.thingsboard.domain.audit.model.ActionType;
+import org.thingsboard.domain.audit.ActionType;
 
 @Data
 @Builder

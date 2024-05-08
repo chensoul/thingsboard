@@ -43,7 +43,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.thingsboard.common.util.MiscUtils;
-import org.thingsboard.domain.oauth2.service.OAuth2Service;
+import org.thingsboard.domain.oauth2.OAuth2Service;
 
 @Service
 @Slf4j

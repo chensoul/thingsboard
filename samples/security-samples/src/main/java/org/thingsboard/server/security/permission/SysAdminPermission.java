@@ -18,8 +18,8 @@ package org.thingsboard.server.security.permission;
 import java.io.Serializable;
 import org.springframework.stereotype.Component;
 import org.thingsboard.common.model.HasTenantId;
-import org.thingsboard.domain.user.model.Authority;
-import org.thingsboard.domain.user.model.User;
+import org.thingsboard.domain.user.Authority;
+import org.thingsboard.domain.user.User;
 import org.thingsboard.server.security.SecurityUser;
 
 @Component(value = "sysAdminPermission")

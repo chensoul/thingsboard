@@ -28,8 +28,7 @@ import org.thingsboard.common.model.BaseData;
 import org.thingsboard.common.model.EntityType;
 import org.thingsboard.common.model.HasName;
 import org.thingsboard.common.model.HasTenantId;
-import org.thingsboard.domain.notification.info.NotificationInfo;
-import org.thingsboard.domain.notification.template.NotificationTemplate;
+import org.thingsboard.domain.notification.internal.template.NotificationTemplate;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

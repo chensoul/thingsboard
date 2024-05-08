@@ -24,12 +24,12 @@ import lombok.Builder;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.thingsboard.common.util.TemplateUtils;
-import org.thingsboard.domain.setting.notification.NotificationDeliveryMethodConfig;
-import org.thingsboard.domain.setting.notification.NotificationSetting;
-import org.thingsboard.domain.notification.template.NotificationDeliveryTemplate;
-import org.thingsboard.domain.notification.template.NotificationDeliveryMethod;
-import org.thingsboard.domain.notification.template.NotificationTemplate;
-import org.thingsboard.domain.notification.template.NotificationType;
+import org.thingsboard.domain.setting.NotificationDeliveryMethodConfig;
+import org.thingsboard.domain.setting.NotificationSetting;
+import org.thingsboard.domain.notification.internal.template.NotificationDeliveryTemplate;
+import org.thingsboard.domain.notification.internal.template.NotificationDeliveryMethod;
+import org.thingsboard.domain.notification.internal.template.NotificationTemplate;
+import org.thingsboard.domain.notification.internal.template.NotificationType;
 
 @SuppressWarnings("unchecked")
 public class NotificationContext {

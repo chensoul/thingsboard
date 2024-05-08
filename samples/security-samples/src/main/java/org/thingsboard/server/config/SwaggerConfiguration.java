@@ -70,7 +70,7 @@ import org.thingsboard.server.security.rest.exception.CredentialsExpiredResponse
 import org.thingsboard.common.exception.ThingsboardErrorCode;
 import org.thingsboard.common.exception.ErrorResponse;
 import org.thingsboard.common.util.JacksonUtil;
-import org.thingsboard.domain.user.model.Authority;
+import org.thingsboard.domain.user.Authority;
 import org.thingsboard.server.security.rest.model.LoginRequest;
 import org.thingsboard.server.security.rest.model.LoginResponse;
 

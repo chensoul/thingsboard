@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 import org.thingsboard.common.exception.ThingsboardErrorCode;
 import org.thingsboard.common.exception.ThingsboardException;
 import org.thingsboard.common.model.HasTenantId;
-import org.thingsboard.domain.user.model.Authority;
+import org.thingsboard.domain.user.Authority;
 import org.thingsboard.server.security.SecurityUser;
 
 @Service

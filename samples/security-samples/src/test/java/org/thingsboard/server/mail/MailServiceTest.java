@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.thingsboard.common.util.JacksonUtil;
-import org.thingsboard.domain.notification.channel.mail.MailService;
+import org.thingsboard.domain.notification.internal.channel.mail.MailService;
 
 /**
  * TODO Comment

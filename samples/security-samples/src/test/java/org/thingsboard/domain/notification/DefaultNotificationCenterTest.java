@@ -5,13 +5,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.thingsboard.common.util.JacksonUtil;
-import org.thingsboard.domain.notification.info.AlarmNotificationInfo;
-import org.thingsboard.domain.notification.info.NotificationInfo;
-import org.thingsboard.domain.setting.notification.NotificationSetting;
-import org.thingsboard.domain.notification.targets.NotificationTarget;
-import org.thingsboard.domain.notification.targets.PlatformUserNotificationTargetConfig;
-import org.thingsboard.domain.notification.template.NotificationTemplate;
-import org.thingsboard.domain.notification.template.NotificationType;
+import org.thingsboard.domain.notification.internal.info.AlarmNotificationInfo;
+import org.thingsboard.domain.notification.internal.DefaultNotificationCenter;
+import org.thingsboard.domain.notification.internal.targets.NotificationTarget;
+import org.thingsboard.domain.notification.internal.targets.PlatformUserNotificationTargetConfig;
+import org.thingsboard.domain.notification.internal.template.NotificationTemplate;
+import org.thingsboard.domain.notification.internal.template.NotificationType;
 
 /**
  * TODO Comment
@@ -40,7 +39,7 @@ class DefaultNotificationCenterTest {
 		notificationTarget.setTenantId(tenantId);
 
 		List<NotificationTarget> targets = List.of(notificationTarget);
-		NotificationInfo notificationInfo = new AlarmNotificationInfo("1", "offline");
+		NotificationInfo notificationInfo = new AlarmNotificationInfo();
 
 		NotificationRequest request = NotificationRequest.builder()
 			.tenantId(tenantId)

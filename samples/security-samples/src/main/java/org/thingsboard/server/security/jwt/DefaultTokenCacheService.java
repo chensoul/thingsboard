@@ -23,7 +23,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import static org.thingsboard.common.CacheConstants.USERS_SESSION_INVALIDATION_CACHE;
-import org.thingsboard.domain.user.event.UserAuthDataChangedEvent;
+import org.thingsboard.domain.user.UserAuthDataChangedEvent;
 
 @Slf4j
 @RequiredArgsConstructor

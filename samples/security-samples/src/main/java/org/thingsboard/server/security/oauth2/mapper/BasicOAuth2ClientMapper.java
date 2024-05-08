@@ -20,8 +20,8 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Service;
-import org.thingsboard.domain.oauth2.model.OAuth2MapperConfig;
-import org.thingsboard.domain.oauth2.model.OAuth2Registration;
+import org.thingsboard.domain.oauth2.OAuth2MapperConfig;
+import org.thingsboard.domain.oauth2.OAuth2Registration;
 import org.thingsboard.server.security.oauth2.BasicMapperUtils;
 import org.thingsboard.server.security.oauth2.OAuth2User;
 

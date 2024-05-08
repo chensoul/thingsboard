@@ -19,16 +19,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.thingsboard.common.model.BaseData;
-import org.thingsboard.domain.oauth2.model.OAuth2ClientInfo;
-import org.thingsboard.domain.oauth2.model.OAuth2Domain;
-import org.thingsboard.domain.oauth2.model.OAuth2DomainInfo;
-import org.thingsboard.domain.oauth2.model.OAuth2Info;
-import org.thingsboard.domain.oauth2.model.OAuth2Mobile;
-import org.thingsboard.domain.oauth2.model.OAuth2MobileInfo;
-import org.thingsboard.domain.oauth2.model.OAuth2Param;
-import org.thingsboard.domain.oauth2.model.OAuth2ParamInfo;
-import org.thingsboard.domain.oauth2.model.OAuth2Registration;
-import org.thingsboard.domain.oauth2.model.OAuth2RegistrationInfo;
 import static org.thingsboard.server.security.SecurityUser.SYS_TENANT_ID;
 
 public class OAuth2Utils {

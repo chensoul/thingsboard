@@ -32,10 +32,10 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import org.thingsboard.domain.audit.model.ActionType;
-import org.thingsboard.domain.oauth2.model.OAuth2Registration;
-import org.thingsboard.domain.oauth2.service.OAuth2Service;
-import org.thingsboard.domain.setting.security.SecuritySettingService;
+import org.thingsboard.domain.audit.ActionType;
+import org.thingsboard.domain.oauth2.OAuth2Registration;
+import org.thingsboard.domain.oauth2.OAuth2Service;
+import org.thingsboard.domain.setting.SecuritySettingService;
 import org.thingsboard.server.security.SecurityUser;
 import org.thingsboard.server.security.jwt.JwtTokenFactory;
 import org.thingsboard.server.security.jwt.token.JwtPair;

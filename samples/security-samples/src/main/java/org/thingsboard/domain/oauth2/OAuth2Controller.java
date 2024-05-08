@@ -29,10 +29,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.thingsboard.common.util.MiscUtils;
-import org.thingsboard.domain.oauth2.model.OAuth2ClientInfo;
-import org.thingsboard.domain.oauth2.model.OAuth2Info;
-import org.thingsboard.domain.oauth2.model.PlatformType;
-import org.thingsboard.domain.oauth2.service.OAuth2Service;
 import org.thingsboard.server.security.oauth2.OAuth2Configuration;
 
 @RestController

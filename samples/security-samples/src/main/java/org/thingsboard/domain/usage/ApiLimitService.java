@@ -17,7 +17,7 @@ package org.thingsboard.domain.usage;
 
 import java.util.function.Function;
 import org.thingsboard.common.model.EntityType;
-import org.thingsboard.domain.tenant.model.DefaultTenantProfileConfiguration;
+import org.thingsboard.domain.tenant.DefaultTenantProfileConfiguration;
 
 public interface ApiLimitService {
 

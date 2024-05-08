@@ -750,6 +750,28 @@ notification_system:
     # Semicolon-separated deduplication durations (in millis) for trigger types. Format: 'NotificationRuleTriggerType1:123;NotificationRuleTriggerType2:456'
     deduplication_durations: "${TB_NOTIFICATION_RULES_DEDUPLICATION_DURATIONS:NEW_PLATFORM_VERSION:0;RATE_LIMITS:14400000;}"
 
+monitoring:
+  # Monitored server domain
+  domain: "${DOMAIN:localhost:8090}"
+  rest:
+    # Base REST API url, https://DOMAIN by default
+    base_url: '${REST_BASE_URL:http://${monitoring.domain}}'
+    # Authentication username
+    username: '${REST_AUTH_USERNAME:zhijun.chen@dmall.com}'
+    # Authentication password
+    password: '${REST_AUTH_PASSWORD:sysadmin}'
+    # REST request timeout in milliseconds
+    request_timeout_ms: '${REST_REQUEST_TIMEOUT_MS:5000}'
+  ws:
+    # WebSocket url, wss://DOMAIN by default
+    base_url: '${WS_BASE_URL:ws://${monitoring.domain}}'
+    # WebSocket request timeout
+    request_timeout_ms: '${WS_REQUEST_TIMEOUT_MS:3000}'
+  # Checks frequency in milliseconds
+  monitoring_rate_ms: '${MONITORING_RATE_MS:10000}'
+  # Maximum time between request to transport and WebSocket update
+  check_timeout_ms: '${CHECK_TIMEOUT_MS:5000}'
+
 # General management parameters
 management:
   endpoints:

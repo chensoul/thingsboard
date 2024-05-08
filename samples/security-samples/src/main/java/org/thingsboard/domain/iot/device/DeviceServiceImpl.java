@@ -19,7 +19,7 @@ import org.thingsboard.domain.iot.device.model.SnmpDeviceTransportConfiguration;
 import org.thingsboard.domain.iot.deviceprofile.DeviceProfile;
 import org.thingsboard.domain.iot.deviceprofile.DeviceProfileService;
 import org.thingsboard.domain.iot.deviceprofile.DeviceProfileType;
-import org.thingsboard.domain.user.model.User;
+import org.thingsboard.domain.user.User;
 
 /**
  * TODO Comment

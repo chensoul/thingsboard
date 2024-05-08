@@ -2,9 +2,7 @@ package org.thingsboard.domain.notification;
 
 import com.google.common.util.concurrent.FutureCallback;
 import java.util.Set;
-import org.hibernate.annotations.TenantId;
-import org.thingsboard.domain.setting.notification.NotificationSetting;
-import org.thingsboard.domain.notification.template.NotificationDeliveryMethod;
+import org.thingsboard.domain.notification.internal.template.NotificationDeliveryMethod;
 
 /**
  * TODO Comment

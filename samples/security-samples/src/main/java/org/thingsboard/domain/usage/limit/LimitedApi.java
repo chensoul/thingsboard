@@ -18,7 +18,7 @@ package org.thingsboard.domain.usage.limit;
 import java.util.Optional;
 import java.util.function.Function;
 import lombok.Getter;
-import org.thingsboard.domain.tenant.model.DefaultTenantProfileConfiguration;
+import org.thingsboard.domain.tenant.DefaultTenantProfileConfiguration;
 
 public enum LimitedApi {
 

@@ -26,8 +26,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.thingsboard.common.util.JacksonUtil;
-import org.thingsboard.domain.oauth2.model.OAuth2MapperConfig;
-import org.thingsboard.domain.oauth2.model.OAuth2Registration;
+import org.thingsboard.domain.oauth2.OAuth2MapperConfig;
+import org.thingsboard.domain.oauth2.OAuth2Registration;
 import org.thingsboard.server.security.oauth2.BasicMapperUtils;
 import org.thingsboard.server.security.oauth2.OAuth2User;
 

@@ -17,7 +17,6 @@ package org.thingsboard.server.ws;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.annotation.PostConstruct;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,12 +24,13 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.thingsboard.common.util.JacksonUtil;
-import org.thingsboard.server.ws.cmd.CmdUpdate;
+import org.thingsboard.server.ws.cmd.DataUpdate;
 import org.thingsboard.server.ws.cmd.WsCmd;
 import org.thingsboard.server.ws.cmd.WsCmdType;
-import org.thingsboard.server.ws.cmd.WsCommandWrapper;
+import org.thingsboard.server.ws.cmd.WsCmdWrapper;
 import org.thingsboard.server.ws.handler.WsCmdHandler;
 
 /**
@@ -42,8 +42,9 @@ import org.thingsboard.server.ws.handler.WsCmdHandler;
 public class DefaultWebSocketService implements WebSocketService {
 	public static final int UNKNOWN_SUBSCRIPTION_ID = 0;
 
-	private final WebSocketMsgEndpoint msgEndpoint;
+	@Lazy
 	private final List<WsCmdHandler<? extends WsCmd>> cmdHandlers;
+	private final WebSocketMsgEndpoint msgEndpoint;
 
 	private Map<WsCmdType, WsCmdHandler<? extends WsCmd>> cmdHandlerMap = new HashMap<>();
 
@@ -53,12 +54,12 @@ public class DefaultWebSocketService implements WebSocketService {
 	}
 
 	@Override
-	public void handleCommand(WebSocketSessionRef sessionRef, WsCommandWrapper commandsWrapper) {
+	public void handleCommand(WebSocketSessionRef sessionRef, WsCmdWrapper commandsWrapper) {
 		if (commandsWrapper == null || CollectionUtils.isEmpty(commandsWrapper.getCmds())) {
 			return;
 		}
 		String sessionId = sessionRef.getSessionId();
-		if (!msgEndpoint.validate(sessionId)) {
+		if (!msgEndpoint.contains(sessionRef)) {
 			log.warn("[{}] Session not found. ", sessionId);
 			sendError(sessionRef, UNKNOWN_SUBSCRIPTION_ID, "Session not found");
 			return;
@@ -82,7 +83,7 @@ public class DefaultWebSocketService implements WebSocketService {
 	}
 
 	@Override
-	public void sendUpdate(WebSocketSessionRef sessionRef, CmdUpdate update) {
+	public void sendUpdate(WebSocketSessionRef sessionRef, DataUpdate update) {
 		doSendUpdate(sessionRef, update.getCmdId(), update);
 	}
 

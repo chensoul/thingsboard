@@ -63,7 +63,7 @@ import org.thingsboard.server.security.SecurityUser;
 import org.thingsboard.server.security.jwt.JwtAuthenticationProvider;
 import org.thingsboard.server.security.jwt.JwtExpiredTokenException;
 import static org.thingsboard.server.ws.DefaultWebSocketService.UNKNOWN_SUBSCRIPTION_ID;
-import org.thingsboard.server.ws.cmd.WsCommandWrapper;
+import org.thingsboard.server.ws.cmd.WsCmdWrapper;
 import org.thingsboard.server.ws.message.PingWebSocketMsg;
 import org.thingsboard.server.ws.message.WebSocketMsgType;
 import org.thingsboard.server.ws.message.TextWebSocketMsg;
@@ -75,7 +75,7 @@ import org.thingsboard.server.ws.message.WebSocketMsg;
 public class WebSocketHandler extends TextWebSocketHandler implements WebSocketMsgEndpoint {
 	public static final int NUMBER_OF_PING_ATTEMPTS = 3;
 
-	private final ConcurrentMap<String, SessionMetaData> internalSessionMap = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, CustomSendHandler> internalSessionMap = new ConcurrentHashMap<>();
 	private final ConcurrentMap<String, String> externalSessionMap = new ConcurrentHashMap<>();
 	private final ConcurrentMap<String, WebSocketSessionRef> blacklistedSessions = new ConcurrentHashMap<>();
 
@@ -97,7 +97,7 @@ public class WebSocketHandler extends TextWebSocketHandler implements WebSocketM
 
 	private ExecutorService executor;
 	private ScheduledExecutorService pingExecutor;
-	private Cache<String, SessionMetaData> pendingSessions;
+	private Cache<String, CustomSendHandler> pendingSessions;
 
 	@PostConstruct
 	private void init() {
@@ -107,10 +107,10 @@ public class WebSocketHandler extends TextWebSocketHandler implements WebSocketM
 
 		pendingSessions = Caffeine.newBuilder()
 			.expireAfterWrite(authTimeoutMs, TimeUnit.MILLISECONDS)
-			.<String, SessionMetaData>removalListener((sessionId, sessionMd, removalCause) -> {
-				if (removalCause == RemovalCause.EXPIRED && sessionMd != null) {
+			.<String, CustomSendHandler>removalListener((sessionId, sendHandler, removalCause) -> {
+				if (removalCause == RemovalCause.EXPIRED && sendHandler != null) {
 					try {
-						close(sessionMd.sessionRef, CloseStatus.POLICY_VIOLATION);
+						close(sendHandler.sessionRef, CloseStatus.POLICY_VIOLATION);
 					} catch (IOException e) {
 						log.warn("IO error", e);
 					}
@@ -133,27 +133,27 @@ public class WebSocketHandler extends TextWebSocketHandler implements WebSocketM
 	@Override
 	public void handleTextMessage(WebSocketSession session, TextMessage message) {
 		try {
-			SessionMetaData sessionMd = getSessionMd(session.getId());
-			if (sessionMd == null) {
-				session.close(CloseStatus.SERVER_ERROR.withReason("Session not found!"));
+			CustomSendHandler sendHandler = getSendHandler(session.getId());
+			if (sendHandler == null) {
+				session.close(CloseStatus.SERVER_ERROR.withReason("Session not found"));
 				return;
 			}
-			sessionMd.onMsg(message.getPayload());
+			sendHandler.onMsg(message.getPayload());
 		} catch (IOException e) {
 			log.warn("IO error", e);
 		}
 	}
 
 	@Override
-	protected void handlePongMessage(WebSocketSession session, PongMessage message) throws Exception {
+	public void handlePongMessage(WebSocketSession session, PongMessage message) {
 		try {
-			SessionMetaData sessionMd = getSessionMd(session.getId());
-			if (sessionMd == null) {
-				session.close(CloseStatus.SERVER_ERROR.withReason("Session not found!"));
+			CustomSendHandler sendHandler = getSendHandler(session.getId());
+			if (sendHandler == null) {
+				session.close(CloseStatus.SERVER_ERROR.withReason("Session not found"));
 				return;
 			}
-			log.debug("{} Processing pong response {}", sessionMd.sessionRef, message.getPayload());
-			sessionMd.processPongMessage(System.currentTimeMillis());
+			log.debug("{} Processing pong response {}", sendHandler.sessionRef, message.getPayload());
+			sendHandler.processPongMessage(System.currentTimeMillis());
 		} catch (IOException e) {
 			log.warn("IO error", e);
 		}
@@ -187,17 +187,17 @@ public class WebSocketHandler extends TextWebSocketHandler implements WebSocketM
 	@Override
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
 		super.afterConnectionClosed(session, closeStatus);
-		SessionMetaData sessionMd = internalSessionMap.remove(session.getId());
-		if (sessionMd == null) {
-			sessionMd = pendingSessions.asMap().remove(session.getId());
+		CustomSendHandler sendHandler = internalSessionMap.remove(session.getId());
+		if (sendHandler == null) {
+			sendHandler = pendingSessions.asMap().remove(session.getId());
 		}
-		if (sessionMd != null) {
-			externalSessionMap.remove(sessionMd.sessionRef.getSessionId());
-			if (sessionMd.sessionRef.getSecurityCtx() != null) {
-				webSocketSessionLimitService.cleanupLimits(session, sessionMd.sessionRef);
-				processInWebSocketService(sessionMd.sessionRef, SessionEvent.onClosed());
+		if (sendHandler != null) {
+			externalSessionMap.remove(sendHandler.sessionRef.getSessionId());
+			if (sendHandler.sessionRef.getSecurityCtx() != null) {
+				webSocketSessionLimitService.cleanupLimits(session, sendHandler.sessionRef);
+				processInWebSocketService(sendHandler.sessionRef, SessionEvent.onClosed());
 			}
-			log.info("{} Session is closed", sessionMd.sessionRef);
+			log.info("{} Session is closed", sendHandler.sessionRef);
 		} else {
 			log.info("[{}] Session is closed", session.getId());
 		}
@@ -206,16 +206,16 @@ public class WebSocketHandler extends TextWebSocketHandler implements WebSocketM
 	@Override
 	public void handleTransportError(WebSocketSession session, Throwable tError) throws Exception {
 		super.handleTransportError(session, tError);
-		SessionMetaData sessionMd = getSessionMd(session.getId());
-		if (sessionMd != null) {
+		CustomSendHandler sendHandler = getSendHandler(session.getId());
+		if (sendHandler != null) {
 			log.debug("[{}] Session transport error", session.getId(), tError);
-			processInWebSocketService(sessionMd.sessionRef, SessionEvent.onError(tError));
+			processInWebSocketService(sendHandler.sessionRef, SessionEvent.onError(tError));
 		}
 	}
 
 	@Override
-	public boolean validate(String sessionId) {
-		return getSessionMdByExternalId(sessionId) != null;
+	public boolean contains(WebSocketSessionRef sessionRef) {
+		return getSendHandlerByExternalId(sessionRef.getSessionId()) != null;
 	}
 
 	@Override
@@ -232,48 +232,48 @@ public class WebSocketHandler extends TextWebSocketHandler implements WebSocketM
 	@Override
 	public void sendPing() {
 		long currentTime = System.currentTimeMillis();
-		internalSessionMap.values().forEach(sessionMd -> {
-			executor.submit(() -> sessionMd.sendPing(currentTime));
+		internalSessionMap.values().forEach(sendHandler -> {
+			executor.submit(() -> sendHandler.sendPing(currentTime));
 		});
 	}
 
 	@Override
 	public void close(WebSocketSessionRef sessionRef, CloseStatus reason) throws IOException {
 		String externalId = sessionRef.getSessionId();
-		SessionMetaData sessionMd = getSessionMdByExternalId(externalId);
-		if (sessionMd == null) {
+		CustomSendHandler sendHandler = getSendHandlerByExternalId(externalId);
+		if (sendHandler == null) {
 			return;
 		}
-		sessionMd.session.close(reason);
+		sendHandler.session.close(reason);
 	}
 
-	private void establishSession(WebSocketSession session, WebSocketSessionRef sessionRef, SessionMetaData sessionMd) throws IOException {
+	private void establishSession(WebSocketSession session, WebSocketSessionRef sessionRef, CustomSendHandler sendHandler) throws IOException {
 		if (sessionRef.getSecurityCtx() != null) {
 			if (webSocketSessionLimitService.checkLimited(session, sessionRef)) {
 				return;
 			}
-			if (sessionMd == null) {
-				sessionMd = new SessionMetaData(session, sessionRef);
+			if (sendHandler == null) {
+				sendHandler = new CustomSendHandler(session, sessionRef);
 			}
-			sessionMd.setMaxMsgQueueSize(webSocketSessionLimitService.getMaxMsgQueueSize(sessionRef));
+			sendHandler.setMaxMsgQueueSize(webSocketSessionLimitService.getMaxMsgQueueSize(sessionRef));
 
-			internalSessionMap.put(session.getId(), sessionMd);
+			internalSessionMap.put(session.getId(), sendHandler);
 			externalSessionMap.put(sessionRef.getSessionId(), session.getId());
 			processInWebSocketService(sessionRef, SessionEvent.onEstablished());
 			log.info("[{}][{}] Session established from user: {}@{}",
 				sessionRef.getSessionId(), session.getId(), sessionRef.getSecurityCtx().getName(), sessionRef.getSecurityCtx().getTenantId());
 		} else {
-			sessionMd = new SessionMetaData(session, sessionRef);
-			pendingSessions.put(session.getId(), sessionMd);
+			sendHandler = new CustomSendHandler(session, sessionRef);
+			pendingSessions.put(session.getId(), sendHandler);
 			externalSessionMap.put(sessionRef.getSessionId(), session.getId());
 		}
 	}
 
-	void processMsg(SessionMetaData sessionMd, String msg) throws IOException {
-		WebSocketSessionRef sessionRef = sessionMd.sessionRef;
-		WsCommandWrapper cmdsWrapper;
+	void processMsg(CustomSendHandler sendHandler, String msg) throws IOException {
+		WebSocketSessionRef sessionRef = sendHandler.sessionRef;
+		WsCmdWrapper cmdWrapper;
 		try {
-			cmdsWrapper = JacksonUtil.fromString(msg, WsCommandWrapper.class);
+			cmdWrapper = JacksonUtil.fromString(msg, WsCmdWrapper.class);
 		} catch (Exception e) {
 			log.warn("{} Failed to decode cmd: {}", sessionRef, e.getMessage(), e);
 			if (sessionRef.getSecurityCtx() != null) {
@@ -286,14 +286,14 @@ public class WebSocketHandler extends TextWebSocketHandler implements WebSocketM
 
 		if (sessionRef.getSecurityCtx() != null) {
 			log.debug("{} Processing {}", sessionRef, msg);
-			webSocketService.handleCommand(sessionRef, cmdsWrapper);
+			webSocketService.handleCommand(sessionRef, cmdWrapper);
 		} else {
-			String token = cmdsWrapper.getToken();
+			String token = cmdWrapper.getToken();
 			if (token == null) {
-				close(sessionRef, CloseStatus.POLICY_VIOLATION.withReason("Auth cmd is missing"));
+				close(sessionRef, CloseStatus.POLICY_VIOLATION.withReason("Auth Token is missing"));
 				return;
 			}
-			log.trace("{} Authenticating session", sessionRef);
+			log.debug("{} Authenticating session", sessionRef);
 			SecurityUser securityCtx;
 			try {
 				securityCtx = authenticationProvider.authenticate(token);
@@ -302,19 +302,17 @@ public class WebSocketHandler extends TextWebSocketHandler implements WebSocketM
 				return;
 			}
 			sessionRef.setSecurityCtx(securityCtx);
-			pendingSessions.invalidate(sessionMd.session.getId());
-			establishSession(sessionMd.session, sessionRef, sessionMd);
+			pendingSessions.invalidate(sendHandler.session.getId());
+			establishSession(sendHandler.session, sessionRef, sendHandler);
 
-			webSocketService.handleCommand(sessionRef, cmdsWrapper);
+			webSocketService.handleCommand(sessionRef, cmdWrapper);
 		}
 	}
 
 	private void processInWebSocketService(WebSocketSessionRef sessionRef, SessionEvent event) {
-		if (sessionRef.getSecurityCtx() == null) {
-			return;
+		if (sessionRef.getSecurityCtx() != null) {
+			eventPublisher.publishEvent(new WebSocketSessionEvent(new WebSocketSessionEvent.WebSocketSessionEventSource(sessionRef, event)));
 		}
-
-		eventPublisher.publishEvent(new WebSocketSessionEvent(new WebSocketSessionEvent.WebSocketSessionEventSource(sessionRef, event)));
 	}
 
 	private WebSocketSessionRef toRef(WebSocketSession session) {
@@ -331,11 +329,11 @@ public class WebSocketHandler extends TextWebSocketHandler implements WebSocketM
 			.build();
 	}
 
-	private void doSend(WebSocketSessionRef sessionRef, int subscriptionId, String msg) throws IOException {
+	private void doSend(WebSocketSessionRef sessionRef, int cmdId, String msg) throws IOException {
 		log.debug("{} Sending {}", sessionRef, msg);
 		String externalId = sessionRef.getSessionId();
-		SessionMetaData sessionMd = getSessionMdByExternalId(externalId);
-		if (sessionMd == null) {
+		CustomSendHandler sendHandler = getSendHandlerByExternalId(externalId);
+		if (sendHandler == null) {
 			return;
 		}
 
@@ -343,41 +341,41 @@ public class WebSocketHandler extends TextWebSocketHandler implements WebSocketM
 		if (rateLimitService.checkRateLimited(LimitedApi.WS_UPDATES_PER_SESSION, tenantId, (Object) sessionRef.getSessionId())) {
 			if (blacklistedSessions.putIfAbsent(externalId, sessionRef) == null) {
 				log.info("{} Failed to process session update. Max session updates limit reached", sessionRef);
-				sessionMd.sendMsg("{\"subscriptionId\":" + subscriptionId + ", \"errorCode\":" + ThingsboardErrorCode.TOO_MANY_REQUESTS.getErrorCode() + ", \"errorMsg\":\"Too many updates!\"}");
+				sendHandler.sendMsg("{\"cmdId\":" + cmdId + ", \"errorCode\":" + ThingsboardErrorCode.TOO_MANY_REQUESTS.getErrorCode() + ", \"errorMsg\":\"Too many updates\"}");
 			}
 			return;
 		}
-		sessionMd.sendMsg(msg);
+		sendHandler.sendMsg(msg);
 
 		blacklistedSessions.remove(externalId);
 		log.debug("{} Session is no longer blacklisted.", sessionRef);
 	}
 
-	private SessionMetaData getSessionMd(String internalSessionId) {
-		SessionMetaData sessionMd = internalSessionMap.get(internalSessionId);
-		if (sessionMd == null) {
-			sessionMd = pendingSessions.getIfPresent(internalSessionId);
+	private CustomSendHandler getSendHandler(String internalSessionId) {
+		CustomSendHandler sendHandler = internalSessionMap.get(internalSessionId);
+		if (sendHandler == null) {
+			sendHandler = pendingSessions.getIfPresent(internalSessionId);
 		}
-		if (sessionMd == null) {
+		if (sendHandler == null) {
 			log.warn("[{}] Failed to find session by internal id", internalSessionId);
 		}
-		return sessionMd;
+		return sendHandler;
 	}
 
-	private SessionMetaData getSessionMdByExternalId(String externalId) {
+	private CustomSendHandler getSendHandlerByExternalId(String externalId) {
 		String internalId = externalSessionMap.get(externalId);
 		if (internalId == null) {
 			log.warn("[{}] Failed to find session by external id", externalId);
 			return null;
 		}
-		SessionMetaData sessionMd = internalSessionMap.get(internalId);
-		if (sessionMd == null) {
+		CustomSendHandler sendHandler = internalSessionMap.get(internalId);
+		if (sendHandler == null) {
 			log.warn("[{}][{}] Failed to find session by internal id", externalId, internalId);
 		}
-		return sessionMd;
+		return sendHandler;
 	}
 
-	class SessionMetaData implements SendHandler {
+	class CustomSendHandler implements SendHandler {
 		private final WebSocketSession session;
 		private final RemoteEndpoint.Async asyncRemote;
 		private final WebSocketSessionRef sessionRef;
@@ -391,7 +389,7 @@ public class WebSocketHandler extends TextWebSocketHandler implements WebSocketM
 		private final Lock inboundMsgQueueProcessorLock = new ReentrantLock();
 		private volatile long lastActivityTime;
 
-		SessionMetaData(WebSocketSession session, WebSocketSessionRef sessionRef) {
+		CustomSendHandler(WebSocketSession session, WebSocketSessionRef sessionRef) {
 			super();
 			this.session = session;
 			Session nativeSession = ((NativeWebSocketSession) session).getNativeSession(Session.class);
@@ -440,7 +438,7 @@ public class WebSocketHandler extends TextWebSocketHandler implements WebSocketM
 				processNextMsg();
 			} else {
 				log.info("{} Session closed due to updates queue size exceeded", sessionRef);
-				closeSession(CloseStatus.POLICY_VIOLATION.withReason("Max pending updates limit reached!"));
+				closeSession(CloseStatus.POLICY_VIOLATION.withReason("Max pending updates limit reached"));
 			}
 		}
 

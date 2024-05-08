@@ -12,10 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.thingsboard.domain.notification.NotificationCenter;
-import org.thingsboard.domain.notification.template.NotificationDeliveryMethod;
-import org.thingsboard.domain.setting.notification.NotificationSetting;
-import org.thingsboard.domain.setting.notification.NotificationSettingService;
-import org.thingsboard.domain.setting.notification.UserNotificationSetting;
+import org.thingsboard.domain.notification.internal.template.NotificationDeliveryMethod;
 import org.thingsboard.server.security.SecurityUser;
 import static org.thingsboard.server.security.SecurityUser.SYS_TENANT_ID;
 

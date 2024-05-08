@@ -24,9 +24,9 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.thingsboard.common.util.JacksonUtil;
-import org.thingsboard.domain.oauth2.model.OAuth2CustomMapperConfig;
-import org.thingsboard.domain.oauth2.model.OAuth2MapperConfig;
-import org.thingsboard.domain.oauth2.model.OAuth2Registration;
+import org.thingsboard.domain.oauth2.OAuth2CustomMapperConfig;
+import org.thingsboard.domain.oauth2.OAuth2MapperConfig;
+import org.thingsboard.domain.oauth2.OAuth2Registration;
 import org.thingsboard.server.security.oauth2.OAuth2User;
 
 @Service(value = "customOAuth2ClientMapper")

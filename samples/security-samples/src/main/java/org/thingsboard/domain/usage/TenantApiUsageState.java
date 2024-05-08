@@ -24,8 +24,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.util.Pair;
 import org.thingsboard.common.model.EntityType;
-import org.thingsboard.domain.tenant.model.TenantProfile;
-import org.thingsboard.domain.tenant.model.TenantProfileData;
+import org.thingsboard.domain.tenant.TenantProfile;
+import org.thingsboard.domain.tenant.TenantProfileData;
 
 public class TenantApiUsageState extends BaseApiUsageState {
 	@Getter

@@ -18,7 +18,7 @@ package org.thingsboard.server.security.jwt.token;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.thingsboard.domain.user.model.Authority;
+import org.thingsboard.domain.user.Authority;
 
 @Data
 @AllArgsConstructor

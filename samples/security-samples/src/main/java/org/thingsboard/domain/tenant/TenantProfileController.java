@@ -16,7 +16,6 @@ import org.thingsboard.data.model.page.PageData;
 import org.thingsboard.data.model.page.PageLink;
 import org.thingsboard.common.model.EntityType;
 import org.thingsboard.domain.BaseController;
-import org.thingsboard.domain.tenant.model.TenantProfile;
 import org.thingsboard.server.security.permission.Operation;
 
 /**
