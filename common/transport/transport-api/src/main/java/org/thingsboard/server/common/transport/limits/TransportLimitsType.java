@@ -13,22 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.thingsboard.server.service.ws;
+package org.thingsboard.server.common.transport.limits;
 
-import org.springframework.web.socket.CloseStatus;
-
-import java.io.IOException;
-
-/**
- * Created by ashvayka on 27.03.18.
- */
-public interface WebSocketMsgEndpoint {
-
-    void send(WebSocketSessionRef sessionRef, int subscriptionId, String msg) throws IOException;
-
-    void sendPing(WebSocketSessionRef sessionRef, long currentTime) throws IOException;
-
-    void close(WebSocketSessionRef sessionRef, CloseStatus withReason) throws IOException;
-
-    boolean isOpen(String sessionId);
+public enum TransportLimitsType {
+    TENANT_LIMITS, DEVICE_LIMITS, GATEWAY_LIMITS
 }
