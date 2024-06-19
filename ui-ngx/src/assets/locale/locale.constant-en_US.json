@@ -437,6 +437,10 @@
             "ios": "iOS",
             "app-id": "App ID",
             "app-id-required": "App ID is required",
+            "google-play-link": "Google Play link",
+            "google-play-link-required": "Google Play link is required",
+            "app-store-link": "App Store link",
+            "app-store-link-required": "App Store link is required",
             "appearance": "Appearance",
             "appearance-on-home-page": "Appearance on Home page",
             "enabled": "Enabled",
@@ -1856,8 +1860,9 @@
             "server": "Server",
             "short-id": "Short server ID",
             "short-id-tooltip": "Server short Id. Used as link to associate server Object Instance.\nThis identifier uniquely identifies each LwM2M Server configured for the LwM2M Client.\nResource MUST be set when the Bootstrap-Server Resource has a value of 'false'.\nThe values ID:0 and ID:65535 values MUST NOT be used for identifying the LwM2M Server.",
+            "short-id-tooltip-bootstrap": "Server short Id. Used as link to associate server Object Instance.\nThis identifier uniquely identifies each LwM2M Server configured for the LwM2M Client.\nResource MUST be set when the Bootstrap-Server Resource has a value of 'false'.",
             "short-id-required": "Short server ID is required.",
-            "short-id-range": "Short server ID should be in a range from 1 to 65534.",
+            "short-id-range": "Short server ID should be in a range from {{ min }} to {{ max }}.",
             "short-id-pattern": "Short server ID must be a positive integer.",
             "lifetime": "Client registration lifetime",
             "lifetime-required": "Client registration lifetime is required.",
@@ -2831,6 +2836,7 @@
         "enable-remote-logging": "Enable remote logging",
         "ellipsis-chips-text": "+ {{count}} more",
         "launch-gateway": "Launch gateway",
+        "launch-command": "Launch command",
         "launch-docker-compose": "Start the gateway using the following command in the terminal from folder with docker-compose.yml file",
         "logs-configuration": "Logs configuration",
         "create-new-gateway": "Create a new gateway",
@@ -4324,6 +4330,15 @@
             "retry-failed-and-timeout-hint": "Retry all failed and timed-out messages from processing pack"
         }
     },
+    "queue-statistics": {
+        "queue-statistics": "Queue statistics",
+        "no-queue-statistics-matching": "No queue statistics matching '{{entity}}' were found.",
+        "queue-statistics-required": "Queue statistics is required.",
+        "list-of-queue-statistics": "{ count, plural, =1 {One queue statistic} other {List of # queue statistics} }",
+        "selected-queue-statistics": "{ count, plural, =1 {1 queue statistic} other {# queue statistics} } selected",
+        "no-queue-statistics-text": "No queue statistics found",
+        "queue-statistics-starts-with": "Queue statistics whose names start with '{{prefix}}'"
+    },
     "server-error": {
         "general": "General server error",
         "authentication": "Authentication error",
@@ -5576,7 +5591,9 @@
     },
     "widgets": {
         "mobile-app-qr-code": {
-            "configuration-hint": "The configuration depends on the Mobile app QR code widget in platform main settings"
+            "configuration-hint": "The configuration depends on the Mobile app QR code widget in platform main settings",
+            "get-it-on-google-play": "Get it on Google Play",
+            "download-on-the-app-store": "Download on the App Store"
         },
         "action-button": {
             "behavior": "Behavior",
@@ -6217,6 +6234,7 @@
             "gauge-bar-background": "Gauge bar background",
             "bar-color": "Bar color",
             "min-and-max-value": "Min and max value",
+            "min-and-max-label": "Min and max label",
             "font": "Font",
             "tick-width-and-color": "Tick width and color"
         },
