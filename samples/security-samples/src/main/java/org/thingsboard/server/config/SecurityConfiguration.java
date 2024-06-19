@@ -40,7 +40,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.thingsboard.common.exception.ErrorResponseExceptionHandler;
+import org.thingsboard.common.exception.ErrorExceptionHandler;
 import org.thingsboard.domain.usage.limit.RateLimitProcessingFilter;
 import org.thingsboard.server.security.jwt.JwtAuthenticationProvider;
 import org.thingsboard.server.security.jwt.JwtTokenAuthenticationProcessingFilter;
@@ -73,7 +73,7 @@ public class SecurityConfiguration {
 	public static final String MAIL_OAUTH2_PROCESSING_ENTRY_POINT = "/api/system/mail/oauth2/code";
 
 	@Autowired
-	private ErrorResponseExceptionHandler restAccessDeniedHandler;
+	private ErrorExceptionHandler restAccessDeniedHandler;
 
 	@Autowired
 	@Qualifier("defaultAuthenticationSuccessHandler")

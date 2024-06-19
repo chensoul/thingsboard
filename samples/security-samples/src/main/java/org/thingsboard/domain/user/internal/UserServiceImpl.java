@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 import org.thingsboard.common.validation.exception.DataValidationException;
 import org.thingsboard.data.model.page.PageData;
 import org.thingsboard.data.model.page.PageLink;
-import static org.thingsboard.common.exception.ErrorResponseExceptionHandler.YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION;
+import static org.thingsboard.common.exception.ErrorExceptionHandler.YOU_DON_T_HAVE_PERMISSION_TO_PERFORM_THIS_OPERATION;
 import org.thingsboard.common.exception.ThingsboardErrorCode;
 import org.thingsboard.common.exception.ThingsboardException;
 import org.thingsboard.common.model.EntityType;

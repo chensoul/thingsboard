@@ -23,15 +23,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
-import org.thingsboard.common.exception.ErrorResponseExceptionHandler;
+import org.thingsboard.common.exception.ErrorExceptionHandler;
 
 @Component(value = "defaultAuthenticationFailureHandler")
 public class RestAuthenticationFailureHandler implements AuthenticationFailureHandler {
 
-	private final ErrorResponseExceptionHandler errorResponseHandler;
+	private final ErrorExceptionHandler errorResponseHandler;
 
 	@Autowired
-	public RestAuthenticationFailureHandler(ErrorResponseExceptionHandler errorResponseHandler) {
+	public RestAuthenticationFailureHandler(ErrorExceptionHandler errorResponseHandler) {
 		this.errorResponseHandler = errorResponseHandler;
 	}
 

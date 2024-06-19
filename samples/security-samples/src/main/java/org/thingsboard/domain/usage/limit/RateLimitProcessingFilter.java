@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.thingsboard.common.exception.RateLimitedException;
-import org.thingsboard.common.exception.ErrorResponseExceptionHandler;
+import org.thingsboard.common.exception.ErrorExceptionHandler;
 import org.thingsboard.common.exception.ThingsboardException;
 import org.thingsboard.common.model.EntityType;
 import static org.thingsboard.common.model.EntityType.MERCHANT;
@@ -38,7 +38,7 @@ import org.thingsboard.server.security.SecurityUser;
 @Slf4j
 @RequiredArgsConstructor
 public class RateLimitProcessingFilter extends OncePerRequestFilter {
-	private final ErrorResponseExceptionHandler errorResponseHandler;
+	private final ErrorExceptionHandler errorResponseHandler;
 	private final RateLimitService rateLimitService;
 
 	@SneakyThrows

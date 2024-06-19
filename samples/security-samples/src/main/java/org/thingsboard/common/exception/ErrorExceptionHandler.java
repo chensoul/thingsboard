@@ -47,7 +47,7 @@ import org.thingsboard.server.security.rest.exception.UserPasswordNotValidExcept
 @Controller
 @RequiredArgsConstructor
 @RestControllerAdvice
-public class ErrorResponseExceptionHandler extends ResponseEntityExceptionHandler implements AccessDeniedHandler, ErrorController {
+public class ErrorExceptionHandler extends ResponseEntityExceptionHandler implements AccessDeniedHandler, ErrorController {
 	private static final Map<HttpStatus, ThingsboardErrorCode> statusToErrorCodeMap = new HashMap<>();
 	private static final Map<ThingsboardErrorCode, HttpStatus> errorCodeToStatusMap = new HashMap<>();
 
