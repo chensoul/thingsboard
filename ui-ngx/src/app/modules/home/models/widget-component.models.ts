@@ -449,6 +449,8 @@ export class WidgetContext {
       labelPattern.destroy();
     }
     this.labelPatterns.clear();
+    this.width = undefined;
+    this.height = undefined;
     this.destroyed = true;
   }
 
@@ -531,6 +533,7 @@ export interface WidgetInfo extends WidgetTypeDescriptor, WidgetControllerDescri
   widgetName: string;
   fullFqn: string;
   deprecated: boolean;
+  scada: boolean;
   typeSettingsSchema?: string | any;
   typeDataKeySettingsSchema?: string | any;
   typeLatestDataKeySettingsSchema?: string | any;
@@ -565,6 +568,7 @@ export const MissingWidgetType: WidgetInfo = {
   widgetName: 'Widget type not found',
   fullFqn: 'undefined',
   deprecated: false,
+  scada: false,
   sizeX: 8,
   sizeY: 6,
   resources: [],
@@ -590,6 +594,7 @@ export const ErrorWidgetType: WidgetInfo = {
   widgetName: 'Error loading widget',
   fullFqn: 'error',
   deprecated: false,
+  scada: false,
   sizeX: 8,
   sizeY: 6,
   resources: [],
@@ -632,6 +637,7 @@ export const toWidgetInfo = (widgetTypeEntity: WidgetType): WidgetInfo => ({
   widgetName: widgetTypeEntity.name,
   fullFqn: fullWidgetTypeFqn(widgetTypeEntity),
   deprecated: widgetTypeEntity.deprecated,
+  scada: widgetTypeEntity.scada,
   type: widgetTypeEntity.descriptor.type,
   sizeX: widgetTypeEntity.descriptor.sizeX,
   sizeY: widgetTypeEntity.descriptor.sizeY,
@@ -685,6 +691,7 @@ export const toWidgetType = (widgetInfo: WidgetInfo, id: WidgetTypeId, tenantId:
     fqn: widgetTypeFqn(widgetInfo.fullFqn),
     name: widgetInfo.widgetName,
     deprecated: widgetInfo.deprecated,
+    scada: widgetInfo.scada,
     descriptor
   };
 };
