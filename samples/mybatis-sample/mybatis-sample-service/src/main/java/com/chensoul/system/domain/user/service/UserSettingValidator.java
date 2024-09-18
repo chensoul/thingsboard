@@ -1,0 +1,41 @@
+package com.chensoul.system.domain.user.service;
+
+import com.chensoul.exception.BusinessException;
+import com.chensoul.system.domain.user.mybatis.UserSettingDao;
+import com.chensoul.system.user.domain.UserSetting;
+import com.chensoul.validation.DataValidator;
+import java.util.Iterator;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
+/**
+ * TODO Comment
+ *
+ * @author <a href="mailto:ichensoul@gmail.com">chensoul</a>
+ * @since TODO
+ */
+@RequiredArgsConstructor
+@Component
+public class UserSettingValidator extends DataValidator<UserSetting> {
+    private final UserSettingDao userSettingDao;
+
+    @Override
+    protected void validateDataImpl(UserSetting data) {
+        Iterator<String> fieldNames = data.getExtra().fieldNames();
+        while (fieldNames.hasNext()) {
+            String fieldName = fieldNames.next();
+            if (fieldName.contains(".") || fieldName.contains(",")) {
+                throw new BusinessException("Json field name should not contain \".\" or \",\" symbols");
+            }
+        }
+    }
+
+    @Override
+    protected UserSetting validateUpdate(UserSetting data) {
+        UserSetting old = userSettingDao.findById(data.getId());
+        if (old == null) {
+            throw new BusinessException("Can't update non existing userSetting!");
+        }
+        return old;
+    }
+}
