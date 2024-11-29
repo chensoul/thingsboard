@@ -138,8 +138,14 @@ public class ThingsboardInstallService {
                             systemDataLoaderService.updateDefaultNotificationConfigs(false);
                             systemDataLoaderService.updateSecuritySettings();
                         case "3.7.0":
-                            log.info("Upgrading ThingsBoard from version 3.7.0 to 3.7.1 ...");
+                            log.info("Upgrading ThingsBoard from version 3.7.0 to 3.8.0 ...");
                             databaseEntitiesUpgradeService.upgradeDatabase("3.7.0");
+                        case "3.8.0":
+                            log.info("Upgrading ThingsBoard from version 3.8.0 to 3.8.1 ...");
+                        case "3.8.1":
+                            log.info("Upgrading ThingsBoard from version 3.8.1 to 3.9.0 ...");
+                            databaseEntitiesUpgradeService.upgradeDatabase("3.8.1");
+                            installScripts.updateResourcesUsage();
                             //TODO DON'T FORGET to update switch statement in the CacheCleanupService if you need to clear the cache
                             break;
                         default:
@@ -151,7 +157,7 @@ public class ThingsboardInstallService {
                     dataUpdateService.upgradeRuleNodes();
                     systemDataLoaderService.loadSystemWidgets();
                     installScripts.loadSystemLwm2mResources();
-                    installScripts.loadSystemImages();
+                    installScripts.loadSystemImagesAndResources();
                     if (installScripts.isUpdateImages()) {
                         installScripts.updateImages();
                     }
@@ -165,6 +171,7 @@ public class ThingsboardInstallService {
                 log.info("Installing DataBase schema for entities...");
 
                 entityDatabaseSchemaService.createDatabaseSchema();
+                entityDatabaseSchemaService.createSchemaVersion();
 
                 entityDatabaseSchemaService.createOrUpdateViewsAndFunctions();
                 entityDatabaseSchemaService.createOrUpdateDeviceInfoView(persistToTelemetry);
@@ -197,7 +204,7 @@ public class ThingsboardInstallService {
 //                systemDataLoaderService.loadSystemPlugins();
 //                systemDataLoaderService.loadSystemRules();
                 installScripts.loadSystemLwm2mResources();
-                installScripts.loadSystemImages();
+                installScripts.loadSystemImagesAndResources();
 
                 if (loadDemo) {
                     log.info("Loading demo data...");
