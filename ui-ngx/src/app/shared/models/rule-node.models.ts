@@ -21,23 +21,23 @@ import { ComponentDescriptor } from '@shared/models/component-descriptor.models'
 import { FcEdge, FcNode } from 'ngx-flowchart';
 import { Observable } from 'rxjs';
 import { PageComponent } from '@shared/components/page.component';
-import { AfterViewInit, EventEmitter, Inject, OnInit, Directive } from '@angular/core';
+import { AfterViewInit, EventEmitter, Inject, OnInit, Directive, DestroyRef, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState } from '@core/core.state';
 import { AbstractControl, UntypedFormGroup } from '@angular/forms';
 import { RuleChainType } from '@shared/models/rule-chain.models';
 import { DebugRuleNodeEventBody } from '@shared/models/event.models';
-import { TranslateService } from '@ngx-translate/core';
+import { HasEntityDebugSettings } from '@shared/models/entity.models';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 export interface RuleNodeConfiguration {
   [key: string]: any;
 }
 
-export interface RuleNode extends BaseData<RuleNodeId> {
+export interface RuleNode extends BaseData<RuleNodeId>, HasEntityDebugSettings {
   ruleChainId?: RuleChainId;
   type: string;
   name: string;
-  debugMode: boolean;
   singletonMode: boolean;
   queueName?: string;
   configurationVersion?: number;
@@ -103,6 +103,7 @@ export abstract class RuleNodeConfigurationComponent extends PageComponent imple
 
   private configurationSet = false;
   private disabledValue = false;
+  private destroyRef = inject(DestroyRef);
 
   set disabled(value: boolean) {
     if (this.disabledValue !== value) {
@@ -160,11 +161,15 @@ export abstract class RuleNodeConfigurationComponent extends PageComponent imple
       for (const part of path) {
         control = control.get(part);
       }
-      control.valueChanges.subscribe(() => {
+      control.valueChanges.pipe(
+        takeUntilDestroyed(this.destroyRef)
+      ).subscribe(() => {
         this.updateValidators(true, trigger);
       });
     }
-    this.configForm().valueChanges.subscribe((updated: RuleNodeConfiguration) => {
+    this.configForm().valueChanges.pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe((updated: RuleNodeConfiguration) => {
       this.onConfigurationChanged(updated);
     });
   }
@@ -332,7 +337,7 @@ export interface RuleNodeComponentDescriptor extends ComponentDescriptor {
   configurationDescriptor?: RuleNodeConfigurationDescriptor;
 }
 
-export interface FcRuleNodeType extends FcNode {
+export interface FcRuleNodeType extends FcNode, HasEntityDebugSettings {
   component?: RuleNodeComponentDescriptor;
   singletonMode?: boolean;
   queueName?: string;
@@ -345,7 +350,6 @@ export interface FcRuleNode extends FcRuleNodeType {
   ruleNodeId?: RuleNodeId;
   additionalInfo?: any;
   configuration?: RuleNodeConfiguration;
-  debugMode?: boolean;
   error?: string;
   highlighted?: boolean;
   componentClazz?: string;

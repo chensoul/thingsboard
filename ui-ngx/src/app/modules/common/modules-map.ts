@@ -160,7 +160,6 @@ import * as MaterialIconsDialogComponent from '@shared/components/dialog/materia
 import * as ColorInputComponent from '@shared/components/color-input.component';
 import * as MaterialIconSelectComponent from '@shared/components/material-icon-select.component';
 import * as NodeScriptTestDialogComponent from '@shared/components/dialog/node-script-test-dialog.component';
-import * as JsonFormComponent from '@shared/components/json-form/json-form.component';
 import * as NotificationComponent from '@shared/components/notification/notification.component';
 import * as TemplateAutocompleteComponent from '@shared/components/notification/template-autocomplete.component';
 import * as ImageInputComponent from '@shared/components/image-input.component';
@@ -331,11 +330,14 @@ import * as AssetProfileComponent from '@home/components/profile/asset-profile.c
 import * as AssetProfileDialogComponent from '@home/components/profile/asset-profile-dialog.component';
 import * as AssetProfileAutocompleteComponent from '@home/components/profile/asset-profile-autocomplete.component';
 import * as RuleChainSelectComponent from '@shared/components/rule-chain/rule-chain-select.component';
+import * as TimezoneComponent from '@shared/components/time/timezone.component';
+import * as TimezonePanelComponent from '@shared/components/time/timezone-panel.component';
+import * as DatapointsLimitComponent from '@shared/components/time/datapoints-limit.component';
+import * as AggregationTypeSelectComponent from '@shared/components/time/aggregation/aggregation-type-select.component';
+import * as AggregationOptionsConfigComponent from '@shared/components/time/aggregation/aggregation-options-config-panel.component';
+import * as IntervalOptionsConfigPanelComponent from '@shared/components/time/interval-options-config-panel.component';
 
 import { IModulesMap } from '@modules/common/modules-map.models';
-import { TimezoneComponent } from '@shared/components/time/timezone.component';
-import { TimezonePanelComponent } from '@shared/components/time/timezone-panel.component';
-import { DatapointsLimitComponent } from '@shared/components/time/datapoints-limit.component';
 import { Observable, map, of } from 'rxjs';
 import { getFlexLayout } from '@shared/legacy/flex-layout.models';
 import { isJSResourceUrl } from '@shared/public-api';
@@ -470,7 +472,10 @@ class ModulesMap implements IModulesMap {
     '@shared/components/time/timezone-select.component': TimezoneSelectComponent,
     '@shared/components/time/timezone.component': TimezoneComponent,
     '@shared/components/time/timezone-panel.component': TimezonePanelComponent,
-    '@shared/components/time/datapoints-limit': DatapointsLimitComponent,
+    '@shared/components/time/datapoints-limit.component': DatapointsLimitComponent,
+    '@shared/components/time/aggregation/aggregation-type-select.component': AggregationTypeSelectComponent,
+    '@shared/components/time/aggregation/aggregation-options-config-panel.component': AggregationOptionsConfigComponent,
+    '@shared/components/time/interval-options-config-panel.component': IntervalOptionsConfigPanelComponent,
     '@shared/components/value-input.component': ValueInputComponent,
     '@shared/components/dashboard-autocomplete.component': DashboardAutocompleteComponent,
     '@shared/components/entity/entity-subtype-autocomplete.component': EntitySubTypeAutocompleteComponent,
@@ -501,7 +506,6 @@ class ModulesMap implements IModulesMap {
     '@shared/components/color-input.component': ColorInputComponent,
     '@shared/components/material-icon-select.component': MaterialIconSelectComponent,
     '@shared/components/dialog/node-script-test-dialog.component': NodeScriptTestDialogComponent,
-    '@shared/components/json-form/json-form.component': JsonFormComponent,
     '@shared/components/notification/notification.component': NotificationComponent,
     '@shared/components/notification/template-autocomplete.component': TemplateAutocompleteComponent,
     '@shared/components/image-input.component': ImageInputComponent,
