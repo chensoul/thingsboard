@@ -1,5 +1,5 @@
 ///
-/// Copyright © 2016-2024 The Thingsboard Authors
+/// Copyright © 2016-2025 The Thingsboard Authors
 ///
 /// Licensed under the Apache License, Version 2.0 (the "License");
 /// you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ import {
 } from '@home/components/widget/lib/scada/scada-symbol.models';
 import { IAliasController } from '@core/api/widget-api.models';
 import { TargetDevice, widgetType } from '@shared/models/widget.models';
-import { mergeDeep } from '@core/utils';
+import { isDefinedAndNotNull, mergeDeepIgnoreArray } from '@core/utils';
 import {
   ScadaSymbolBehaviorGroup,
   toBehaviorGroups
@@ -207,7 +207,7 @@ export class ScadaSymbolObjectSettingsComponent implements OnInit, OnChanges, Co
   private setupValue() {
     if (this.metadata) {
       const defaults = defaultScadaSymbolObjectSettings(this.metadata);
-      this.modelValue = mergeDeep<ScadaSymbolObjectSettings>(defaults, this.modelValue);
+      this.modelValue = mergeDeepIgnoreArray<ScadaSymbolObjectSettings>(defaults, this.modelValue);
       this.scadaSymbolObjectSettingsFormGroup.patchValue(
         this.modelValue, {emitEvent: false}
       );

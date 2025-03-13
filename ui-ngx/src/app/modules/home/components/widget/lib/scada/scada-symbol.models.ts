@@ -1,5 +1,5 @@
 ///
-/// Copyright © 2016-2024 The Thingsboard Authors
+/// Copyright © 2016-2025 The Thingsboard Authors
 ///
 /// Licensed under the Apache License, Version 2.0 (the "License");
 /// you may not use this file except in compliance with the License.
@@ -52,6 +52,7 @@ import {
   isUndefined,
   isUndefinedOrNull,
   mergeDeep,
+  mergeDeepIgnoreArray,
   parseFunction
 } from '@core/utils';
 import { BehaviorSubject, forkJoin, Observable, Observer, of, Subject } from 'rxjs';
@@ -516,7 +517,7 @@ export class ScadaSymbolObject {
     const doc: XMLDocument = new DOMParser().parseFromString(this.svgContent, 'image/svg+xml');
     this.metadata = parseScadaSymbolMetadataFromDom(doc);
     const defaults = defaultScadaSymbolObjectSettings(this.metadata);
-    this.settings = mergeDeep<ScadaSymbolObjectSettings>({} as ScadaSymbolObjectSettings,
+    this.settings = mergeDeepIgnoreArray<ScadaSymbolObjectSettings>({} as ScadaSymbolObjectSettings,
       defaults, this.inputSettings || {} as ScadaSymbolObjectSettings);
     this.prepareMetadata();
     this.prepareSvgShape(doc);
