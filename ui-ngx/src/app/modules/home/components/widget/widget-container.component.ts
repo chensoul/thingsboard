@@ -44,11 +44,11 @@ import { GridsterItemComponent } from 'angular-gridster2';
 import { UtilsService } from '@core/services/utils.service';
 import { from } from 'rxjs';
 import { DashboardUtilsService } from '@core/services/dashboard-utils.service';
-import ITooltipsterInstance = JQueryTooltipster.ITooltipsterInstance;
-import ITooltipsterGeoHelper = JQueryTooltipster.ITooltipsterGeoHelper;
 import { TbContextMenuEvent } from '@shared/models/jquery-event.models';
 import { WidgetHeaderActionButtonType } from '@shared/models/widget.models';
 import ITooltipsterInstance = JQueryTooltipster.ITooltipsterInstance;
+import ITooltipsterGeoHelper = JQueryTooltipster.ITooltipsterGeoHelper;
+import { WidgetComponent } from '@home/components/widget/widget.component';
 
 export enum WidgetComponentActionType {
   MOUSE_DOWN,
@@ -215,6 +215,12 @@ export class WidgetContainerComponent extends PageComponent implements OnInit, O
       event,
       actionType: WidgetComponentActionType.MOUSE_DOWN
     });
+  }
+
+  widgetActionAbsolute(widgetComponent: WidgetComponent, absolute = false) {
+    return absolute ? true :
+      !(this.widget.showWidgetTitlePanel && !widgetComponent.widgetContext?.embedTitlePanel &&
+        (this.widget.showTitle||this.widget.hasAggregation)) && !widgetComponent.widgetContext?.embedActionsPanel;
   }
 
   onClicked(event: MouseEvent): void {
