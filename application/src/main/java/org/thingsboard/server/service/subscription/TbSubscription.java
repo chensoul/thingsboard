@@ -15,8 +15,8 @@
  */
 package org.thingsboard.server.service.subscription;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.thingsboard.server.common.data.id.EntityId;
 import org.thingsboard.server.common.data.id.TenantId;
 
@@ -24,11 +24,8 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 
 @Data
-@AllArgsConstructor
+@RequiredArgsConstructor
 public abstract class TbSubscription<T> {
-
-    /** Cache the hash code */
-    private transient int hash; // Default to 0. The hash code calculated for this object likely never be zero
 
     private final String serviceId;
     private final String sessionId;
@@ -37,6 +34,8 @@ public abstract class TbSubscription<T> {
     private final EntityId entityId;
     private final TbSubscriptionType type;
     private final BiConsumer<TbSubscription<T>, T> updateProcessor;
+    /** Cache the hash code */
+    private transient int hash; // Default to 0. The hash code calculated for this object likely never be zero
 
     @Override
     public boolean equals(Object o) {
