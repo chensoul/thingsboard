@@ -13,28 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.thingsboard.server.queue.discovery;
+package org.thingsboard.server.common.data.notification.info;
 
-import org.thingsboard.server.common.msg.queue.ServiceType;
-import org.thingsboard.server.gen.transport.TransportProtos.ServiceInfo;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.Set;
-import java.util.UUID;
+import java.util.Map;
 
-public interface TbServiceInfoProvider {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class ResourcesShortageNotificationInfo implements RuleOriginatedNotificationInfo {
 
-    String getServiceId();
+    private String resource;
+    private Long usage;
 
-    String getServiceType();
-
-    ServiceInfo getServiceInfo();
-
-    boolean isService(ServiceType serviceType);
-
-    ServiceInfo generateNewServiceInfoWithCurrentSystemInfo();
-
-    Set<UUID> getAssignedTenantProfiles();
-
-    boolean setReady(boolean ready);
+    @Override
+    public Map<String, String> getTemplateData() {
+        return Map.of(
+                "resource", resource,
+                "usage", String.valueOf(usage)
+        );
+    }
 
 }
