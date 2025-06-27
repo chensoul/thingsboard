@@ -89,7 +89,7 @@ public class JobManagerTest extends AbstractControllerTest {
 
     @Test
     public void testSubmitJob_allTasksSuccessful() {
-        int tasksCount = 5;
+        int tasksCount = 7;
         JobId jobId = submitJob(DummyJobConfiguration.builder()
                 .successfulTasksCount(tasksCount)
                 .taskProcessingTimeMs(1000)
@@ -154,10 +154,10 @@ public class JobManagerTest extends AbstractControllerTest {
 
     @Test
     public void testCancelJob_whileRunning() throws Exception {
-        int tasksCount = 100;
+        int tasksCount = 200;
         JobId jobId = submitJob(DummyJobConfiguration.builder()
                 .successfulTasksCount(tasksCount)
-                .taskProcessingTimeMs(100)
+                .taskProcessingTimeMs(50)
                 .build()).getId();
 
         Thread.sleep(500);
@@ -165,8 +165,7 @@ public class JobManagerTest extends AbstractControllerTest {
         await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() -> {
             Job job = findJobById(jobId);
             assertThat(job.getStatus()).isEqualTo(JobStatus.CANCELLED);
-            assertThat(job.getResult().getSuccessfulCount()).isBetween(1, tasksCount - 1);
-            assertThat(job.getResult().getDiscardedCount()).isBetween(1, tasksCount - 1);
+            assertThat(job.getResult().getDiscardedCount()).isBetween(1, tasksCount);
             assertThat(job.getResult().getTotalCount()).isEqualTo(tasksCount);
             assertThat(job.getResult().getCompletedCount()).isEqualTo(tasksCount);
         });

@@ -1069,7 +1069,7 @@
         "delete-multiple-title": "Are you sure you want to delete { count, plural, =1 {1 calculated field} other {# calculated fields} }?",
         "delete-multiple-text": "Be careful, after the confirmation all selected calculated fields will be removed and all related data will become unrecoverable.",
         "test-with-this-message": "Test with this message",
-        "use-message-timestamp": "Use message timestamp",
+        "use-latest-timestamp": "Use latest timestamp",
         "hint": {
             "arguments-simple-with-rolling": "Simple type calculated field should not contain keys with time series rolling type.",
             "arguments-empty": "Arguments should not be empty.",
@@ -1086,7 +1086,7 @@
             "decimals-range": "Decimals by default should be a number between 0 and 15.",
             "expression": "Default expression demonstrates how to transform a temperature from Fahrenheit to Celsius.",
             "arguments-entity-not-found": "Argument target entity not found.",
-            "use-message-timestamp": "If enabled, the calculated value will be persisted using the timestamp of the telemetry that triggered the calculation, instead of the server time."
+            "use-latest-timestamp": "If enabled, the calculated value will be persisted using the most recent timestamp from the arguments telemetry, instead of the server time."
         }
     },
     "confirm-on-exit": {
@@ -2584,6 +2584,8 @@
         "type-tb-resources": "Resources",
         "list-of-tb-resources": "{ count, plural, =1 {One resource} other {List of # resources} }",
         "type-ota-package": "OTA package",
+        "type-ota-packages": "OTA packages",
+        "list-of-ota-packages": "{ count, plural, =1 {One OTA package} other {List of # OTA packages} }",
         "type-rpc": "RPC",
         "type-queue": "Queue",
         "type-queue-stats": "Queue statistics",
@@ -3442,6 +3444,7 @@
             "power-button-background": "Power button background",
             "value-box-background": "Value box background",
             "value-units": "Value units",
+            "enable-units-scale": "Enable units on scale",
             "filtration-mode": "Filtration mode",
             "filtration-mode-hint": "Integer value indication the current filtration mode.",
             "filtration-mode-update": "Filtration mode update state",
@@ -3963,6 +3966,7 @@
         "input-fields-support-templatization": "Input fields support templatization.",
         "link": "Link",
         "link-required": "Link is required",
+        "link-max-length": "Link should be less than or equal to {{ length }} characters",
         "link-type": {
             "dashboard": "Open dashboard",
             "link": "Open URL link"
@@ -4167,6 +4171,7 @@
       "checksum-copied-message": "Package checksum has been copied to clipboard",
       "change-firmware": "Change of the firmware may cause update of { count, plural, =1 {1 device} other {# devices} }.",
       "change-software": "Change of the software may cause update of { count, plural, =1 {1 device} other {# devices} }.",
+      "change-ota-setting-title": "Are you sure you want to change OTA settings?",
       "chose-compatible-device-profile": "The uploaded package will be available only for devices with the chosen profile.",
       "chose-firmware-distributed-device": "Choose firmware that will be distributed to the devices",
       "chose-software-distributed-device": "Choose software that will be distributed to the devices",
@@ -5883,7 +5888,7 @@
         "date": "Date",
         "show-date-time-interval": "Show date time interval",
         "show-date-time-interval-hint": "Show date time interval according to the data aggregation.",
-        "hide-zero-false-tooltip-values": "Hide zero/false values",
+        "hide-zero-tooltip-values": "Hide zero values",
         "background-color": "Background color",
         "background-blur": "Background blur"
     },
@@ -6121,6 +6126,8 @@
         "electron-volts": "Electron volts",
         "joules-per-coulomb": "Joules per Coulomb",
         "british-thermal-unit": "British Thermal Units",
+        "thousand-british-thermal-unit": "Thousand British Thermal Units",
+        "million-british-thermal-unit": "Million British Thermal Units",
         "foot-pound": "Foot-pound",
         "calorie": "Calorie",
         "small-calorie": "Small Calorie",
@@ -6151,8 +6158,15 @@
         "watt-per-square-inch": "Watts per square inch",
         "kilowatt-per-square-inch": "Kilowatts per square inch",
         "horsepower": "Horsepower",
-        "btu-per-hour": "British thermal units/hour",
-        "btu-per-second": "British thermal units/second",
+        "btu-per-hour": "British thermal units per hour",
+        "btu-per-second": "British thermal units per second",
+        "btu-per-day": "British thermal units per day",
+        "mbtu-per-hour": "Thousand British thermal units per hour",
+        "mbtu-per-second": "Thousand British thermal units per second",
+        "mbtu-per-day": "Thousand British thermal units per day",
+        "mmbtu-per-hour": "Million British thermal units per hour",
+        "mmbtu-per-second": "Million British thermal units per second",
+        "mmbtu-per-day": "Million British thermal units per day",
         "foot-pound-per-second": "foot-pound per second",
         "coulomb": "Coulomb",
         "millicoulomb": "Millicoulombs",
