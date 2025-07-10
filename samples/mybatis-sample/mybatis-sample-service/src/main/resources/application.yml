@@ -1,0 +1,130 @@
+#
+# Copyright © 2016-2025 The Thingsboard Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+server.port: 8080
+server.error.include-message: always
+
+server.shutdown: graceful
+spring.lifecycle.timeout-per-shutdown-phase: 20s
+
+spring:
+  application:
+    name: chensoul-system-service
+  main:
+    allow-bean-definition-overriding: true
+    allow-circular-references: true
+    keep-alive: true # ensures JVM is kept alive, even if all threads are virtual threads https://docs.spring.io/spring-boot/docs/3.2.0/reference/htmlsingle/#features.spring-application.virtual-threads
+  threads:
+    virtual:
+      enabled: true
+#  web:
+#    resources:
+#      add-mappings: false # disable static content.
+#  mvc:
+#    log-resolved-exception: false # remove tomcat log exception since it is already treated in GlobalExceptionHandler
+
+
+spring.datasource:
+  driver-class-name: com.mysql.cj.jdbc.Driver
+  url: jdbc:mysql://localhost:3306/chensoul-cloud?connectTimeout=2000&socketTimeout=600000&allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
+  username: root
+  password: 123456
+  type: com.zaxxer.hikari.HikariDataSource
+  hikari:
+    minimum-idle: 8
+    maximum-pool-size: 16 #最大连接数：cpu核 * 2 + 磁盘数 + 10
+    connection-timeout: 30000 #等待连接池分配连接的最大时长，默认30秒
+    connection-test-query: 'SELECT 1'
+    idle-timeout: 12000 #最大连接数和最小连接数不等时有效
+
+spring.data.redis:
+  host: localhost
+  port: 6379
+  password:
+  timeout: 2000
+  lettuce:
+    pool:
+      max-active: 8
+      max-wait: -1
+      max-idle: 8
+      min-idle: 0
+  repositories:
+    enabled: false
+
+management:
+  info:
+    java.enabled: true
+    process.enabled: true
+    os.enabled: true
+    env.enabled: true
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: info, metrics, sbom, flyway, preStopHook, prometheus
+
+# Audit log parameters
+audit-log:
+  # Enable/disable audit log functionality.
+  enabled: "${AUDIT_LOG_ENABLED:true}"
+  # Logging levels per each entity type.
+  # Allowed values: OFF (disable), W (log write operations), RW (log read and write operations)
+  logging-level:
+    mask:
+      "user": "${AUDIT_LOG_MASK_USER:W}" # User logging levels. Allowed values: OFF (disable), W (log write operations), RW (log read and write operation
+  sink:
+    # Type of external sink. possible options: none, elasticsearch
+    type: "${AUDIT_LOG_SINK_TYPE:none}"
+    # Name of the index where audit logs are stored
+    # Index name could contain next placeholders (not mandatory):
+    # @{TENANT} - substituted by tenant ID
+    # @{DATE} - substituted by current date in format provided in audit_log.sink.date_format
+    index_pattern: "${AUDIT_LOG_SINK_INDEX_PATTERN:@{TENANT}_AUDIT_LOG_@{DATE}}"
+    # Date format. Details of the pattern can be found here:
+    # https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html
+    date_format: "${AUDIT_LOG_SINK_DATE_FORMAT:YYYY.MM.dd}"
+    scheme_name: "${AUDIT_LOG_SINK_SCHEME_NAME:http}" # http or https
+    host: "${AUDIT_LOG_SINK_HOST:localhost}" # Host of external sink system
+    port: "${AUDIT_LOG_SINK_PORT:9200}" # Port of external sink system
+    user_name: "${AUDIT_LOG_SINK_USER_NAME:}" # Username used to access external sink system
+    password: "${AUDIT_LOG_SINK_PASSWORD:}" # Password used to access external sink system
+
+security:
+  # Enable/disable access to Tenant Administrators JWT token by System Administrator or Customer Users JWT token by Tenant Administrator
+  user_token_access_enabled: "${SECURITY_USER_TOKEN_ACCESS_ENABLED:true}"
+  # Enable/disable case-sensitive username login
+  user_login_case_sensitive: "${SECURITY_USER_LOGIN_CASE_SENSITIVE:true}"
+  claim:
+    # Enable/disable claiming devices; if false -> the device's [claimingAllowed] SERVER_SCOPE attribute must be set to [true] to allow claiming the specific device
+    allowClaimingByDefault: "${SECURITY_CLAIM_ALLOW_CLAIMING_BY_DEFAULT:true}"
+    # Time allowed to claim the device in milliseconds
+    duration: "${SECURITY_CLAIM_DURATION:86400000}" # 1 minute, note this value must equal claimDevices.timeToLiveInMinutes value
+  basic:
+    # Enable/Disable basic security options
+    enabled: "${SECURITY_BASIC_ENABLED:false}"
+  oauth2:
+    # Redirect URL where access code from external user management system will be processed
+    loginProcessingUrl: "${SECURITY_OAUTH2_LOGIN_PROCESSING_URL:/login/oauth2/code/}"
+    githubMapper:
+      # The email addresses that will be mapped from the URL
+      emailUrl: "${SECURITY_OAUTH2_GITHUB_MAPPER_EMAIL_URL_KEY:https://api.github.com/user/emails}"
+  java_cacerts:
+    # CA certificates keystore default path. Typically this keystore is at JAVA_HOME/lib/security/cacerts
+    path: "${SECURITY_JAVA_CACERTS_PATH:${java.home}/lib/security/cacerts}"
+    # The password of the cacerts keystore file
+    password: "${SECURITY_JAVA_CACERTS_PASSWORD:changeit}"
